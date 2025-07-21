@@ -2,49 +2,45 @@
 import { useState, useEffect, useRef } from 'react';
 
 const videos = [
-  { src: '/public/niños0.mp4', title: 'Línea Niños', alt: 'Video 5' },
-  { src: '/public/daysport0.mp4', title: 'Colección Daysport', alt: 'Video 1' },
-  { src: '/public/daysport1.mp4', title: 'Colección Daysport', alt: 'Video 2' },
-  { src: '/public/mujer-corriendo-playa0.mp4', title: 'Línea Mujer', alt: 'Video 3' },
-  { src: '/public/natacion0.mp4', title: 'Línea Natación', alt: 'Video 4' },
+  { src: './public/daysport0.mp4', title: 'Colección Daysport' },
+  { src: './public/daysport1.mp4', title: 'Nueva Colección' },
+  { src: './public/mujer-corriendo-playa0.mp4', title: 'Línea Mujer' },
+  { src: './public/natacion0.mp4', title: 'Línea Natación' },
+  { src: './public/niños0.mp4', title: 'Línea Niños' }
 ];
 
 export default function VideoCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   // Inicializar referencias
   useEffect(() => {
-    videoRefs.current = videos.map((_, i) => videoRefs.current[i] ?? null);
+    videoRefs.current = new Array(videos.length);
   }, []);
 
-  // Control de reproducción
+  // Manejar la reproducción automática
   useEffect(() => {
     const video = videoRefs.current[currentIndex];
     if (video) {
-      if (isPlaying) {
-        video.play().catch(e => console.error("Error al reproducir:", e));
-      } else {
-        video.pause();
-      }
+      video.play().catch(e => console.error("Error al reproducir:", e));
     }
-  }, [currentIndex, isPlaying]);
+    
+    return () => {
+      if (video) video.pause();
+    };
+  }, [currentIndex]);
 
-  // Cambio automático de video
+  // Cambiar de video automáticamente
   useEffect(() => {
     const interval = setInterval(() => {
-      if (isPlaying) {
-        setCurrentIndex((prev) => (prev + 1) % videos.length);
-      }
+      setCurrentIndex((prev) => (prev + 1) % videos.length);
     }, 8000);
     return () => clearInterval(interval);
-  }, [isPlaying, videos.length]);
+  }, []);
 
-  function goToSlide(index: number) {
+  const goToSlide = (index: number) => {
     setCurrentIndex(index);
-    setIsPlaying(true);
-  }
+  };
 
   return (
     <div className="relative h-[500px] overflow-hidden">
@@ -56,12 +52,14 @@ export default function VideoCarousel() {
             className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           >
             <video
-              ref={(el) => { videoRefs.current[index] = el; }}
-              autoPlay
+              ref={(el: HTMLVideoElement | null) => {
+                videoRefs.current[index] = el;
+              }}
               muted
               loop
               playsInline
               className="absolute inset-0 w-full h-full object-cover"
+              preload="auto"
             >
               <source src={video.src} type="video/mp4" />
               Tu navegador no soporta videos HTML5.
@@ -90,10 +88,7 @@ export default function VideoCarousel() {
 
       {/* Botones de navegación */}
       <button
-        onClick={() => {
-          setCurrentIndex((prev) => (prev - 1 + videos.length) % videos.length);
-          setIsPlaying(true);
-        }}
+        onClick={() => goToSlide((currentIndex - 1 + videos.length) % videos.length)}
         className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
         aria-label="Video anterior"
       >
@@ -102,10 +97,7 @@ export default function VideoCarousel() {
         </svg>
       </button>
       <button
-        onClick={() => {
-          setCurrentIndex((prev) => (prev + 1) % videos.length);
-          setIsPlaying(true);
-        }}
+        onClick={() => goToSlide((currentIndex + 1) % videos.length)}
         className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
         aria-label="Siguiente video"
       >
