@@ -45,10 +45,10 @@ export default function VideoCarousel() {
     return () => clearInterval(interval);
   }, [isPlaying, videos.length]);
 
-  function goToSlide(index: number) {
+  const goToSlide = (index: number) => {
     setCurrentIndex(index);
     setIsPlaying(true);
-  }
+  };
 
   return (
     <div className="relative h-[500px] overflow-hidden">
