@@ -6,6 +6,7 @@ export default async function Home() {
   const womenProducts = await getFeaturedProducts('mujer');
   const menProducts = await getFeaturedProducts('hombre');
   const kidsProducts = await getFeaturedProducts('niños');
+  const accessoriesProducts = await getFeaturedProducts('accesorios');
 
   return (
     <>
