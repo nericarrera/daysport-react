@@ -33,7 +33,7 @@ export default function Navbar() {
             {/* Logo - Siempre a la izquierda */}
             <Link href="/" className="flex-shrink-0 order-first">
               <Image
-                src="/daysport-transparente-01.png"
+                src="/daysport-transparente-02.png"
                 alt="Daysport Logo"
                 width={120}
                 height={40}
