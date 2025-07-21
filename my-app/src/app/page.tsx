@@ -30,7 +30,7 @@ export default async function Home() {
 
       {/* Slogan */}
       <div className="py-8 text-center bg-gray-100">
-        <p className="text-2xl font-light italic">"MAKES A DIFFERENCE"</p>
+        <p className="text-2xl font-light">make a difference</p>
       </div>
 
       {/* Carruseles de productos */}
