@@ -1,5 +1,6 @@
 import ProductCarousel from './components/ProductCarousel';
 import { getFeaturedProducts } from './components/Product';
+import VideoCarousel from './components/VideoCarousel';
 
 export default async function Home() {
   // En un proyecto real, estos datos podrían venir de una API o CMS
@@ -10,28 +11,12 @@ export default async function Home() {
 
   return (
     <>
-      {/* Banner Hero */}
-      <div className="relative h-[500px] overflow-hidden">
-        <video 
-          autoPlay 
-          muted 
-          loop 
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/daysport0.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="text-center text-white px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Tu mejor compra está aquí</h1>
-            <p className="text-xl">Descubre ofertas y productos exclusivos</p>
-          </div>
-        </div>
-      </div>
+      {/* Reemplazamos el banner hero estático por el VideoCarousel */}
+      <VideoCarousel />
 
       {/* Slogan */}
       <div className="py-8 text-center bg-black text-yellow-400">
-        <p className="text-4xl font-light ">MAKE A DIFFERENCE</p>
+        <p className="text-4xl font-light">MAKE A DIFFERENCE</p>
       </div>
 
       {/* Carruseles de productos */}
@@ -39,7 +24,7 @@ export default async function Home() {
         <ProductCarousel title="Novedades Mujer" products={womenProducts} />
         <ProductCarousel title="Novedades Hombre" products={menProducts} />
         <ProductCarousel title="Novedades Niños" products={kidsProducts} />
-        <ProductCarousel title="Novedades Accesorios" products={[]} />
+        <ProductCarousel title="Novedades Accesorios" products={accessoriesProducts} />
       </div>
 
       {/* Banner promocional */}
