@@ -2,11 +2,11 @@
 import { useState, useEffect, useRef } from 'react';
 
 const videos = [
-  { src: '/videos/daysport0.mp4', title: 'Colección Daysport', alt: 'Video 1' },
-  { src: '/videos/daysport1.mp4', title: 'Colección Daysport', alt: 'Video 2' },
-  { src: '/videos/mujer-corriendo-playa0.mp4', title: 'Línea Mujer', alt: 'Video 3' },
-  { src: '/videos/natacion0.mp4', title: 'Línea Natación', alt: 'Video 4' },
-  { src: '/videos/niños0.mp4', title: 'Línea Niños', alt: 'Video 5' },
+  { src: '/public/niños0.mp4', title: 'Línea Niños', alt: 'Video 5' },
+  { src: '/public/daysport0.mp4', title: 'Colección Daysport', alt: 'Video 1' },
+  { src: '/public/daysport1.mp4', title: 'Colección Daysport', alt: 'Video 2' },
+  { src: '/public/mujer-corriendo-playa0.mp4', title: 'Línea Mujer', alt: 'Video 3' },
+  { src: '/public/natacion0.mp4', title: 'Línea Natación', alt: 'Video 4' },
 ];
 
 export default function VideoCarousel() {
@@ -41,10 +41,10 @@ export default function VideoCarousel() {
     return () => clearInterval(interval);
   }, [isPlaying, videos.length]);
 
-  const goToSlide = (index: number) => {
+  function goToSlide(index: number) {
     setCurrentIndex(index);
     setIsPlaying(true);
-  };
+  }
 
   return (
     <div className="relative h-[500px] overflow-hidden">
