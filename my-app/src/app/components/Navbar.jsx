@@ -1,6 +1,6 @@
 // components/Navbar.js
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -8,6 +8,22 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [cartItemsCount, setCartItemsCount] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef(null);
+
+  // Cerrar el buscador al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Detect mobile view
   useEffect(() => {
@@ -28,7 +44,7 @@ export default function Navbar() {
 
       {/* Main navbar */}
       <nav className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 pl-6">
           <div className="flex justify-between items-center h-16">
             {/* Mobile menu button */}
             {isMobileView && (
@@ -56,11 +72,11 @@ export default function Navbar() {
             {isMobileView && (
               <Link href="/" className="mx-auto">
                 <Image
-                  src="/daysport-transparente-01.png"
+                  src="/daysport-transparente-02.png"
                   alt="Daysport Logo"
                   width={120}
                   height={40}
-                  className="h-10 w-auto"
+                  className="h-18 w-18"
                 />
               </Link>
             )}
@@ -71,46 +87,61 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex-shrink-0">
                   <Image
-                    src="/daysport-transparente-01.png"
+                    src="/daysport-transparente-02.png"
                     alt="Daysport Logo"
                     width={120}
                     height={40}
-                    className="h-10 w-auto"
+                    className="h-18 w-18"
                   />
                 </Link>
 
                 {/* Menú central */}
                 <div className="flex-1 flex justify-center px-4">
-                  <div className="flex space-x-6">
-                    <Link href="/mujer" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium whitespace-nowrap">
+                  <div className="flex space-x-6 text-left">
+                    <Link href="/mujer" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
                       MUJER
                     </Link>
-                    <Link href="/hombre" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium whitespace-nowrap">
+                    <Link href="/hombre" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
                       HOMBRE
                     </Link>
-                    <Link href="/ninos" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium whitespace-nowrap">
+                    <Link href="/ninos" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
                       NIÑOS
                     </Link>
-                    <Link href="/accesorios" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium whitespace-nowrap">
+                    <Link href="/accesorios" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
                       ACCESORIOS
                     </Link>
                   </div>
                 </div>
 
-                {/* Barra de búsqueda */}
-                <div className="w-64 mx-4">
-                  <input
-                    type="text"
-                    placeholder="Buscar productos..."
-                    className="w-full px-4 py-1 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Iconos */}
+                {/* Barra de búsqueda desplegable */}
                 <div className="flex items-center space-x-4">
+                  <div className="relative" ref={searchRef}>
+                    {/* Icono de búsqueda */}
+                    <button 
+                      onClick={() => setSearchOpen(!searchOpen)}
+                      className="text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </button>
+                    
+                    {/* Input de búsqueda (se muestra cuando searchOpen es true) */}
+                    {searchOpen && (
+                      <div className="absolute right-0 top-full mt-1 w-64 bg-purple-950 shadow-lg rounded-md p-2 z-10">
+                        <input
+                          type="text"
+                          placeholder="Buscar productos..."
+                          className="text-black w-full px-4 py-2 rounded-full border bg-amber-50 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          autoFocus
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   {/* Cart */}
                   <div className="relative">
-                    <button className="p-2">
+                    <button className=" text-black">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
@@ -123,8 +154,8 @@ export default function Navbar() {
                   </div>
 
                   {/* User */}
-                  <button className="p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <button className="p-1 text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-2" fill="none" viewBox="0 0 22 22" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </button>
@@ -136,7 +167,10 @@ export default function Navbar() {
             {isMobileView && (
               <div className="flex items-center space-x-4">
                 {/* Search icon */}
-                <button className="p-2">
+                <button 
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  className="p-2 text-black" 
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -144,7 +178,7 @@ export default function Navbar() {
 
                 {/* Cart */}
                 <div className="relative">
-                  <button className="p-2">
+                  <button className="p-2 text-black">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -177,6 +211,18 @@ export default function Navbar() {
                 ACCESORIOS
               </Link>
             </div>
+          </div>
+        )}
+
+        {/* Mobile search (se muestra cuando searchOpen es true) */}
+        {isMobileView && searchOpen && (
+          <div className="md:hidden bg-white p-4 text-center">
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              className="justify-center text-center w-medium px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+              autoFocus
+            />
           </div>
         )}
       </nav>
