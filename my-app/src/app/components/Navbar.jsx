@@ -22,7 +22,7 @@ export default function Navbar() {
   return (
     <>
       {/* Top banner */}
-      <div className="bg-black color-yellow text-center py-2 text-sm">
+      <div className="bg-black text-yellow-400 text-center py-2 text-sm">
         ENVIOS A TODO EL PAIS !
       </div>
 
@@ -30,11 +30,22 @@ export default function Navbar() {
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
+            {/* Logo - Siempre a la izquierda */}
+            <Link href="/" className="flex-shrink-0 order-first">
+              <Image
+                src="/daysport-transparente-01.png"
+                alt="Daysport Logo"
+                width={120}
+                height={40}
+                className="h-10 w-auto"
+              />
+            </Link>
+
             {/* Mobile menu button */}
             {isMobileView && (
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden p-2 rounded-md focus:outline-none"
+                className="md:hidden p-2 rounded-md focus:outline-none ml-auto"
               >
                 <svg
                   className="h-6 w-6"
@@ -52,50 +63,26 @@ export default function Navbar() {
               </button>
             )}
 
-            {/* Logo - Mobile */}
-            {isMobileView && (
-              <Link href="/" className="flex-shrink-0">
-                <Image
-                  src="daysport-transparente-01.png"
-                  alt="Daysport Logo"
-                  width={40}
-                  height={40}
-                  className="h-10 w-auto"
-                />
-              </Link>
-            )}
-
-            {/* Desktop menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/mujer" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
-                MUJER
-              </Link>
-              <Link href="/hombre" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
-                HOMBRE
-              </Link>
-              <Link href="/ninos" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
-                NIÑOS
-              </Link>
-                <Link href="/accesorios" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
-                    ACCESORIOS
+            {/* Desktop menu - Centrado */}
+            <div className="hidden md:flex items-center justify-center flex-1 mx-4">
+              <div className="flex space-x-8">
+                <Link href="/mujer" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
+                  MUJER
                 </Link>
+                <Link href="/hombre" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
+                  HOMBRE
+                </Link>
+                <Link href="/ninos" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
+                  NIÑOS
+                </Link>
+                <Link href="/accesorios" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
+                  ACCESORIOS
+                </Link>
+              </div>
             </div>
 
-            {/* Logo - Desktop */}
-            {!isMobileView && (
-              <Link href="/" className="flex-shrink-0">
-                <Image
-                  src="/img/logo/Copilot_20250623_112142.png"
-                  alt="Daysport Logo"
-                  width={60}
-                  height={60}
-                  className="h-15 w-auto"
-                />
-              </Link>
-            )}
-
-            {/* Icons */}
-            <div className="flex items-center space-x-4">
+            {/* Icons - Siempre a la derecha */}
+            <div className="flex items-center space-x-4 order-last">
               {/* Search */}
               <div className="relative">
                 <input
