@@ -2,25 +2,36 @@
 import { useState, useEffect, useRef } from 'react';
 
 const videos = [
-    {src: './daysport0.mp4', title: 'Coleccion daysport', alt: 'Video 1'},
-    {src: './daysport1.mp4', title: 'Coleccion daysport', alt: 'Video 2'},
-    {src: './mujer-corriendo-playa0.mp4', title: 'Coleccion daysport', alt: 'Video 3'},
-    {src: './natacion0.mp4', title: 'Coleccion daysport', alt: 'Video 4'},
-    {src: './niños0.mp4', title: 'Coleccion daysport', alt: 'Video 5'},
+  { src: '/videos/daysport0.mp4', title: 'Colección Daysport', alt: 'Video 1' },
+  { src: '/videos/daysport1.mp4', title: 'Colección Daysport', alt: 'Video 2' },
+  { src: '/videos/mujer-corriendo-playa0.mp4', title: 'Línea Mujer', alt: 'Video 3' },
+  { src: '/videos/natacion0.mp4', title: 'Línea Natación', alt: 'Video 4' },
+  { src: '/videos/niños0.mp4', title: 'Línea Niños', alt: 'Video 5' },
 ];
 
-export default function VideoCarousel(){
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(true);
-    const videoRef = useRef(null);
+export default function VideoCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-    useEffect(() => {
-        const video = videoRef.current[currentIndex];
-        if (video) {
-            isPlayinglay ? video.play() : video.pause();
-        }
-    }, [currentIndex, isPlaying]);
+  // Inicializar referencias
+  useEffect(() => {
+    videoRefs.current = videos.map((_, i) => videoRefs.current[i] ?? null);
+  }, []);
 
+  // Control de reproducción
+  useEffect(() => {
+    const video = videoRefs.current[currentIndex];
+    if (video) {
+      if (isPlaying) {
+        video.play().catch(e => console.error("Error al reproducir:", e));
+      } else {
+        video.pause();
+      }
+    }
+  }, [currentIndex, isPlaying]);
+
+  // Cambio automático de video
   useEffect(() => {
     const interval = setInterval(() => {
       if (isPlaying) {
@@ -28,9 +39,9 @@ export default function VideoCarousel(){
       }
     }, 8000);
     return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [isPlaying, videos.length]);
 
-  const goToSlide = (index) => {
+  const goToSlide = (index: number) => {
     setCurrentIndex(index);
     setIsPlaying(true);
   };
@@ -45,7 +56,7 @@ export default function VideoCarousel(){
             className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           >
             <video
-              ref={(el) => (videoRefs.current[index] = el)}
+              ref={(el) => { videoRefs.current[index] = el; }}
               autoPlay
               muted
               loop
@@ -53,6 +64,7 @@ export default function VideoCarousel(){
               className="absolute inset-0 w-full h-full object-cover"
             >
               <source src={video.src} type="video/mp4" />
+              Tu navegador no soporta videos HTML5.
             </video>
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
               <div className="text-center text-white px-4">
@@ -70,7 +82,7 @@ export default function VideoCarousel(){
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-yellow-400' : 'bg-white bg-opacity-50'}`}
+            className={`w-3 h-3 rounded-full transition-colors ${index === currentIndex ? 'bg-yellow-400' : 'bg-white bg-opacity-50'}`}
             aria-label={`Ir al video ${index + 1}`}
           />
         ))}
