@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
-import { useCart } from './Context/CartContext';
+import { useCart } from './CartContext';
 
 export default function ProductCarousel({ title, products }) {
   const [currentIndex, setCurrentIndex] = useState(0);
