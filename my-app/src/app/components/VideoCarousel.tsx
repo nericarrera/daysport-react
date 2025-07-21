@@ -2,11 +2,11 @@
 import { useState, useEffect, useRef } from 'react';
 
 const videos = [
-  { src: './videos/daysport0.mp4', title: 'Colección Daysport' },
-  { src: './videos/daysport1.mp4', title: 'Nueva Colección' },
-  { src: './videos/mujer-corriendo-playa0.mp4', title: 'Línea Mujer' },
-  { src: './videos/natacion0.mp4', title: 'Línea Natación' },
-  { src: './videos/niños0.mp4', title: 'Línea Niños' }
+  { src: '/videos/daysport0.mp4', title: 'Colección Daysport' },
+  { src: '/videos/daysport1.mp4', title: 'Nueva Colección' },
+  { src: '/videos/mujer-corriendo-playa0.mp4', title: 'Línea Mujer' },
+  { src: '/videos/natacion0.mp4', title: 'Línea Natación' },
+  { src: '/videos/niños0.mp4', title: 'Línea Niños' }
 ];
 
 export default function VideoCarousel() {
