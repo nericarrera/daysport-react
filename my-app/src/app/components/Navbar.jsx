@@ -22,7 +22,7 @@ export default function Navbar() {
   return (
     <>
       {/* Top banner */}
-      <div className="bg-black text-yellow text-center py-2 text-sm">
+      <div className="bg-black color-yellow text-center py-2 text-sm">
         ENVIOS A TODO EL PAIS !
       </div>
 
