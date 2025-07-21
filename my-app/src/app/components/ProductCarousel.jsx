@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import { useCart } from '../context/CartContext';
+import { useCart } from './components/CartContext';
 
 export default function ProductCarousel({ title, products }) {
   const [currentIndex, setCurrentIndex] = useState(0);
