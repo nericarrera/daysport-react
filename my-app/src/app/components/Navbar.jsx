@@ -56,7 +56,7 @@ export default function Navbar() {
             {isMobileView && (
               <Link href="/" className="flex-shrink-0">
                 <Image
-                  src="/img/logo/Copilot_20250623_112142.png"
+                  src="daysport-transparente-01.png"
                   alt="Daysport Logo"
                   width={40}
                   height={40}
@@ -76,6 +76,9 @@ export default function Navbar() {
               <Link href="/ninos" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
                 NIÑOS
               </Link>
+                <Link href="/accesorios" className="text-gray-800 hover:text-blue-600 px-3 py-2 font-medium">
+                    ACCESORIOS
+                </Link>
             </div>
 
             {/* Logo - Desktop */}
