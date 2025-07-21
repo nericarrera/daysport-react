@@ -29,8 +29,8 @@ export default async function Home() {
       </div>
 
       {/* Slogan */}
-      <div className="py-8 text-center bg-gray-100">
-        <p className="text-2xl font-light">make a difference</p>
+      <div className="py-8 text-center bg-black text-yellow-400">
+        <p className="text-4xl font-light ">MAKE A DIFFERENCE</p>
       </div>
 
       {/* Carruseles de productos */}
@@ -38,6 +38,7 @@ export default async function Home() {
         <ProductCarousel title="Novedades Mujer" products={womenProducts} />
         <ProductCarousel title="Novedades Hombre" products={menProducts} />
         <ProductCarousel title="Novedades Niños" products={kidsProducts} />
+        <ProductCarousel title="Novedades Accesorios" products={[]} />
       </div>
 
       {/* Banner promocional */}
