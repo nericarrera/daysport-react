@@ -35,9 +35,17 @@ export default async function Home() {
     ))}
   </div>
 </div>
-     
-        
-      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto px-4 my-8">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <img
+              src={`/img/banner/promo-${item}.jpg`}
+              alt={`Promoción ${item}`}
+              className="w-full h-auto"
+            />
+          </div>
+        ))}
+      </div>
     </>
   );
 }
