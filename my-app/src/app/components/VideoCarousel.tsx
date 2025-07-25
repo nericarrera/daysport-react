@@ -64,18 +64,7 @@ export default function VideoCarousel() {
 
   return (
     <div className="relative h-[500px] overflow-hidden bg-black">
-      {/* Estado de carga/error */}
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
-          <div className="text-white text-lg">Cargando video...</div>
-        </div>
-      )}
       
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
-          <div className="text-white text-lg">{error}</div>
-        </div>
-      )}
 
       {/* Videos */}
       <div className="relative w-full h-full">
