@@ -11,22 +11,42 @@ const videos = [
 
 export default function VideoCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  // Inicializar referencias
+  // Inicializar el array de referencias
   useEffect(() => {
-    videoRefs.current = new Array(videos.length);
+    videoRefs.current = videos.map(() => null);
   }, []);
 
   // Manejar la reproducción automática
   useEffect(() => {
-    const video = videoRefs.current[currentIndex];
-    if (video) {
-      video.play().catch(e => console.error("Error al reproducir:", e));
-    }
+    const currentVideoRef = videoRefs.current[currentIndex];
+    
+    const playVideo = async () => {
+      if (currentVideoRef) {
+        try {
+          setIsLoading(true);
+          await currentVideoRef.play();
+          setIsLoading(false);
+          setError(null);
+        } catch (err) {
+          console.error("Error al reproducir:", err);
+          setError("Error al cargar el video");
+          setIsLoading(false);
+        }
+      }
+    };
+
+    playVideo();
     
     return () => {
-      if (video) video.pause();
+      // Usamos la referencia capturada en el closure
+      if (currentVideoRef) {
+        currentVideoRef.pause();
+        currentVideoRef.currentTime = 0;
+      }
     };
   }, [currentIndex]);
 
@@ -43,23 +63,40 @@ export default function VideoCarousel() {
   };
 
   return (
-    <div className="relative h-[500px] overflow-hidden">
+    <div className="relative h-[500px] overflow-hidden bg-black">
+      {/* Estado de carga/error */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
+          <div className="text-white text-lg">Cargando video...</div>
+        </div>
+      )}
+      
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
+          <div className="text-white text-lg">{error}</div>
+        </div>
+      )}
+
       {/* Videos */}
       <div className="relative w-full h-full">
         {videos.map((video, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
           >
             <video
-              ref={(el: HTMLVideoElement | null) => {
+              ref={(el) => {
                 videoRefs.current[index] = el;
               }}
+              autoPlay
               muted
               loop
               playsInline
               className="absolute inset-0 w-full h-full object-cover"
               preload="auto"
+              onError={() => setError(`Error al cargar ${video.title}`)}
             >
               <source src={video.src} type="video/mp4" />
               Tu navegador no soporta videos HTML5.
@@ -80,7 +117,9 @@ export default function VideoCarousel() {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-colors ${index === currentIndex ? 'bg-yellow-400' : 'bg-white bg-opacity-50'}`}
+            className={`w-3 h-3 rounded-full transition-colors ${
+              index === currentIndex ? 'bg-yellow-400' : 'bg-white bg-opacity-50'
+            }`}
             aria-label={`Ir al video ${index + 1}`}
           />
         ))}
@@ -89,7 +128,7 @@ export default function VideoCarousel() {
       {/* Botones de navegación */}
       <button
         onClick={() => goToSlide((currentIndex - 1 + videos.length) % videos.length)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all z-20"
         aria-label="Video anterior"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +137,7 @@ export default function VideoCarousel() {
       </button>
       <button
         onClick={() => goToSlide((currentIndex + 1) % videos.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all z-20"
         aria-label="Siguiente video"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

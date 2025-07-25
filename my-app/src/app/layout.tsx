@@ -5,6 +5,7 @@ import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { CartProvider } from './components/CartContext';
+import VideoCarousel from './components/VideoCarousel';
 
 const inter = Inter({ subsets: ['latin'] });
 

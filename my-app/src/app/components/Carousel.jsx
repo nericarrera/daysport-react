@@ -1,19 +1,12 @@
 'use client';
-import { useState, ReactNode } from 'react';
-
-interface CarouselProps {
-  title?: string;
-  items: any[];
-  renderItem: (item: any) => ReactNode;
-  itemsToShow?: number;
-}
+import { useState } from 'react';
 
 export default function Carousel({
   title,
   items,
   renderItem,
   itemsToShow = 4
-}: CarouselProps) {
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const maxIndex = Math.max(items.length - itemsToShow, 0);
 
