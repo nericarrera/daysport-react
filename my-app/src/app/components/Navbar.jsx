@@ -362,7 +362,7 @@ const userMenuRef = useRef(null);
   {userMenuOpen && (
     <div className="fixed inset-0 bg-white text-black z-50 overflow-y-auto pt-16">
       <div className="p-4">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center p-2 mb-6">
           <h3 className="text-xl font-bold">
             {isLoggedIn ? 'Mi Cuenta' : 'Iniciar Sesión'}
           </h3>
@@ -381,21 +381,21 @@ const userMenuRef = useRef(null);
             <nav className="space-y-1 text-black">
               <Link 
                 href="/mi-cuenta" 
-                className="block py-3 px-0 text-black hover:bg-gray-300 rounded-lg"
+                className="block py-3 px-2 text-black hover:bg-gray-300 rounded-lg"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Mi Perfil
               </Link>
               <Link 
                 href="/mis-pedidos" 
-                className="block py-3 px-0 text-black hover:bg-gray-100 rounded-lg"
+                className="block py-3 px-2 text-black hover:bg-gray-100 rounded-lg"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Mis Pedidos
               </Link>
             </nav>
             <button 
-              className="w-full mt-6 py-3 px-0 bg-purple-800 text-white rounded-lg hover:bg-yellow-400"
+              className="w-full mt-6 py-3 px-2 bg-purple-800 text-white rounded-lg hover:bg-yellow-400"
               onClick={() => setIsLoggedIn(false)}
             >
               Cerrar Sesión
