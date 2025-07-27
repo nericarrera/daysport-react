@@ -9,9 +9,11 @@ export default async function Home() {
   const accessoriesProducts = await getFeaturedProducts('accesorios');
 
   return (
-    <>
-      {/* VideoCarousel como hero banner */}
-      <VideoCarousel />
+    <div className="bg-white">
+      {/* VideoCarousel como hero banner - contenedor principal */}
+      <div className="relative w-full h-[500px] overflow-hidden">
+        <VideoCarousel />
+      </div>
 
       {/* Slogan */}
       <div className="py-8 text-center bg-black text-yellow-400">
@@ -19,25 +21,14 @@ export default async function Home() {
       </div>
 
       {/* Carruseles de productos */}
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="bg-transparent mx-auto px-4">
         <ProductCarousel title="Novedades Mujer" products={womenProducts} />
         <ProductCarousel title="Novedades Hombre" products={menProducts} />
         <ProductCarousel title="Novedades Niños" products={kidsProducts} />
         <ProductCarousel title="Novedades Accesorios" products={accessoriesProducts} />
       </div>
 
-      {/* Banner promocional (imágenes) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto px-4 my-8">
-        {[1, 2, 3].map((item) => (
-          <div key={item} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-            <img
-              src={`/img/banner/promo-${item}.jpg`}
-              alt={`Promoción ${item}`}
-              className="w-full h-auto"
-            />
-          </div>
-        ))}
-      </div>
-    </>
+      
+    </div>
   );
 }
