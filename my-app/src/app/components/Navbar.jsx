@@ -1,4 +1,3 @@
-// components/Navbar.js
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -9,21 +8,32 @@ export default function Navbar() {
   const [isMobileView, setIsMobileView] = useState(false);
   const [cartItemsCount, setCartItemsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false); // Nuevo estado para el modal del carrito
   const searchRef = useRef(null);
+  const cartRef = useRef(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+const [isLoggedIn, setIsLoggedIn] = useState(true);
+const userMenuRef = useRef(null);
 
-  // Cerrar el buscador al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setSearchOpen(false);
-      }
-    };
+  // Cerrar el buscador y el carrito al hacer clic fuera
+ useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (searchRef.current && !searchRef.current.contains(event.target)) {
+      setSearchOpen(false);
+    }
+    if (cartRef.current && !cartRef.current.contains(event.target)) {
+      setCartOpen(false);
+    }
+    if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+      setUserMenuOpen(false);
+    }
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
 
   // Detect mobile view
   useEffect(() => {
@@ -34,6 +44,27 @@ export default function Navbar() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Datos de ejemplo para el carrito (esto luego vendrá de tu CartContext)
+  const [cartItems, setCartItems] = useState([
+    {
+      id: 1,
+      name: 'Remera Deportiva Mujer',
+      price: 5990,
+      image: '/img/products/remera-mujer.jpg',
+      quantity: 1
+    },
+    {
+      id: 2,
+      name: 'Short Deportivo Hombre',
+      price: 4990,
+      image: '/img/products/short-hombre.jpg',
+      quantity: 2
+    }
+  ]);
+
+  // Calcular total
+  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   return (
     <>
@@ -53,7 +84,7 @@ export default function Navbar() {
                 className="md:hidden p-2 rounded-md focus:outline-none"
               >
                 <svg
-                  className="h-6 w-6"
+                  className="h-7 w-7 text-gray-950"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -98,16 +129,16 @@ export default function Navbar() {
                 {/* Menú central */}
                 <div className="flex-1 flex justify-center px-4">
                   <div className="flex space-x-6 text-left">
-                    <Link href="/mujer" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
+                    <Link href="/mujer" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
                       MUJER
                     </Link>
-                    <Link href="/hombre" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
+                    <Link href="/hombre" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
                       HOMBRE
                     </Link>
-                    <Link href="/ninos" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
+                    <Link href="/ninos" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
                       NIÑOS
                     </Link>
-                    <Link href="/accesorios" className="text-gray-800 hover:text-blue-600 px-0 py-2 font-medium whitespace-nowrap">
+                    <Link href="/accesorios" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
                       ACCESORIOS
                     </Link>
                   </div>
@@ -119,14 +150,14 @@ export default function Navbar() {
                     {/* Icono de búsqueda */}
                     <button 
                       onClick={() => setSearchOpen(!searchOpen)}
-                      className="text-gray-600 hover:text-blue-600 transition-colors"
+                      className="text-gray-600 hover:text-gray-300 transition-colors"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </button>
                     
-                    {/* Input de búsqueda (se muestra cuando searchOpen es true) */}
+                    {/* Input de búsqueda */}
                     {searchOpen && (
                       <div className="absolute right-0 top-full mt-1 w-64 bg-purple-950 shadow-lg rounded-md p-2 z-10">
                         <input
@@ -140,8 +171,11 @@ export default function Navbar() {
                   </div>
 
                   {/* Cart */}
-                  <div className="relative">
-                    <button className=" text-black">
+                  <div className="relative" ref={cartRef}>
+                    <button 
+                      className="text-black"
+                      onClick={() => setCartOpen(!cartOpen)}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
@@ -151,14 +185,137 @@ export default function Navbar() {
                         </span>
                       )}
                     </button>
+
+                    {/* Modal del Carrito */}
+                    {cartOpen && (
+                      <div className={`absolute right-0 top-full mt-1 w-80 md:w-96 bg-white shadow-xl rounded-md z-50 ${isMobileView ? 'fixed inset-0 h-full w-full m-0 rounded-none' : ''}`}>
+                        <div className="p-4">
+                          <h3 className="text-lg font-bold mb-4">Tu Carrito ({cartItems.length})</h3>
+                          
+                          {/* Lista de productos */}
+                          <div className="max-h-60 overflow-y-auto mb-4">
+                            {cartItems.length > 0 ? (
+                              cartItems.map(item => (
+                                <div key={item.id} className="flex items-center py-3 border-b">
+                                  <div className="relative w-16 h-16 mr-3">
+                                    <Image
+                                      src={item.image}
+                                      alt={item.name}
+                                      fill
+                                      className="object-cover rounded"
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <h4 className="font-medium">{item.name}</h4>
+                                    <p className="text-sm text-gray-600">
+                                      {item.quantity} x ${item.price.toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <p className="font-semibold">
+                                    ${(item.price * item.quantity).toLocaleString()}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-center py-4">Tu carrito está vacío</p>
+                            )}
+                          </div>
+
+                          {/* Total */}
+                          <div className="border-t pt-3 mb-4">
+                            <div className="flex justify-between font-bold">
+                              <span>Total:</span>
+                              <span>${cartTotal.toLocaleString()}</span>
+                            </div>
+                          </div>
+
+                          {/* Botones */}
+                          <div className="flex flex-col space-y-2">
+                            <Link 
+                              href="/carrito" 
+                              className="bg-purple-800 text-white py-2 px-4 rounded text-center hover:bg-purple-500 transition-colors"
+                              onClick={() => setCartOpen(false)}
+                            >
+                              Ver Carrito
+                            </Link>
+                            <button 
+                              className="bg-yellow-400 text-black py-2 px-4 rounded hover:bg-purple-500 transition-colors"
+                              onClick={() => {
+                                // Aquí iría la lógica para proceder al pago
+                                console.log('Proceder al pago');
+                                setCartOpen(false);
+                              }}
+                            >
+                              Comprar Ahora
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* User */}
-                  <button className="p-1 text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-2" fill="none" viewBox="0 0 22 22" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </button>
+                  {/* Menú de Usuario */}
+<div className="relative" ref={userMenuRef}>
+  <button 
+    className="p-1 text-black"
+    onClick={() => setUserMenuOpen(!userMenuOpen)}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 22 22" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  </button>
+
+  {userMenuOpen && (
+    <div className="absolute right-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md z-50">
+      {isLoggedIn ? (
+        <>
+          <div className="px-4 py-3 border-b">
+            <p className="text-sm font-medium">Hola, Usuario</p>
+            <p className="text-xs text-gray-500 truncate">usuario@example.com</p>
+          </div>
+          <Link 
+            href="/mi-cuenta" 
+            className="block px-4 py-2 text-sm hover:bg-gray-100"
+            onClick={() => setUserMenuOpen(false)}
+          >
+            Mi Cuenta
+          </Link>
+          <Link 
+            href="/mis-pedidos" 
+            className="block px-4 py-2 text-sm hover:bg-gray-100"
+            onClick={() => setUserMenuOpen(false)}
+          >
+            Mis Pedidos
+          </Link>
+          <button 
+            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 border-t"
+            onClick={() => setIsLoggedIn(false)}
+          >
+            Cerrar Sesión
+          </button>
+        </>
+      ) : (
+        <>
+          <Link 
+            href="/iniciar-sesion" 
+            className="block px-4 py-3 text-sm font-medium hover:bg-gray-100"
+            onClick={() => setUserMenuOpen(false)}
+          >
+            Iniciar Sesión
+          </Link>
+          <Link 
+            href="/registrarse" 
+            className="block px-4 py-3 text-sm hover:bg-gray-100 border-t"
+            onClick={() => setUserMenuOpen(false)}
+          >
+            Crear Cuenta
+          </Link>
+        </>
+      )}
+    </div>
+  )}
+</div>
                 </div>
               </>
             )}
@@ -177,8 +334,11 @@ export default function Navbar() {
                 </button>
 
                 {/* Cart */}
-                <div className="relative">
-                  <button className="p-2 text-black">
+                <div className="relative" ref={cartRef}>
+                  <button 
+                    className="p-1text-black"
+                    onClick={() => setCartOpen(!cartOpen)}
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -189,6 +349,82 @@ export default function Navbar() {
                     )}
                   </button>
                 </div>
+                <div className="relative" ref={userMenuRef}>
+  <button 
+    className="p-2 text-black"
+    onClick={() => setUserMenuOpen(!userMenuOpen)}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 22 22" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  </button>
+
+  {userMenuOpen && (
+    <div className="fixed inset-0 bg-white z-50 overflow-y-auto pt-16">
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold">
+            {isLoggedIn ? 'Mi Cuenta' : 'Iniciar Sesión'}
+          </h3>
+          <button 
+            onClick={() => setUserMenuOpen(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {isLoggedIn ? (
+          <>
+            <nav className="space-y-1">
+              <Link 
+                href="/mi-cuenta" 
+                className="block py-3 px-4 bg-gray-100 rounded-lg"
+                onClick={() => setUserMenuOpen(false)}
+              >
+                Mi Perfil
+              </Link>
+              <Link 
+                href="/mis-pedidos" 
+                className="block py-3 px-4 hover:bg-gray-100 rounded-lg"
+                onClick={() => setUserMenuOpen(false)}
+              >
+                Mis Pedidos
+              </Link>
+            </nav>
+            <button 
+              className="w-full mt-6 py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+              onClick={() => setIsLoggedIn(false)}
+            >
+              Cerrar Sesión
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="space-y-3">
+              <Link 
+                href="/iniciar-sesion" 
+                className="block w-full py-3 px-4 bg-yellow-400 text-black rounded-lg text-center font-medium hover:bg-yellow-500"
+                onClick={() => setUserMenuOpen(false)}
+              >
+                Iniciar Sesión
+              </Link>
+              <Link 
+                href="/registrarse" 
+                className="block w-full py-3 px-4 border border-gray-300 rounded-lg text-center hover:bg-gray-100"
+                onClick={() => setUserMenuOpen(false)}
+              >
+                Crear Cuenta
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )}
+</div>
               </div>
             )}
           </div>
@@ -214,7 +450,7 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Mobile search (se muestra cuando searchOpen es true) */}
+        {/* Mobile search */}
         {isMobileView && searchOpen && (
           <div className="md:hidden bg-white p-4 text-center">
             <input
@@ -223,6 +459,86 @@ export default function Navbar() {
               className="justify-center text-center w-medium px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
               autoFocus
             />
+          </div>
+        )}
+
+        {/* Mobile Cart Modal */}
+        {isMobileView && cartOpen && (
+          <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">Tu Carrito ({cartItems.length})</h3>
+                <button 
+                  onClick={() => setCartOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Lista de productos */}
+              <div className="mb-4">
+                {cartItems.length > 0 ? (
+                  cartItems.map(item => (
+                    <div key={item.id} className="flex items-center py-3 border-b">
+                      <div className="relative w-16 h-16 mr-3">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover rounded"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium">{item.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          {item.quantity} x ${item.price.toLocaleString()}
+                        </p>
+                      </div>
+                      <p className="font-semibold">
+                        ${(item.price * item.quantity).toLocaleString()}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center py-8">Tu carrito está vacío</p>
+                )}
+              </div>
+
+              {/* Total */}
+              {cartItems.length > 0 && (
+                <div className="border-t pt-3 mb-6">
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total:</span>
+                    <span>${cartTotal.toLocaleString()}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Botones */}
+              <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-md">
+                <div className="flex flex-col space-y-2">
+                  <Link 
+                    href="/carrito" 
+                    className="bg-gray-950 text-white py-3 px-4 rounded text-center hover:bg-purple-500 transition-colors"
+                    onClick={() => setCartOpen(false)}
+                  >
+                    Ver Carrito
+                  </Link>
+                  <button 
+                    className="bg-purple-800 text-black py-3 px-4 rounded hover:bg-purple-500 transition-colors"
+                    onClick={() => {
+                      console.log('Proceder al pago');
+                      setCartOpen(false);
+                    }}
+                  >
+                    Comprar Ahora
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </nav>
