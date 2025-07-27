@@ -360,7 +360,7 @@ const userMenuRef = useRef(null);
   </button>
 
   {userMenuOpen && (
-    <div className="fixed inset-0 bg-white z-50 overflow-y-auto pt-16">
+    <div className="fixed inset-0 bg-white text-black z-50 overflow-y-auto pt-16">
       <div className="p-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold">
@@ -378,24 +378,24 @@ const userMenuRef = useRef(null);
 
         {isLoggedIn ? (
           <>
-            <nav className="space-y-1">
+            <nav className="space-y-1 text-black">
               <Link 
                 href="/mi-cuenta" 
-                className="block py-3 px-4 bg-gray-100 rounded-lg"
+                className="block py-3 px-0 text-black hover:bg-gray-300 rounded-lg"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Mi Perfil
               </Link>
               <Link 
                 href="/mis-pedidos" 
-                className="block py-3 px-4 hover:bg-gray-100 rounded-lg"
+                className="block py-3 px-0 text-black hover:bg-gray-100 rounded-lg"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Mis Pedidos
               </Link>
             </nav>
             <button 
-              className="w-full mt-6 py-3 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+              className="w-full mt-6 py-3 px-0 bg-purple-800 text-white rounded-lg hover:bg-yellow-400"
               onClick={() => setIsLoggedIn(false)}
             >
               Cerrar Sesión
@@ -413,7 +413,7 @@ const userMenuRef = useRef(null);
               </Link>
               <Link 
                 href="/registrarse" 
-                className="block w-full py-3 px-4 border border-gray-300 rounded-lg text-center hover:bg-gray-100"
+                className="block w-full py-3 px-4 border text-black border-gray-300 rounded-lg text-center hover:bg-gray-100"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Crear Cuenta
