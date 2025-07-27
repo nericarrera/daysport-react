@@ -326,9 +326,9 @@ const userMenuRef = useRef(null);
                 {/* Search icon */}
                 <button 
                   onClick={() => setSearchOpen(!searchOpen)}
-                  className="p-2 text-black" 
+                  className=" text-black" 
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 25" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
@@ -336,7 +336,7 @@ const userMenuRef = useRef(null);
                 {/* Cart */}
                 <div className="relative" ref={cartRef}>
                   <button 
-                    className="p-1text-black"
+                    className=" text-black"
                     onClick={() => setCartOpen(!cartOpen)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -351,10 +351,10 @@ const userMenuRef = useRef(null);
                 </div>
                 <div className="relative" ref={userMenuRef}>
   <button 
-    className="p-2 text-black"
+    className=" text-black"
     onClick={() => setUserMenuOpen(!userMenuOpen)}
   >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 22 22" stroke="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   </button>
