@@ -159,11 +159,11 @@ const userMenuRef = useRef(null);
                     
                     {/* Input de búsqueda */}
                     {searchOpen && (
-                      <div className="absolute right-0 top-full mt-1 w-64 bg-purple-950 shadow-lg rounded-md p-2 z-10">
+                      <div className="absolute right-0 top-full mt-1 w-60 shadow-lg rounded-md p-2 z-10">
                         <input
                           type="text"
                           placeholder="Buscar productos..."
-                          className="text-black w-full px-4 py-2 rounded-full border bg-amber-50 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          className="text-black w-full px-4 py-2 rounded-ullf border bg-amber-50 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           autoFocus
                         />
                       </div>
@@ -258,7 +258,7 @@ const userMenuRef = useRef(null);
                   {/* Menú de Usuario */}
 <div className="relative" ref={userMenuRef}>
   <button 
-    className="p-1 text-black"
+    className="text-black mb-2"
     onClick={() => setUserMenuOpen(!userMenuOpen)}
   >
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 22 22" stroke="currentColor">
@@ -271,25 +271,25 @@ const userMenuRef = useRef(null);
       {isLoggedIn ? (
         <>
           <div className="px-4 py-3 border-b">
-            <p className="text-sm font-medium">Hola, Usuario</p>
+            <p className="text-sm font-medium text-black">Hola, Usuario</p>
             <p className="text-xs text-gray-500 truncate">usuario@example.com</p>
           </div>
           <Link 
             href="/mi-cuenta" 
-            className="block px-4 py-2 text-sm hover:bg-gray-100"
+            className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
             onClick={() => setUserMenuOpen(false)}
           >
             Mi Cuenta
           </Link>
           <Link 
             href="/mis-pedidos" 
-            className="block px-4 py-2 text-sm hover:bg-gray-100"
+            className="block px-4 py-2 text-sm hover:bg-gray-100 text-black"
             onClick={() => setUserMenuOpen(false)}
           >
             Mis Pedidos
           </Link>
           <button 
-            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 border-t"
+            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-black border-t"
             onClick={() => setIsLoggedIn(false)}
           >
             Cerrar Sesión
@@ -326,7 +326,7 @@ const userMenuRef = useRef(null);
                 {/* Search icon */}
                 <button 
                   onClick={() => setSearchOpen(!searchOpen)}
-                  className=" text-black" 
+                  className="text-black" 
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 25" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
