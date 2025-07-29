@@ -14,7 +14,22 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const userMenuRef = useRef(null);
-  const [showBanner, setShowBanner] = useState(true);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const texts = [
+  { 
+    content: "ENVIOS A TODO EL PAÍS!", 
+    style: "text-yellow-400" 
+  },
+  { 
+    content: "¡COMPRA EN 3 CUOTAS SIN INTERÉS!", 
+    style: "text-green-400 font-bold" 
+  },
+  { 
+    content: "¡20% DE DESCUENTO EN TU PRIMERA COMPRA!", 
+    style: "text-purple-400 animate-pulse" 
+  },
+  // Puedes agregar más mensajes aquí
+];
   
 
   // Cerrar el buscador y el carrito al hacer clic fuera
@@ -69,32 +84,44 @@ export default function Navbar() {
   const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   // banner show
-  useEffect (() => {
-    const timer = setTimeout (() => {
-      setShowBanner(false);
-    }, 5000);
+ useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentTextIndex((prev) => (prev + 1) % texts.length);
+  }, 3000); // Cambia cada 3 segundos (ajustable)
 
-    return () => clearTimeout (timer);
-  }, []);
+  return () => clearInterval(interval);
+}, [texts.length]);
 
 
   return (
     <>
       {/* Top banner */}
-      {showBanner && (
-  <div className="bg-black text-yellow-400 text-center py-2 text-sm relative">
-    ENVIOS A TODO EL PAIS !
-    <button 
-      onClick={() => setShowBanner(false)}
-      className="absolute right-2 top-1/2 -translate-y-1/2 text-yellow-400 hover:text-white"
-      aria-label="Cerrar banner"
+  <div className="bg-black text-center py-3 text-sm relative min-h-[44px] flex items-center justify-center overflow-hidden">
+  {texts.map((text, index) => (
+    <div
+      key={text.content}
+      className={`
+        absolute w-full transition-all duration-500 transform
+        ${currentTextIndex === index ? 
+          'translate-y-0 opacity-100' : 
+          'translate-y-full opacity-0'
+        }
+        ${text.style} // Aplica los estilos personalizados
+      `}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-)}
+      {text.content}
+    </div>
+  ))}
+  
+  {/* Botón de cerrar (opcional) */}
+  <button 
+    onClick={() => setCurrentTextIndex(-1)} // Oculta todos los mensajes
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-yellow-300 transition-colors"
+    aria-label="Cerrar banner"
+  >
+    <X className="h-4 w-4" /> {/* Asegúrate de importar el icono X de tu librería de iconos */}
+  </button>
+</div>
 
       {/* Main navbar */}
       <nav className="bg-white shadow-md">
