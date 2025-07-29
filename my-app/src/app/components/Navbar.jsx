@@ -6,14 +6,16 @@ import Image from 'next/image';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false); // Nuevo estado para el modal del carrito
   const [cartItemsCount, setCartItemsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false); // Nuevo estado para el modal del carrito
-  const searchRef = useRef(null);
   const cartRef = useRef(null);
+  const searchRef = useRef(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-const [isLoggedIn, setIsLoggedIn] = useState(true);
-const userMenuRef = useRef(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const userMenuRef = useRef(null);
+  const [showBanner, setShowBanner] = useState(true);
+  
 
   // Cerrar el buscador y el carrito al hacer clic fuera
  useEffect(() => {
@@ -66,10 +68,20 @@ const userMenuRef = useRef(null);
   // Calcular total
   const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
+  // banner show
+  useEffect (() => {
+    const timer = setTimeout (() => {
+      setShowBanner(false);
+    }, 5000);
+
+    return () => clearTimeout (timer);
+  }, []);
+
+
   return (
     <>
       {/* Top banner */}
-      <div className="bg-black text-yellow-400 text-center py-2 text-sm">
+      <div className="bg-black text-yellow-400 text-center py-2 text-sm animated-fadeInOut">
         ENVIOS A TODO EL PAIS !
       </div>
 
@@ -150,7 +162,7 @@ const userMenuRef = useRef(null);
                     {/* Icono de búsqueda */}
                     <button 
                       onClick={() => setSearchOpen(!searchOpen)}
-                      className="text-gray-600 hover:text-gray-300 transition-colors"
+                      className="text-gray-600 hover:text-purple-500 transition-colors cursor-pointer"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -159,7 +171,7 @@ const userMenuRef = useRef(null);
                     
                     {/* Input de búsqueda */}
                     {searchOpen && (
-                      <div className="absolute right-0 top-full mt-1 w-60 shadow-lg rounded-md p-2 z-10">
+                      <div className="absolute right-0 top-full mt-1 w-50 shadow-lg rounded-md p-2 z-10">
                         <input
                           type="text"
                           placeholder="Buscar productos..."
@@ -173,7 +185,7 @@ const userMenuRef = useRef(null);
                   {/* Cart */}
                   <div className="relative" ref={cartRef}>
                     <button 
-                      className="text-black"
+                      className="text-black hover:text-purple-500 transition-colors cursor-pointer"
                       onClick={() => setCartOpen(!cartOpen)}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -239,7 +251,7 @@ const userMenuRef = useRef(null);
                               Ver Carrito
                             </Link>
                             <button 
-                              className="bg-yellow-400 text-black py-2 px-4 rounded hover:bg-purple-500 transition-colors"
+                              className="bg-yellow-400 text-black py-2 px-4 rounded hover:bg-black hover:text-white transition-colors"
                               onClick={() => {
                                 // Aquí iría la lógica para proceder al pago
                                 console.log('Proceder al pago');
@@ -258,7 +270,7 @@ const userMenuRef = useRef(null);
                   {/* Menú de Usuario */}
 <div className="relative" ref={userMenuRef}>
   <button 
-    className="text-black mb-2"
+    className="text-black mb-2 hover:text-purple-500 transition-colors cursor-pointer"
     onClick={() => setUserMenuOpen(!userMenuOpen)}
   >
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 22 22" stroke="currentColor">
@@ -267,29 +279,29 @@ const userMenuRef = useRef(null);
   </button>
 
   {userMenuOpen && (
-    <div className="absolute right-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md z-50">
+    <div className="absolute right-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md z-50 cursor-pointer border-t">
       {isLoggedIn ? (
         <>
-          <div className="px-4 py-3 border-b">
+          <div className="px-4 py-3 border-b hover:bg-yellow-300 cursor-pointer">
             <p className="text-sm font-medium text-black">Hola, Usuario</p>
             <p className="text-xs text-gray-500 truncate">usuario@example.com</p>
           </div>
           <Link 
             href="/mi-cuenta" 
-            className="block px-4 py-2 text-sm text-black hover:bg-gray-100"
+            className="block px-4 py-2 text-sm text-black hover:bg-yellow-300"
             onClick={() => setUserMenuOpen(false)}
           >
             Mi Cuenta
           </Link>
           <Link 
             href="/mis-pedidos" 
-            className="block px-4 py-2 text-sm hover:bg-gray-100 text-black"
+            className="block px-4 py-2 text-sm hover:bg-yellow-300 text-black border-t"
             onClick={() => setUserMenuOpen(false)}
           >
             Mis Pedidos
           </Link>
           <button 
-            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-black border-t"
+            className="w-full text-left px-4 py-2 text-sm hover:bg-yellow-300 text-black border-t"
             onClick={() => setIsLoggedIn(false)}
           >
             Cerrar Sesión
@@ -299,14 +311,14 @@ const userMenuRef = useRef(null);
         <>
           <Link 
             href="/iniciar-sesion" 
-            className="block px-4 py-3 text-sm font-medium hover:bg-gray-100"
+            className="block px-4 py-3 text-sm font-medium text-black hover:bg-yellow-300"
             onClick={() => setUserMenuOpen(false)}
           >
             Iniciar Sesión
           </Link>
           <Link 
             href="/registrarse" 
-            className="block px-4 py-3 text-sm hover:bg-gray-100 border-t"
+            className="block px-4 py-3 text-sm text-black hover:bg-yellow-300 border-t"
             onClick={() => setUserMenuOpen(false)}
           >
             Crear Cuenta
@@ -368,7 +380,7 @@ const userMenuRef = useRef(null);
           </h3>
           <button 
             onClick={() => setUserMenuOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-black hover:bg-amber-300"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -378,10 +390,10 @@ const userMenuRef = useRef(null);
 
         {isLoggedIn ? (
           <>
-            <nav className="space-y-1 text-black">
+            <nav className="space-y-1 text-black justify-center">
               <Link 
                 href="/mi-cuenta" 
-                className="block py-3 px-2 text-black hover:bg-gray-300 rounded-lg"
+                className="block py-3 px-2 text-black hover:bg-yellow-400 rounded-lg"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Mi Perfil
@@ -395,7 +407,7 @@ const userMenuRef = useRef(null);
               </Link>
             </nav>
             <button 
-              className="w-full mt-6 py-3 px-2 bg-purple-800 text-white rounded-lg hover:bg-yellow-400"
+              className="w-full text-center justify-center mt-6 py-3 px-2 bg-purple-800 text-white rounded-lg hover:bg-yellow-400"
               onClick={() => setIsLoggedIn(false)}
             >
               Cerrar Sesión
@@ -406,14 +418,14 @@ const userMenuRef = useRef(null);
             <div className="space-y-3">
               <Link 
                 href="/iniciar-sesion" 
-                className="block w-full py-3 px-4 bg-yellow-400 text-black rounded-lg text-center font-medium hover:bg-yellow-500"
+                className="block w-full py-3 px-4 bg-yellow-400 text-black rounded-lg text-center font-medium hover:bg-yellow-400"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Iniciar Sesión
               </Link>
               <Link 
                 href="/registrarse" 
-                className="block w-full py-3 px-4 border text-black border-gray-300 rounded-lg text-center hover:bg-gray-100"
+                className="block w-full py-3 px-4 border text-black border-black rounded-lg text-center hover:bg-purple-500"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Crear Cuenta
@@ -434,16 +446,16 @@ const userMenuRef = useRef(null);
         {isMobileView && isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <Link href="/mujer" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-gray-100">
+              <Link href="/mujer" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-yellow-300 transition-colors">
                 MUJER
               </Link>
-              <Link href="/hombre" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-gray-100">
+              <Link href="/hombre" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-yellow-300 transition-colors">
                 HOMBRE
               </Link>
-              <Link href="/ninos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-gray-100">
+              <Link href="/ninos" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-yellow-300 transition-colors">
                 NIÑOS
               </Link>
-              <Link href="/accesorios" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-gray-100">
+              <Link href="/accesorios" className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-yellow-300 transition-colors">
                 ACCESORIOS
               </Link>
             </div>
