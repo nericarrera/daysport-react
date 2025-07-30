@@ -1,6 +1,7 @@
 import ProductCarousel from './components/ProductCarousel';
 import { getFeaturedProducts } from './components/Product';
 import VideoCarousel from './components/VideoCarousel';
+import CategorySelector from './components/CategorySelector'; // Importa el nuevo componente
 
 export default async function Home() {
   const womenProducts = await getFeaturedProducts('mujer');
@@ -20,6 +21,9 @@ export default async function Home() {
         <p className="text-4xl font-light">MAKE A DIFFERENCE</p>
       </div>
 
+      {/* Nuevo selector de categorías */}
+      <CategorySelector />
+
       {/* Carruseles de productos */}
       <div className="bg-transparent mx-auto px-4">
         <ProductCarousel title="Novedades Mujer" products={womenProducts} />
@@ -27,8 +31,6 @@ export default async function Home() {
         <ProductCarousel title="Novedades Niños" products={kidsProducts} />
         <ProductCarousel title="Novedades Accesorios" products={accessoriesProducts} />
       </div>
-
-      
     </div>
   );
 }

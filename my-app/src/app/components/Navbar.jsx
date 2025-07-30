@@ -200,7 +200,7 @@ export default function Navbar() {
                     
                     {/* Input de búsqueda */}
                     {searchOpen && (
-                      <div className="absolute right-0 top-full mt-1 w-50 shadow-lg rounded-md p-2 z-10">
+                      <div className="absolute right-0 top-full mt-1 w-50 shadow-lg rounded-md p-2 z-50">
                         <input
                           type="text"
                           placeholder="Buscar productos..."
@@ -229,7 +229,7 @@ export default function Navbar() {
 
                     {/* Modal del Carrito */}
                     {cartOpen && (
-                      <div className={`absolute right-0 top-full mt-1 w-80 md:w-96 bg-white shadow-xl rounded-md z-50 ${isMobileView ? 'fixed inset-0 h-full w-full m-0 rounded-none' : ''}`}>
+                      <div className={`absolute right-0 top-full mt-1 w-80 md:w-96 text-black bg-white shadow-xl rounded-md z-50 ${isMobileView ? 'fixed inset-0 h-full w-full m-0 rounded-none' : ''}`}>
                         <div className="p-4">
                           <h3 className="text-lg font-bold mb-4">Tu Carrito ({cartItems.length})</h3>
                           
@@ -511,7 +511,7 @@ export default function Navbar() {
                 <h3 className="text-xl font-bold">Tu Carrito ({cartItems.length})</h3>
                 <button 
                   onClick={() => setCartOpen(false)}
-                  className="text-gray-600 hover:text-gray-700"
+                  className="text-black hover:text-gray-700"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -520,7 +520,7 @@ export default function Navbar() {
               </div>
               
               {/* Lista de productos */}
-              <div className="mb-4 cursor-pointer">
+              <div className="mb-4 cursor-pointer text-black">
                 {cartItems.length > 0 ? (
                   cartItems.map(item => (
                     <div key={item.id} className="flex items-center py-3 border-b">
@@ -534,7 +534,7 @@ export default function Navbar() {
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium">{item.name}</h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-black">
                           {item.quantity} x ${item.price.toLocaleString()}
                         </p>
                       </div>
