@@ -2,11 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import MegaMenu from './components/MegaMenu';
 
 export default function Navbar() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [cartOpen, setCartOpen] = useState(false); // Nuevo estado para el modal del carrito
@@ -32,56 +29,6 @@ export default function Navbar() {
     style: "text-purple-400 animate-pulse" 
   },
 ];
-
-const categoriesData = {
-  mujer: {
-    name: 'MUJER',
-    href: '/mujer',
-    subcategories: [
-      { name: 'Remeras', href: '/mujer/remeras', image: '/img/categories/mujer-remeras.jpg' },
-      { name: 'Buzos', href: '/mujer/buzos', image: '/img/categories/mujer-buzos.jpg' },
-      { name: 'Joggins', href: '/mujer/joggins', image: '/img/categories/mujer-joggins.jpg' },
-      { name: 'Shorts', href: '/mujer/shorts', image: '/img/categories/mujer-shorts.jpg' },
-      { name: 'Musculosas', href: '/mujer/musculosas', image: '/img/categories/mujer-musculosas.jpg' },
-      { name: 'Tops', href: '/mujer/tops', image: '/img/categories/mujer-tops.jpg' },
-      { name: 'Calzas', href: '/mujer/calzas', image: '/img/categories/mujer-calzas.jpg' },
-      { name: 'Calzado', href: '/mujer/calzado', image: '/img/categories/mujer-calzado.jpg' }
-    ]
-  },
-  hombre: {
-    name: 'HOMBRE',
-    href: '/hombre',
-    subcategories: [
-      { name: 'Remeras', href: '/hombre/remeras', image: '/img/categories/hombre-remeras.jpg' },
-      { name: 'Buzos', href: '/hombre/buzos', image: '/img/categories/hombre-buzos.jpg' },
-      { name: 'Joggins', href: '/hombre/joggins', image: '/img/categories/hombre-joggins.jpg' },
-      { name: 'Shorts', href: '/hombre/shorts', image: '/img/categories/hombre-shorts.jpg' },
-      { name: 'Camisetas', href: '/hombre/camisetas', image: '/img/categories/hombre-camisetas.jpg' },
-      { name: 'Pantalones', href: '/hombre/pantalones', image: '/img/categories/hombre-pantalones.jpg' },
-      { name: 'Calzado', href: '/hombre/calzado', image: '/img/categories/hombre-calzado.jpg' }
-    ]
-  },
-  ninos: {
-    name: 'NIÑOS',
-    href: '/ninos',
-    subcategories: [
-      { name: 'Remeras', href: '/ninos/remeras', image: '/img/categories/ninos-remeras.jpg' },
-      { name: 'Buzos', href: '/ninos/buzos', image: '/img/categories/ninos-buzos.jpg' },
-      { name: 'Shorts', href: '/ninos/shorts', image: '/img/categories/ninos-shorts.jpg' },
-      { name: 'Calzado', href: '/ninos/calzado', image: '/img/categories/ninos-calzado.jpg' }
-    ]
-  },
-  accesorios: {
-    name: 'ACCESORIOS',
-    href: '/accesorios',
-    subcategories: [
-      { name: 'Gorras', href: '/accesorios/gorras', image: '/img/categories/accesorios-gorras.jpg' },
-      { name: 'Mochilas', href: '/accesorios/mochilas', image: '/img/categories/accesorios-mochilas.jpg' },
-      { name: 'Medias', href: '/accesorios/medias', image: '/img/categories/accesorios-medias.jpg' },
-      { name: 'Guantes', href: '/accesorios/guantes', image: '/img/categories/accesorios-guantes.jpg' }
-    ]
-  }
-};
   
 
   // Cerrar el buscador y el carrito al hacer clic fuera
@@ -221,27 +168,22 @@ const categoriesData = {
                 </Link>
 
                 {/* Menú central */}
-         <div className="flex-1 flex justify-center px-4">
-  <div className="flex space-x-6 text-left">
-    {Object.entries(categoriesData).map(([key, category]) => (
-      <div 
-        key={key}
-        className="relative"
-        onMouseEnter={() => {
-          setActiveCategory(key);
-          setIsMegaMenuOpen(true);
-        }}
-      >
-        <Link 
-          href={category.href} 
-          className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap"
-        >
-          {category.name}
-        </Link>
-      </div>
-    ))}
-  </div>
-</div>
+                <div className="flex-1 flex justify-center px-4">
+                  <div className="flex space-x-6 text-left">
+                    <Link href="/mujer" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
+                      MUJER
+                    </Link>
+                    <Link href="/hombre" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
+                      HOMBRE
+                    </Link>
+                    <Link href="/ninos" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
+                      NIÑOS
+                    </Link>
+                    <Link href="/accesorios" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
+                      ACCESORIOS
+                    </Link>
+                  </div>
+                </div>
 
                 {/* Barra de búsqueda desplegable */}
                 <div className="flex items-center space-x-4">
@@ -641,11 +583,6 @@ const categoriesData = {
           </div>
         )}
       </nav>
-      <MegaMenu 
-  isOpen={isMegaMenuOpen && !isMobileView} 
-  onClose={() => setIsMegaMenuOpen(false)}
-  categoryData={activeCategory ? categoriesData[activeCategory] : null}
-/>
     </>
   );
 }
