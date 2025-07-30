@@ -28,7 +28,6 @@ export default function Navbar() {
     content: "¡20% DE DESCUENTO EN TU PRIMERA COMPRA!", 
     style: "text-purple-400 animate-pulse" 
   },
-  // Puedes agregar más mensajes aquí
 ];
   
 
@@ -87,7 +86,7 @@ export default function Navbar() {
  useEffect(() => {
   const interval = setInterval(() => {
     setCurrentTextIndex((prev) => (prev + 1) % texts.length);
-  }, 3000); // Cambia cada 3 segundos (ajustable)
+  }, 6000); // Cambia cada 3 segundos (ajustable)
 
   return () => clearInterval(interval);
 }, [texts.length]);
@@ -96,12 +95,12 @@ export default function Navbar() {
   return (
     <>
       {/* Top banner */}
-  <div className="bg-black text-center py-3 text-sm relative min-h-[44px] flex items-center justify-center overflow-hidden">
+  <div className="bg-black text-center py-3 text-sm relative min-h-[29px] flex items-center justify-center overflow-hidden">
   {texts.map((text, index) => (
     <div
       key={text.content}
       className={`
-        absolute w-full transition-all duration-500 transform
+        absolute w-full transition-all duration-600 transform
         ${currentTextIndex === index ? 
           'translate-y-0 opacity-100' : 
           'translate-y-full opacity-0'
@@ -112,17 +111,9 @@ export default function Navbar() {
       {text.content}
     </div>
   ))}
+  </div>
   
-  {/* Botón de cerrar (opcional) */}
-  <button 
-    onClick={() => setCurrentTextIndex(-1)} // Oculta todos los mensajes
-    className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-yellow-300 transition-colors"
-    aria-label="Cerrar banner"
-  >
-    <X className="h-4 w-4" /> {/* Asegúrate de importar el icono X de tu librería de iconos */}
-  </button>
-</div>
-
+  
       {/* Main navbar */}
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 pl-6">
@@ -376,7 +367,7 @@ export default function Navbar() {
                 {/* Search icon */}
                 <button 
                   onClick={() => setSearchOpen(!searchOpen)}
-                  className="text-black" 
+                  className="text-black cursor-pointer" 
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 25" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -386,7 +377,7 @@ export default function Navbar() {
                 {/* Cart */}
                 <div className="relative" ref={cartRef}>
                   <button 
-                    className=" text-black"
+                    className=" text-black cursor-pointer"
                     onClick={() => setCartOpen(!cartOpen)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -401,7 +392,7 @@ export default function Navbar() {
                 </div>
                 <div className="relative" ref={userMenuRef}>
   <button 
-    className=" text-black"
+    className=" text-black cursor-pointer"
     onClick={() => setUserMenuOpen(!userMenuOpen)}
   >
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -418,7 +409,7 @@ export default function Navbar() {
           </h3>
           <button 
             onClick={() => setUserMenuOpen(false)}
-            className="text-black hover:bg-amber-300"
+            className="text-black hover:bg-amber-300 cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -438,14 +429,14 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/mis-pedidos" 
-                className="block py-3 px-2 text-black hover:bg-gray-100 rounded-lg"
+                className="block py-3 px-2 text-black hover:bg-yellow-400 rounded-lg"
                 onClick={() => setUserMenuOpen(false)}
               >
                 Mis Pedidos
               </Link>
             </nav>
             <button 
-              className="w-full text-center justify-center mt-6 py-3 px-2 bg-purple-800 text-white rounded-lg hover:bg-yellow-400"
+              className="w-full text-center justify-center mt-6 py-3 px-2 bg-purple-800 text-white rounded-lg hover:bg-black cursor-pointer"
               onClick={() => setIsLoggedIn(false)}
             >
               Cerrar Sesión
@@ -506,7 +497,7 @@ export default function Navbar() {
             <input
               type="text"
               placeholder="Buscar productos..."
-              className="justify-center text-center w-medium px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+              className="justify-center text-center w-medium px-4 py-2 rounded-full border text-black border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
               autoFocus
             />
           </div>
@@ -514,13 +505,13 @@ export default function Navbar() {
 
         {/* Mobile Cart Modal */}
         {isMobileView && cartOpen && (
-          <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-white z-50 overflow-y-auto text-black">
             <div className="p-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">Tu Carrito ({cartItems.length})</h3>
                 <button 
                   onClick={() => setCartOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-600 hover:text-gray-700"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -529,7 +520,7 @@ export default function Navbar() {
               </div>
               
               {/* Lista de productos */}
-              <div className="mb-4">
+              <div className="mb-4 cursor-pointer">
                 {cartItems.length > 0 ? (
                   cartItems.map(item => (
                     <div key={item.id} className="flex items-center py-3 border-b">
@@ -572,13 +563,13 @@ export default function Navbar() {
                 <div className="flex flex-col space-y-2">
                   <Link 
                     href="/carrito" 
-                    className="bg-gray-950 text-white py-3 px-4 rounded text-center hover:bg-purple-500 transition-colors"
+                    className="bg-gray-950 text-white py-3 px-4 rounded text-center transition-colors"
                     onClick={() => setCartOpen(false)}
                   >
                     Ver Carrito
                   </Link>
                   <button 
-                    className="bg-purple-800 text-black py-3 px-4 rounded hover:bg-purple-500 transition-colors"
+                    className="bg-purple-800 text-black py-3 px-4 rounded hover:bg-yellow-300 transition-colors cursor-pointer"
                     onClick={() => {
                       console.log('Proceder al pago');
                       setCartOpen(false);
