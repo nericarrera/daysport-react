@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import MegaMenu from './MegaMenu';
+import { categories } from '../data/categories';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,6 +31,8 @@ export default function Navbar() {
     style: "text-purple-400 animate-pulse" 
   },
 ];
+
+
   
 
   // Cerrar el buscador y el carrito al hacer clic fuera
