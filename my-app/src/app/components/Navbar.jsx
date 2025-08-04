@@ -34,7 +34,15 @@ export default function Navbar() {
 
 const [activeCategory, setActiveCategory] = useState(null);
 const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+const [isHoveringMegaMenu, setIsHoveringMegaMenu] = useState(false);
+const megaMenuTimeout = useRef(null);
 const megaMenuRef = useRef(null);
+
+useEffect(() => {
+  return () => {
+    clearTimeout(megaMenuTimeout.current);
+  };
+}, []);
 
 
 // Agrega este efecto para manejar el cierre al hacer clic fuera
@@ -137,7 +145,7 @@ useEffect(() => {
   
   
       {/* Main navbar */}
-      <nav className="bg-white shadow-md relative">
+      <nav className="bg-white shadow-md relative" ref={megaMenuRef}>
         <div className="max-w-7xl mx-auto px-4 pl-6">
           <div className="flex justify-between items-center h-16">
             {/* Mobile menu button */}
@@ -189,7 +197,7 @@ useEffect(() => {
                   />
                 </Link>
 
-                {/* Menú central */}
+               {/* Menú central */}
 <div className="flex-1 flex justify-center px-4" ref={megaMenuRef}>
   <div className="flex space-x-8">
     {categories.map((category, index) => (
@@ -197,17 +205,19 @@ useEffect(() => {
         key={category.name}
         className="relative"
         onMouseEnter={() => {
+          clearTimeout(megaMenuTimeout.current);
           setActiveCategory(index);
           setIsMegaMenuOpen(true);
+          setIsHoveringMegaMenu(false);
         }}
         onMouseLeave={() => {
-          // Delay para permitir mover el mouse al MegaMenu
-          setTimeout(() => {
-            if (!megaMenuRef.current?.matches(':hover')) {
+          // Solo cerrar si no estamos hover sobre el MegaMenu
+          megaMenuTimeout.current = setTimeout(() => {
+            if (!isHoveringMegaMenu) {
               setIsMegaMenuOpen(false);
               setActiveCategory(null);
             }
-          }, 100);
+          }, 200); // Tiempo suficiente para mover el mouse
         }}
       >
         <Link
@@ -623,10 +633,20 @@ useEffect(() => {
 {!isMobileView && isMegaMenuOpen && activeCategory !== null && (
   <div 
     className="absolute left-0 right-0 bg-white shadow-lg z-40 border-t border-gray-200"
-    onMouseEnter={() => setIsMegaMenuOpen(true)}
+    onMouseEnter={() => {
+      clearTimeout(megaMenuTimeout.current);
+      setIsHoveringMegaMenu(true);
+    }}
     onMouseLeave={() => {
+      setIsHoveringMegaMenu(false);
       setIsMegaMenuOpen(false);
       setActiveCategory(null);
+    }}
+    style={{
+      transition: 'opacity 0.2s ease, transform 0.2s ease',
+      transform: isMegaMenuOpen ? 'translateY(0)' : 'translateY(-10px)',
+      opacity: isMegaMenuOpen ? 1 : 0,
+      pointerEvents: isMegaMenuOpen ? 'auto' : 'none'
     }}
   >
     <div className="max-w-7xl mx-auto px-8 py-6">
