@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import MegaMenu from './MegaMenu';
-import { categories } from '../data/categories';
+import { categories } from './Category';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
