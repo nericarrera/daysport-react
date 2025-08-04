@@ -32,6 +32,24 @@ export default function Navbar() {
   },
 ];
 
+const [activeCategory, setActiveCategory] = useState(null);
+const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+const megaMenuRef = useRef(null);
+
+
+// Agrega este efecto para manejar el cierre al hacer clic fuera
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (megaMenuRef.current && !megaMenuRef.current.contains(event.target)) {
+      setIsMegaMenuOpen(false);
+      setActiveCategory(null);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
+
 
   
 
@@ -119,7 +137,7 @@ export default function Navbar() {
   
   
       {/* Main navbar */}
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white shadow-md relative">
         <div className="max-w-7xl mx-auto px-4 pl-6">
           <div className="flex justify-between items-center h-16">
             {/* Mobile menu button */}
@@ -172,22 +190,36 @@ export default function Navbar() {
                 </Link>
 
                 {/* Menú central */}
-                <div className="flex-1 flex justify-center px-4">
-                  <div className="flex space-x-6 text-left">
-                    <Link href="/mujer" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
-                      MUJER
-                    </Link>
-                    <Link href="/hombre" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
-                      HOMBRE
-                    </Link>
-                    <Link href="/ninos" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
-                      NIÑOS
-                    </Link>
-                    <Link href="/accesorios" className="text-gray-800 hover:text-yellow-300 px-0 py-2 font-medium whitespace-nowrap">
-                      ACCESORIOS
-                    </Link>
-                  </div>
-                </div>
+<div className="flex-1 flex justify-center px-4" ref={megaMenuRef}>
+  <div className="flex space-x-8">
+    {categories.map((category, index) => (
+      <div 
+        key={category.name}
+        className="relative"
+        onMouseEnter={() => {
+          setActiveCategory(index);
+          setIsMegaMenuOpen(true);
+        }}
+        onMouseLeave={() => {
+          // Delay para permitir mover el mouse al MegaMenu
+          setTimeout(() => {
+            if (!megaMenuRef.current?.matches(':hover')) {
+              setIsMegaMenuOpen(false);
+              setActiveCategory(null);
+            }
+          }, 100);
+        }}
+      >
+        <Link
+          href={category.href}
+          className="text-gray-800 hover:text-yellow-500 px-0 py-2 font-medium whitespace-nowrap transition-colors"
+        >
+          {category.name}
+        </Link>
+      </div>
+    ))}
+  </div>
+</div>
 
                 {/* Barra de búsqueda desplegable */}
                 <div className="flex items-center space-x-4">
@@ -586,6 +618,65 @@ export default function Navbar() {
             </div>
           </div>
         )}
+
+        {/* MegaMenu para desktop */}
+{!isMobileView && isMegaMenuOpen && activeCategory !== null && (
+  <div 
+    className="absolute left-0 right-0 bg-white shadow-lg z-40 border-t border-gray-200"
+    onMouseEnter={() => setIsMegaMenuOpen(true)}
+    onMouseLeave={() => {
+      setIsMegaMenuOpen(false);
+      setActiveCategory(null);
+    }}
+  >
+    <div className="max-w-7xl mx-auto px-8 py-6">
+      <div className="grid grid-cols-4 gap-8">
+        {/* Columna de subcategorías */}
+        <div className="col-span-1">
+          <h3 className="text-lg font-bold mb-4 text-gray-900">
+            {categories[activeCategory].name}
+          </h3>
+          <ul className="space-y-3">
+            {categories[activeCategory].subcategories.map((subcat) => (
+              <li key={subcat.name}>
+                <Link 
+                  href={subcat.href} 
+                  className="text-gray-700 hover:text-yellow-500 transition-colors block py-1"
+                >
+                  {subcat.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        {/* Destacados con imágenes */}
+        <div className="col-span-3 grid grid-cols-3 gap-6">
+          {categories[activeCategory].subcategories
+            .filter(subcat => subcat.image)
+            .map((subcat) => (
+              <div key={subcat.name} className="group">
+                <Link href={subcat.href} className="block">
+                  <div className="relative aspect-square mb-2 overflow-hidden rounded-lg">
+                    <Image
+                      src={subcat.image}
+                      alt={subcat.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <h4 className="text-gray-900 font-medium group-hover:text-yellow-500 transition-colors">
+                    {subcat.name}
+                  </h4>
+                </Link>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </nav>
     </>
   );
