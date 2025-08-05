@@ -84,7 +84,7 @@ export default function CategorySelector() {
                       className="object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-800 group-hover:text-blue-600 transition-colors whitespace-normal text-center">
+                  <h3 className="text-lg font-medium text-gray-800 group-hover:text-yellow-400 transition-colors whitespace-normal text-center">
                     {category.name}
                   </h3>
                 </div>
