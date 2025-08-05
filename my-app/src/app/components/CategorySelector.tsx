@@ -47,14 +47,14 @@ export default function CategorySelector() {
   return (
     <section className="py-12 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 relative">
-        <h2 className="text-3xl font-bold text-center mb-12">Explora Nuestras Categorías</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-purple-800">Explora Nuestras Categorías</h2>
         
         {/* Contenedor principal */}
         <div className="relative">
           {/* Flecha izquierda */}
           <button 
             onClick={() => scroll('left')}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-all ${!showLeftArrow && 'hidden'}`}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-300 rounded-full p-3 shadow-lg hover:bg-gray-100 transition-all ${!showLeftArrow && 'hidden'}`}
             aria-label="Categorías anteriores"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,8 +79,8 @@ export default function CategorySelector() {
                     <Image
                       src={category.image}
                       alt={category.name}
-                      width={128}
-                      height={128}
+                      width={120}
+                      height={120}
                       className="object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
