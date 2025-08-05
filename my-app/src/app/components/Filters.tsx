@@ -1,20 +1,15 @@
 'use client';
 import { useState } from 'react';
 
-interface FiltersProps {
-  category: string;
-}
-
-export default function Filters({ category }: FiltersProps) {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
-  // const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-
+export default function Filters({ category }: { category: string }) {
+  const [priceRange, setPriceRange] = useState([0, 10000]);
+  
   // Filtros específicos por categoría
-  const filtersByCategory = {
-    mujer: ['Tallas', 'Color', 'Tipo de Actividad', 'Material'],
-    hombre: ['Tallas', 'Color', 'Estilo', 'Marcas'],
-    ninos: ['Edad', 'Tallas', 'Color', 'Personajes'],
-    accesorios: ['Tipo', 'Color', 'Marcas', 'Material']
+  const categoryFilters = {
+    mujer: ['Tallas', 'Color', 'Tipo de Actividad'],
+    hombre: ['Tallas', 'Color', 'Estilo'],
+    ninos: ['Edad', 'Tallas', 'Color'],
+    accesorios: ['Tipo', 'Color']
   };
 
   return (
@@ -24,34 +19,34 @@ export default function Filters({ category }: FiltersProps) {
       {/* Rango de precios */}
       <div className="mb-6">
         <h4 className="font-medium mb-2">Precio</h4>
-        <input
-          type="range"
-          min="0"
-          max="1000"
-          value={priceRange[1]}
-          onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-          className="w-full"
-        />
-        <div className="flex justify-between text-sm text-gray-600 mt-1">
-          <span>${priceRange[0]}</span>
-          <span>${priceRange[1]}</span>
+        <div className="flex items-center justify-between gap-2">
+          <input
+            type="number"
+            value={priceRange[0]}
+            onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+            className="w-full border rounded p-2"
+          />
+          <span>a</span>
+          <input
+            type="number"
+            value={priceRange[1]}
+            onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+            className="w-full border rounded p-2"
+          />
         </div>
       </div>
 
       {/* Filtros específicos */}
-      {filtersByCategory[category as keyof typeof filtersByCategory]?.map((filter) => (
+      {categoryFilters[category as keyof typeof categoryFilters]?.map((filter) => (
         <div key={filter} className="mb-6">
           <h4 className="font-medium mb-2">{filter}</h4>
-          {/* Aquí irían los checkboxes/opciones específicas */}
           <div className="space-y-2">
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" className="rounded" />
-              <span>Opción 1</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" className="rounded" />
-              <span>Opción 2</span>
-            </label>
+            {[1, 2, 3].map((item) => (
+              <label key={item} className="flex items-center space-x-2">
+                <input type="checkbox" className="rounded" />
+                <span>Opción {item}</span>
+              </label>
+            ))}
           </div>
         </div>
       ))}
