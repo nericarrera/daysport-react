@@ -1,6 +1,6 @@
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
-import { products } from '../data/Products';
+import Products from '../data/Products';
 
 export default function MujerPage() {
   const womenProducts = products.filter(product => product.category === 'mujer');
