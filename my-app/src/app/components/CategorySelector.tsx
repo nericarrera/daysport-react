@@ -11,13 +11,13 @@ export default function CategorySelector() {
 
   const categories = [
     { id: 'mujer', name: 'Mujer', image: '/menu-categoria-img/categoria-mujer1.jpg' },
-    { id: 'hombre', name: 'Hombre', image: '/menu-categoria-img/categoria-mujer.jpg' },
-    { id: 'ninos', name: 'Niños', image: '/img/categories/ninos.jpg' },
-    { id: 'zapatillas', name: 'Zapatillas', image: '/img/categories/zapatillas.jpg' },
-    { id: 'accesorios', name: 'Accesorios', image: '/img/categories/accesorios.jpg' },
-    { id: 'deportes', name: 'Deportes', image: '/img/categories/deportes.jpg' },
-    { id: 'ofertas', name: 'Ofertas', image: '/img/categories/ofertas.jpg' },
-    { id: 'colecciones', name: 'Colecciones', image: '/img/categories/colecciones.jpg' }
+    { id: 'hombre', name: 'Hombre', image: '/menu-categoria-img/categoria-hombre1.jpg' },
+    { id: 'ninos', name: 'Niños', image: '/menu-categoria-img/categoria-niños1.jpg' },
+    { id: 'zapatillas', name: 'Zapatillas', image: '/menu-categoria-img/categoria-zapatillas3.jpg' },
+    { id: 'accesorios', name: 'Accesorios', image: '/menu-categoria-img/categoria-accesorios1.jpg' },
+    { id: 'deportes', name: 'Deportes', image: '/menu-categoria-img/categoria-deportes.jpg' },
+    { id: 'ofertas', name: 'Ofertas', image: '/menu-categoria-img/categoria-ofertas1.jpg' },
+    { id: 'colecciones', name: 'Colecciones', image: '/menu-categoria-img/categoria-coleccion.jpg' }
   ];
 
   // Verificar visibilidad de flechas
@@ -75,13 +75,13 @@ export default function CategorySelector() {
                   className="inline-flex flex-col items-center cursor-pointer group"
                   onClick={() => router.push(`/categoria/${category.id}`)}
                 >
-                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-all mb-4">
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-all mb-4 object-cover">
                     <Image
                       src={category.image}
                       alt={category.name}
                       width={120}
                       height={120}
-                      className="object-cover group-hover:scale-105 transition-transform"
+                      className="object-contain w-auto h-auto object-center group-hover:scale-105 transition-transform "
                     />
                   </div>
                   <h3 className="text-lg font-medium text-gray-800 group-hover:text-yellow-400 transition-colors whitespace-normal text-center">
