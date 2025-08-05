@@ -1,6 +1,6 @@
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
-import products from '../components/Products';
+import { Products } from '../components/Products'; // Assuming this is where your products data is defined
 
 export default function MujerPage() {
   const womenProducts = products.filter(product => product.category === 'mujer');
@@ -22,7 +22,7 @@ export default function MujerPage() {
 
         {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid products={womenProducts} />
+          <ProductGrid product={womenProducts} />
         </div>
       </div>
     </div>
