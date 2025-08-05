@@ -1,5 +1,5 @@
 // Update the import path and extension if the file exists with a different name or extension
-import CategoryPage from "../components/CategoryPage";
+import CategoryPage from "../components/Categorypage";
 // or, if the file is named CategoryPage.tsx in the same folder, use:
 // import CategoryPage from "./components/CategoryPage.tsx";
 

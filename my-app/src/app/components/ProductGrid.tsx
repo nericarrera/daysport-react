@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
-import { Product } from '../../types';
+import { Product } from '../Types';
 
 interface ProductGridProps {
   category: string;
