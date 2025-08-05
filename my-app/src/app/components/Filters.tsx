@@ -7,7 +7,7 @@ interface FiltersProps {
 
 export default function Filters({ category }: FiltersProps) {
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  // const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
 
   // Filtros específicos por categoría
   const filtersByCategory = {
