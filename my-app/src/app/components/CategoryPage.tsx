@@ -1,5 +1,5 @@
-import ProductGrid from './ProductGrid';
-import Filters from './Filters';
+import ProductGrid from '../components/ProductGrid';
+import Filters from '../components/Filters';
 
 interface CategoryPageProps {
   title: string;
