@@ -43,10 +43,12 @@ export const categories = [
       href: "/accesorios", 
       subcategories: [
         { name: "Gorras", href: "/accesorios/gorras", image: "/menu-seccion-img/accesorios/menu-gorras.jpg" },
-        { name: "Bolsos", href: "/accesorios/bolsos", image: "/menu-seccion-img/accesorios/menu-bolsos.jpg" },
-        { name: "Calcetines", href: "/accesorios/calcetines", image: "/menu-seccion-img/accesorios/menu-calcetines.jpg" },
-        { name: "Cinturones", href: "/accesorios/cinturones", image: "/menu-seccion-img/accesorios/menu-cinturones.jpg" },
-        { name: "Gafas de sol", href: "/accesorios/gafas-de-sol", image: "/menu-seccion-img/accesorios/menu-gafas-de-sol.jpg" }
+        { name: "Bolsos", href: "/accesorios/bolsos", image: "/menu-seccion-img/accesorios/menu-bolsos.jpeg" },
+        { name: "Medias", href: "/accesorios/medias", image: "/menu-seccion-img/accesorios/menu-medias.jpg" },
+        { name: "Mochilas", href: "/accesorios/mochilas", image: "/menu-seccion-img/accesorios/menu-mochilas.jpg" },
+        { name: "Lentes", href: "/accesorios/lentes", image: "/menu-seccion-img/accesorios/menu-lentes.jpg" },
+        { name: "Botellas", href: "/accesorios/botellas", image: "/menu-seccion-img/accesorios/menu-botellas.jpg" },
+        
       ]
     },
 ];
