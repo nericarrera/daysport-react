@@ -5,7 +5,7 @@ export const categories = [
     subcategories: [
       { name: "Remeras", href: "/mujer/remeras", image: "/menu-seccion-img/mujer/menu-remeras.jpg" },
       { name: "Buzos", href: "/mujer/buzos", image: "/menu-seccion-img/mujer/menu-buzos.jpg" },
-      { name: "Pantalones", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-pantalones.jpg" },
+      { name: "Pantalones", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-pantalones.webp" },
       { name: "Camperas", href: "/mujer/camperas", image: "/menu-seccion-img/mujer/menu-camperas.jpg" },
       { name: "Calzas", href: "/mujer/calzas", image: "/menu-seccion-img/mujer/menu-calzas.jpg" },
       { name: "Shorts", href: "/mujer/shorts", image: "/menu-seccion-img/mujer/menu-shorts.webp" },
@@ -42,11 +42,11 @@ export const categories = [
          name: "ACCESORIOS", 
       href: "/accesorios", 
       subcategories: [
-        { name: "Gorras", href: "/accesorios/gorras", image: "/img/categories/accesorios-gorras.jpg" },
-        { name: "Bolsos", href: "/accesorios/bolsos", image: "/img/categories/accesorios-bolsos.jpg" },
-        { name: "Calcetines", href: "/accesorios/calcetines", image: "/img/categories/accesorios-calcetines.jpg" },
-        { name: "Cinturones", href: "/accesorios/cinturones", image: "/img/categories/accesorios-cinturones.jpg" },
-        { name: "Gafas de sol", href: "/accesorios/gafas-de-sol", image: "/img/categories/accesorios-gafas-de-sol.jpg" }
+        { name: "Gorras", href: "/accesorios/gorras", image: "/menu-seccion-img/accesorios/menu-gorras.jpg" },
+        { name: "Bolsos", href: "/accesorios/bolsos", image: "/menu-seccion-img/accesorios/menu-bolsos.jpg" },
+        { name: "Calcetines", href: "/accesorios/calcetines", image: "/menu-seccion-img/accesorios/menu-calcetines.jpg" },
+        { name: "Cinturones", href: "/accesorios/cinturones", image: "/menu-seccion-img/accesorios/menu-cinturones.jpg" },
+        { name: "Gafas de sol", href: "/accesorios/gafas-de-sol", image: "/menu-seccion-img/accesorios/menu-gafas-de-sol.jpg" }
       ]
     },
 ];
