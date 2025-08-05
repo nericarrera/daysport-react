@@ -1,5 +1,5 @@
 import ProductCarousel from './components/ProductCarousel';
-import { getFeaturedProducts } from './components/Product';
+import { getFeaturedProducts } from './components/Products';
 import VideoCarousel from './components/VideoCarousel';
 import CategorySelector from './components/CategorySelector'; // Importa el nuevo componente
 
