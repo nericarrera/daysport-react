@@ -10,8 +10,8 @@ export default function CategorySelector() {
   const [showRightArrow, setShowRightArrow] = useState(true);
 
   const categories = [
-    { id: 'mujer', name: 'Mujer', image: '/img/categories/mujer.jpg' },
-    { id: 'hombre', name: 'Hombre', image: '/img/categories/hombre.jpg' },
+    { id: 'mujer', name: 'Mujer', video: '/menu-categoria-video/video-categoria-mujer.mp4' },
+    { id: 'hombre', name: 'Hombre', image: '/menu-categoria-img/categoria-mujer.jpg' },
     { id: 'ninos', name: 'Niños', image: '/img/categories/ninos.jpg' },
     { id: 'zapatillas', name: 'Zapatillas', image: '/img/categories/zapatillas.jpg' },
     { id: 'accesorios', name: 'Accesorios', image: '/img/categories/accesorios.jpg' },
