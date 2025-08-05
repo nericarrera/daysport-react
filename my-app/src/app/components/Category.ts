@@ -5,10 +5,10 @@ export const categories = [
     subcategories: [
       { name: "Remeras", href: "/mujer/remeras", image: "/menu-seccion-img/mujer/menu-remeras.jpg" },
       { name: "Buzos", href: "/mujer/buzos", image: "/menu-seccion-img/mujer/menu-buzos.jpg" },
-      { name: "Joggins", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-joggins.jpg" },
+      { name: "Joggins", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-joggins.webp" },
       { name: "Camperas", href: "/mujer/camperas", image: "/menu-seccion-img/mujer/menu-camperas.jpg" },
       { name: "Calzas", href: "/mujer/calzas", image: "/menu-seccion-img/mujer/menu-calzas.jpg" },
-      { name: "Shorts", href: "/mujer/shorts", image: "/menu-seccion-img/mujer/menu-shorts.jpg" },
+      { name: "Shorts", href: "/mujer/shorts", image: "/menu-seccion-img/mujer/menu-shorts.webp" },
       { name: "Zapatillas", href: "/mujer/zapatillas" }
     ]
   },
