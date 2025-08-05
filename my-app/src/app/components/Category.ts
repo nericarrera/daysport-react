@@ -5,7 +5,7 @@ export const categories = [
     subcategories: [
       { name: "Remeras", href: "/mujer/remeras", image: "/menu-seccion-img/mujer/menu-remeras.jpg" },
       { name: "Buzos", href: "/mujer/buzos", image: "/menu-seccion-img/mujer/menu-buzos.jpg" },
-      { name: "Joggins", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-joggins.webp" },
+      { name: "Pantalones", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-pantalones.webp" },
       { name: "Camperas", href: "/mujer/camperas", image: "/menu-seccion-img/mujer/menu-camperas.jpg" },
       { name: "Calzas", href: "/mujer/calzas", image: "/menu-seccion-img/mujer/menu-calzas.jpg" },
       { name: "Shorts", href: "/mujer/shorts", image: "/menu-seccion-img/mujer/menu-shorts.webp" },
@@ -16,11 +16,13 @@ export const categories = [
     name: "HOMBRE",
     href: "/hombre",
     subcategories: [
-      { name: "Remeras", href: "/hombre/remeras", image: "/img/categories/hombre-remeras.jpg" },
-      { name: "Buzos", href: "/hombre/buzos", image: "/img/categories/hombre-buzos.jpg" },
-      { name: "Pantalones", href: "/hombre/pantalones", image: "/img/categories/hombre-pantalones.jpg" },
-      { name: "Camperas", href: "/hombre/camperas", image: "/img/categories/hombre-camperas.jpg" },
-      { name: "Shorts", href: "/hombre/shorts", image: "/img/categories/hombre-shorts.jpg" }
+      { name: "Remeras", href: "/hombre/remeras", image: "/menu-seccion-img/hombre/menu-remeras.jpg" },
+      { name: "Buzos", href: "/hombre/buzos", image: "/menu-seccion-img/hombre/menu-buzos.jpg" },
+      { name: "Pantalones", href: "/hombre/pantalones", image: "/menu-seccion-img/hombre/menu-pantalones.jpg" },
+      { name: "Camperas", href: "/hombre/camperas", image: "/menu-seccion-img/hombre/menu-camperas.jpg" },
+      { name: "Shorts", href: "/hombre/shorts", image: "/menu-seccion-img/hombre/menu-shorts.jpg" },
+      { name: "Deportes", href: "/hombre/deportes", image: "/menu-seccion-img/hombre/menu-deportes.jpg" },
+      { name: "Conjuntos", href: "/hombre/zapatillas", image: "/menu-seccion-img/hombre/menu-conjuntos.jpg" },
     ]
   },
     {
