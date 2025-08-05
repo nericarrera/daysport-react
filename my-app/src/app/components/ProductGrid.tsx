@@ -1,36 +1,17 @@
-'use client';
-import { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '../Types';
 
 interface ProductGridProps {
-  category: string;
+  products: Product[];
 }
 
-export default function ProductGrid({ category }: ProductGridProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        // Reemplaza con tu llamada a la API o datos estáticos
-        const response = await fetch(`/api/products?category=${category}`);
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [category]);
-
-  if (loading) {
-    return <div className="text-center py-8">Cargando productos...</div>;
+export default function ProductGrid({ products }: ProductGridProps) {
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">No se encontraron productos en esta categoría</p>
+      </div>
+    );
   }
 
   return (
