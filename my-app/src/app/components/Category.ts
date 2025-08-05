@@ -8,6 +8,7 @@ export const categories = [
       { name: "Joggins", href: "/mujer/joggins", image: "/menu-seccion-img/mujer/menu-joggins.jpg" },
       { name: "Camperas", href: "/mujer/camperas", image: "/menu-seccion-img/mujer/menu-camperas.jpg" },
       { name: "Calzas", href: "/mujer/calzas", image: "/menu-seccion-img/mujer/menu-calzas.jpg" },
+      { name: "Shorts", href: "/mujer/shorts", image: "/menu-seccion-img/mujer/menu-shorts.jpg" },
       { name: "Zapatillas", href: "/mujer/zapatillas" }
     ]
   },
