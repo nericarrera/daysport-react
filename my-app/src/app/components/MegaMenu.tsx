@@ -30,13 +30,13 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
         <div className="grid grid-cols-4 gap-8">
           {/* Columna de subcategorías */}
           <div className="col-span-1">
-            <h3 className="text-lg font-bold mb-4 text-gray-900">{categoryData.name}</h3>
+            <h3 className="text-lg font-bold mb-4 text-gray-900 text-center">{categoryData.name}</h3>
             <ul className="space-y-3">
               {categoryData.subcategories.map((subcat) => (
                 <li key={subcat.name}>
                   <Link 
                     href={subcat.href} 
-                    className="text-gray-700 hover:text-yellow-500 transition-colors block py-1"
+                    className="text-gray-700 hover:text-yellow-500 transition-colors block py-1 text-center"
                   >
                     {subcat.name}
                   </Link>
@@ -55,10 +55,10 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
                       src={subcat.image || '/default-image.jpg'}
                       alt={subcat.name}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform"
+                      className="object-cover group-hover:scale-105 transition-transform text-center"
                     />
                   </div>
-                  <h4 className="text-gray-900 font-medium group-hover:text-yellow-500 transition-colors">
+                  <h4 className="text-gray-900 font-medium group-hover:text-yellow-500 transition-colors text-center">
                     {subcat.name}
                   </h4>
                 </Link>
