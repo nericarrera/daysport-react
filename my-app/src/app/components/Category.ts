@@ -9,8 +9,10 @@ export const categories = [
       { name: "Camperas", href: "/mujer/camperas", image: "/menu-seccion-img/mujer/menu-camperas.jpg" },
       { name: "Calzas", href: "/mujer/calzas", image: "/menu-seccion-img/mujer/menu-calzas.jpg" },
       { name: "Shorts", href: "/mujer/shorts", image: "/menu-seccion-img/mujer/menu-shorts.webp" },
-      { name: "Zapatillas", href: "/mujer/zapatillas" }
+      { name: "Zapatillas", href: "/mujer/zapatillas", image: "/menu-seccion-img/mujer/menu-zapatillas.jpg" },
+      { name: "Conjuntos", href: "/mujer/conjuntos", image: "/menu-seccion-img/mujer/menu-conjuntos.jpg" },
     ]
+
   },
   {
     name: "HOMBRE",
