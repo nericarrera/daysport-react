@@ -1,18 +1,33 @@
+// components/Breadcrumbs.tsx
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
 
-interface BreadcrumbItem {
-  label: string;
-  href: string;
-  active?: boolean;
-}
+// Mapeo de nombres para categorías principales
+const CATEGORY_NAMES: Record<string, string> = {
+  mujer: 'Mujer',
+  hombre: 'Hombre',
+  niños: 'Niños',
+  accesorios: 'Accesorios',
+  // Agrega más categorías según necesites
+};
 
 interface BreadcrumbsProps {
-  items: BreadcrumbItem[];
   className?: string;
+  customNames?: Record<string, string>; // Para sobrescribir nombres específicos
 }
 
-export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
+export default function Breadcrumbs({ className = '', customNames = {} }: BreadcrumbsProps) {
+  const pathname = usePathname();
+  
+  // Generamos los breadcrumbs dinámicamente
+  const breadcrumbs = generateBreadcrumbs(pathname, { ...CATEGORY_NAMES, ...customNames });
+
+  // No mostrar si estamos en la página de inicio
+  if (breadcrumbs.length === 0) return null;
+
   return (
     <nav className={`flex ${className}`} aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-2">
@@ -26,7 +41,7 @@ export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps)
           </Link>
         </li>
         
-        {items.map((item, index) => (
+        {breadcrumbs.map((item, index) => (
           <li key={index} className="inline-flex items-center">
             <ChevronRightIcon className="h-4 w-4 text-gray-400" />
             <Link
@@ -44,4 +59,25 @@ export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps)
       </ol>
     </nav>
   );
+}
+
+// Función helper para generar los breadcrumbs
+function generateBreadcrumbs(pathname: string, nameMap: Record<string, string>) {
+  const paths = pathname.split('/').filter(Boolean);
+  
+  return paths.map((path, index) => {
+    const href = `/${paths.slice(0, index + 1).join('/')}`;
+    const isLast = index === paths.length - 1;
+    
+    // Formateamos el nombre del path
+    const label = nameMap[path] || 
+                  path.replace(/-/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase());
+
+    return {
+      label,
+      href,
+      active: isLast
+    };
+  });
 }
