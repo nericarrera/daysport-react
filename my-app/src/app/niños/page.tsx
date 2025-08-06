@@ -1,7 +1,7 @@
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
 import { getProductsByCategory } from '../data/Products';
-import Breadcrumbs from '../components/Breadcrumbs';
+import Breadcrumbs from '../components/ui/Breadcrumbs';
 
 export default function NiñosPage() {
   const products = getProductsByCategory('niños');
