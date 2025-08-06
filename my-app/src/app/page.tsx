@@ -1,5 +1,5 @@
 import ProductCarousel from './components/ProductCarousel';
-import { getFeaturedProducts } from './data/products'; // Usando alias @
+import { getFeaturedProducts } from './data/Products'; // Usando alias @
 import VideoCarousel from './components/VideoCarousel';
 import CategorySelector from './components/CategorySelector';
 
