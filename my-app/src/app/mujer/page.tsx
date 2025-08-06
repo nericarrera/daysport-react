@@ -2,7 +2,7 @@ import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
 import { getProductsByCategory } from '../data/Products';
-import { ChevronLeftIcon, HomeIcon } from '@/heroicons/react/24/outline';
+import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 
 export default function MujerPage() {
   const products = getProductsByCategory('mujer');
