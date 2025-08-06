@@ -1,9 +1,10 @@
 import ProductCarousel from './components/ProductCarousel';
-import { getFeaturedProducts } from './data/Products'; // Usando alias @
+import { getFeaturedProducts } from './data/Products'; // Corregida la ruta
 import VideoCarousel from './components/VideoCarousel';
 import CategorySelector from './components/CategorySelector';
 
 export default async function Home() {
+  // Obtener productos en paralelo
   const [womenProducts, menProducts, kidsProducts, accessoriesProducts] = await Promise.all([
     getFeaturedProducts('mujer'),
     getFeaturedProducts('hombre'),
@@ -24,10 +25,22 @@ export default async function Home() {
       <CategorySelector />
 
       <div className="bg-transparent mx-auto px-4">
-        <ProductCarousel title="Novedades Mujer" products={womenProducts} />
-        <ProductCarousel title="Novedades Hombre" products={menProducts} />
-        <ProductCarousel title="Novedades Niños" products={kidsProducts} />
-        <ProductCarousel title="Novedades Accesorios" products={accessoriesProducts} />
+        <ProductCarousel 
+          title="Novedades Mujer" 
+          products={womenProducts} 
+        />
+        <ProductCarousel 
+          title="Novedades Hombre" 
+          products={menProducts} 
+        />
+        <ProductCarousel 
+          title="Novedades Niños" 
+          products={kidsProducts} 
+        />
+        <ProductCarousel 
+          title="Novedades Accesorios" 
+          products={accessoriesProducts} 
+        />
       </div>
     </div>
   );
