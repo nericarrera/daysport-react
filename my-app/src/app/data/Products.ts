@@ -1,4 +1,4 @@
-interface Product {
+interface Products {
   id: string;
   name: string;
   price: number;
@@ -6,7 +6,7 @@ interface Product {
   image: string;
 }
 
-export async function getFeaturedProducts(category: string): Promise<Product[]> {
+export async function getFeaturedProducts(category: string): Promise<Products[]> {
   // Datos de ejemplo - reemplaza con tu lógica real
   const mockProducts = {
     mujer: [

@@ -1,9 +1,21 @@
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
-import Products from '../data/Products';
+import { Products } from '../data/Products'; // Importamos el array products
+
+interface Product {
+  id: string;
+  category: string;
+  // Agrega aquí todas las propiedades necesarias
+  name: string;
+  price: number;
+  image: string;
+  sizes?: string[];
+  colors?: string[];
+}
 
 export default function MujerPage() {
-  const womenProducts = products.filter(product => product.category === 'mujer');
+  // Filtramos con tipo definido
+  const womenProducts = Products.filter((product: Product) => product.category === 'mujer');
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -22,7 +34,7 @@ export default function MujerPage() {
 
         {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid products={womenProducts} /> {/* Cambiado de product a products */}
+          <ProductGrid products={womenProducts} />
         </div>
       </div>
     </div>
