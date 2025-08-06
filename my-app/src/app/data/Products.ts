@@ -4,7 +4,6 @@ interface Product {
   price: number;
   category: string;
   image: string;
-  // ... otras propiedades
 }
 
 export async function getFeaturedProducts(category: string): Promise<Product[]> {
