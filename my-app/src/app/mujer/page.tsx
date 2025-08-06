@@ -1,40 +1,23 @@
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
-import { Products } from '../data/Products'; // Importamos el array products
-
-interface Product {
-  id: string;
-  category: string;
-  // Agrega aquí todas las propiedades necesarias
-  name: string;
-  price: number;
-  image: string;
-  sizes?: string[];
-  colors?: string[];
-}
+import { getProductsByCategory } from '../data/Products';
 
 export default function MujerPage() {
-  // Filtramos con tipo definido
-  const womenProducts = Products.filter((product: Product) => product.category === 'mujer');
+  const products = getProductsByCategory('mujer');
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Encabezado */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Ropa Deportiva para Mujer</h1>
-        <p className="text-gray-600">Descubre nuestra colección diseñada para mujeres activas</p>
+        <h1 className="text-3xl font-bold">Ropa para Mujer</h1>
       </div>
 
-      {/* Contenido */}
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Filtros (sidebar en desktop) */}
         <div className="md:w-1/4">
           <Filters category="mujer" />
         </div>
-
-        {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid products={womenProducts} />
+          <ProductGrid products={products} />
         </div>
       </div>
     </div>
