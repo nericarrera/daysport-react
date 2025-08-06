@@ -147,7 +147,7 @@ useEffect(() => {
       {/* Main navbar */}
       <nav className="bg-white shadow-md relative" ref={megaMenuRef}>
         <div className="max-w-7xl mx-auto px-4 pl-6">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-18">
             {/* Mobile menu button */}
             {isMobileView && (
               <button
@@ -198,7 +198,7 @@ useEffect(() => {
                 </Link>
 
                {/* Menú central */}
-<div className="flex-1 flex justify-center px-4" ref={megaMenuRef}>
+<div className="flex-1 flex justify-center px-4 mt-5" ref={megaMenuRef}>
   <div className="flex space-x-8">
     {categories.map((category, index) => (
       <div 
@@ -232,7 +232,7 @@ useEffect(() => {
 </div>
 
                 {/* Barra de búsqueda desplegable */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 mt-5">
                   <div className="relative" ref={searchRef}>
                     {/* Icono de búsqueda */}
                     <button 
