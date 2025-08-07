@@ -1,13 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { RegisterDto } from '../../../../dto/register.dto';
+import { Controller, Post } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
-
-  @Post('register')
-  async register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  @Post('test')
+  testEndpoint() {
+    return { message: 'Auth endpoint working!' };
   }
 }
