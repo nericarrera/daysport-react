@@ -5,6 +5,8 @@ import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { CartProvider } from './components/CartContext';
+import { ApolloProvider } from '@apollo/client';
+import { client } from '../lib/graphql/client';
 
 const inter = Inter({ subsets: ['latin'] });
 
