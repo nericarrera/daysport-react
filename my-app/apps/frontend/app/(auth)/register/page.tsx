@@ -1,51 +1,51 @@
-'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../../packages/database/prisma/prisma.service';
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
 
-export default function RegisterPage() {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const router = useRouter();
+@Injectable()
+export class AuthService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Error en registro');
-      }
-
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err.message);
+  async register(dto: { 
+    email: string; 
+    password: string; 
+    name?: string 
+  }) {
+    // 1. Verificar si el usuario existe
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email }
+    });
+    if (existingUser) {
+      throw new Error('Email already in use');
     }
-  };
 
-  return (
-    <div>
-      {error && <div className="error">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          required
-          onChange={(e) => setForm({...form, email: e.target.value})}
-        />
-        <input
-          type="password"
-          required
-          minLength={6}
-          onChange={(e) => setForm({...form, password: e.target.value})}
-        />
-        <button type="submit">Registrarse</button>
-      </form>
-    </div>
-  );
+    // 2. Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    // 3. Crear el usuario
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        password: hashedPassword,
+        name: dto.name
+      }
+    });
+
+    // 4. Generar token JWT
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '1h' }
+    );
+
+    return { 
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    };
+  }
 }
