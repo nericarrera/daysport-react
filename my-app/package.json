@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
     "@nestjs/graphql": "^13.1.0",
     "@prisma/client": "^6.13.0",
     "apollo-server-express": "^3.13.0",
