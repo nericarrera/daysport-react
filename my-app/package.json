@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "next dev apps/frontend --dir=apps/frontend",
+    "build": "next build apps/frontend --dir=apps/frontend",
     "start": "next start",
     "lint": "next lint"
   },
