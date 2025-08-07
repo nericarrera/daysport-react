@@ -1,14 +1,27 @@
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
+import { PrismaService } from '../../prisma/prisma.service';
 
+@Injectable()
 export class AuthService {
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService
+  ) {}
+
   async register(email: string, password: string) {
+    const exists = await this.prisma.user.findUnique({ where: { email } });
+    if (exists) throw new Error('Usuario ya existe');
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
+    const user = await this.prisma.user.create({
       data: { email, password: hashedPassword }
     });
-    
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
-    return { user, token };
+
+    return {
+      token: this.jwtService.sign({ userId: user.id }),
+      user
+    };
   }
 }
