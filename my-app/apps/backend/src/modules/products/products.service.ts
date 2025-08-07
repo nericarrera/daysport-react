@@ -9,7 +9,7 @@ export class ProductsService {
     return this.prisma.product.findMany({
       where: { category },
       include: {
-        images: true
+      images: true
       }
     });
   }
