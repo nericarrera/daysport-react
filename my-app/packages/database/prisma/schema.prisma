@@ -1,24 +1,20 @@
+// Especifica tu conexión a la base de datos
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+// Generador del cliente Prisma
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = "postgresql://admin:securepassword@localhost:5432/ecommerce?schema=public"
-}
-
-model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password      String
-  name          String?
-  role          Role      @default(USER)
-  emailVerified Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-enum Role {
-  USER
-  ADMIN
+// Modelo de ejemplo (Product)
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Float
+  description String?
+  category    String
+  createdAt   DateTime @default(now())
 }
