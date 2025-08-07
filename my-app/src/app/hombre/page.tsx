@@ -1,3 +1,4 @@
+
 import ProductGrid from '../components/ProductGrid';
 import Filters from '../components/Filters';
 import { getProductsByCategory } from '../data/Products';
