@@ -9,10 +9,14 @@ class RegisterDto {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}  // Añadido readonly
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  async register(@Body() dto: RegisterDto): Promise<{ token: string; user: string }> {
+    try {
+      return await this.authService.register(dto);
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 }
