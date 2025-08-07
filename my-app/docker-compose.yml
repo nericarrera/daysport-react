@@ -26,4 +26,4 @@ services:
         condition: service_healthy
 
 volumes:
-  postgres_data:
+  - ./packages/database/scripts:/scripts
