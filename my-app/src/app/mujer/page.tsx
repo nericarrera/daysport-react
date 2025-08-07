@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
-import Filters from '../components/Filters';
+import FilterButton from '../components/FilterButton';
 import { getProductsByCategory } from '../data/Products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+
 
 // Datos de las categorías circulares
 const subcategories = [
@@ -102,8 +103,8 @@ export default function MujerPage() {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Filtros */}
         <div className="md:w-1/4">
-          <Filters category="mujer" />
-        </div>
+  <FilterButton category="mujer" />
+</div>
         
         {/* Productos */}
         <div className="md:w-3/4">
