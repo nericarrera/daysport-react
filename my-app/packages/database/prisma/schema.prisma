@@ -1,20 +1,20 @@
-// Especifica tu conexión a la base de datos
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://admin:securepassword@localhost:5432/ecommerce?schema=public"
+  url      = env("DATABASE_URL") // Mejor usar variables de entorno
 }
 
-// Generador del cliente Prisma
 generator client {
   provider = "prisma-client-js"
 }
 
-// Modelo de ejemplo (Product)
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
   price       Float
   description String?
-  category    String
+  category    String   // Cambiaremos esto a relación después
+  images      String[] // Array de URLs de imágenes
+  stock       Int      @default(0)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
