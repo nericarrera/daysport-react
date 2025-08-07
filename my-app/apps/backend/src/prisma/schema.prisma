@@ -1,10 +1,11 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL") // Mejor usar variables de entorno
-}
-
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client" // Ruta correcta para el cliente
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Asegúrate de tener esto en tu .env
 }
 
 model User {
@@ -12,8 +13,6 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      String   @default("USER")
-  cart      Cart?
   createdAt DateTime @default(now())
 }
 
