@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { FunnelIcon } from '@heroicons/react/24/outline';
-import FilterModal from '../components/FilterModal';
+import FilterModal from './FilterModal';
 
 export default function FilterButton({ category }: { category: string }) {
   const [isOpen, setIsOpen] = useState(false);
