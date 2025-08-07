@@ -1,7 +1,7 @@
 // Especifica tu conexión a la base de datos
 datasource db {
   provider = "postgresql"
-  url      = env("DB_URL")
+  url      = "postgresql://admin:securepassword@localhost:5432/ecommerce?schema=public"
 }
 
 // Generador del cliente Prisma
