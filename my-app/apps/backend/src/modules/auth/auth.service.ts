@@ -1,27 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PrismaService } from '../../../../../packages/database/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import { PrismaService } from '../../prisma/prisma.service';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async register(email: string, password: string) {
-    const exists = await this.prisma.user.findUnique({ where: { email } });
-    if (exists) throw new Error('Usuario ya existe');
+  async login(email: string, password: string) {
+    // 1. Buscar usuario en DB
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new UnauthorizedException('Credenciales incorrectas');
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.prisma.user.create({
-      data: { email, password: hashedPassword }
-    });
+    // 2. Comparar contraseña hasheada
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) throw new UnauthorizedException('Credenciales incorrectas');
 
-    return {
-      token: this.jwtService.sign({ userId: user.id }),
-      user
-    };
+    // 3. Generar JWT
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET || 'secret-key', // Cambia esto en producción
+      { expiresIn: '1h' }
+    );
+
+    return { token, user: { id: user.id, email: user.email, name: user.name } };
   }
 }
