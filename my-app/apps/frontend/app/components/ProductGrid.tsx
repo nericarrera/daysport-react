@@ -1,4 +1,5 @@
 import { Product } from '../data/Products';
+import Image from 'next/image';
 
 interface ProductGridProps {
   products: Product[];
@@ -10,7 +11,12 @@ export default function ProductGrid({ products }: ProductGridProps) {
       {products.map(product => (
         <div key={product.id} className="border rounded-lg overflow-hidden">
           {/* Renderizar cada producto */}
-          <img src={product.image} alt={product.name} />
+          <Image 
+          src={product.image} 
+          alt={product.name} 
+          width={400}
+          height={400}
+          className="w-full h-auto"/>
           <h3>{product.name}</h3>
           <p>${product.price}</p>
         </div>
