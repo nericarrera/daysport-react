@@ -13,7 +13,8 @@
     "paths": {
       "@app/*": ["src/*"],
       "@auth/*": ["src/modules/auth/*"]
-    }
+    },
+    "types": ["jest"]  // <-- Añade esta línea
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "test", "dist"]
