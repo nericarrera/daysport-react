@@ -1,40 +1,41 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client" // Ruta correcta para el cliente
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Asegúrate de tener esto en tu .env
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   password  String
   name      String?
-  createdAt DateTime @default(now())
+  carts     Cart[]
+  createdAt DateTime  @default(now())
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   price       Float
   description String?
-  category    String   // Cambiaremos esto a relación después
-  images      String[] // Array de URLs de imágenes
-  stock       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  category    String      // Podrías cambiarlo a relación con modelo Category si lo necesitas
+  images      String[]    // Array de URLs de imágenes
+  stock       Int         @default(0)
+  cartItems   CartItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
-
 model Cart {
-  id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id])
-  userId    Int       @unique
+  id        Int         @id @default(autoincrement())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    Int         @unique
   items     CartItem[]
-  createdAt DateTime  @default(now())
+  createdAt DateTime    @default(now())
 }
 
 model CartItem {
