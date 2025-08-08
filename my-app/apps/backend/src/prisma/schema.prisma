@@ -1,8 +1,12 @@
- datasource db {
-      provider = "postgresql" // Or your database provider like "mysql", "sqlite"
-      url      = "postgresql://postgres:DescoNectarme99@localhost:5433/ecommerce?schema=public"
-    }
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 model User {
   id        Int      @id @default(autoincrement())
