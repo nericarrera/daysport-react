@@ -5,7 +5,7 @@ import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { CartProvider } from './components/CartContext';
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '.apollo/client';
 import { client } from '../lib/graphql/client';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -23,13 +23,15 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
-        <CartProvider>
-          <Navbar />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-        </CartProvider>
+        <ApolloProvider client={client}>
+          <CartProvider>
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
+        </ApolloProvider>
       </body>
     </html>
   );
