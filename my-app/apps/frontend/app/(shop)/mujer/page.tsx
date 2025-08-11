@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import ProductGrid from '../components/ProductGrid';
-import FilterButton from '../components/FilterButton';
-import { getProductsByCategory } from '../data/Products';
+import ProductGrid from '../../components/ProductGrid';
+import FilterButton from '../../components/FilterButton';
+import { getProductsByCategory } from '../../data/Products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 

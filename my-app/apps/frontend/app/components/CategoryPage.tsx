@@ -1,3 +1,4 @@
+'use client';
 import ProductGrid from './ProductGrid';
 import Filters from './Filters';
 
