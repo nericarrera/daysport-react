@@ -12,7 +12,7 @@
     "baseUrl": "./",
     "paths": {
       "@app/*": ["src/*"],
-      "@auth/*": ["src/modules/auth/*"]
+      "@auth/*": ["src/modules/user/*"]
     },
     "types": ["jest"]  // <-- Añade esta línea
   },
