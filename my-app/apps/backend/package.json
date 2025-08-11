@@ -17,6 +17,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.9",
     "@nestjs/common": "^11.1.6",
     "@prisma/client": "^6.13.0",
     "body-parser": "^1.20.3",
