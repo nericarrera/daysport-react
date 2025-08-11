@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.9",
     "@heroicons/react": "^2.2.0",
     "@nestjs/common": "^11.1.6",
     "@nestjs/core": "^11.1.6",
