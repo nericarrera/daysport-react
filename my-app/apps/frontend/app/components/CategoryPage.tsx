@@ -6,12 +6,14 @@ interface CategoryPageProps {
   title: string;
   description: string;
   category: string;
+  
 }
 
 export default function CategoryPage({ 
   title, 
   description, 
-  category 
+  category,
+
 }: CategoryPageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -30,7 +32,7 @@ export default function CategoryPage({
 
         {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid category={category} />
+          <ProductGrid category={category}/>
         </div>
       </div>
     </div>
