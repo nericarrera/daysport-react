@@ -1,6 +1,5 @@
 // components/FilterModal.tsx
 'use client';
-
 import { useState, useEffect } from 'react';
 import { XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
