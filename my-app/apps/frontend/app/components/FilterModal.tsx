@@ -1,13 +1,21 @@
 // components/FilterModal.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+
+interface FilterValues {
+  sizes: string[];
+  colors: string[];
+  priceMin: number;
+  priceMax: number;
+  sort: string;
+}
 
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
   category: string;
-  onApplyFilters: (filters: any) => void;
+  onApplyFilters: (filters: FilterValues) => void;
 }
 
 const SIZE_OPTIONS = {
@@ -34,7 +42,7 @@ const SORT_OPTIONS = [
 export default function FilterModal({ isOpen, onClose, category, onApplyFilters }: FilterModalProps) {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [sortOption, setSortOption] = useState('');
   const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
 
@@ -84,7 +92,7 @@ export default function FilterModal({ isOpen, onClose, category, onApplyFilters 
             </div>
 
             <div className="overflow-y-auto max-h-[70vh]">
-              {/* Sección de Ordenamiento */}
+              {/* Ordenar */}
               <div className="mb-6">
                 <button 
                   onClick={() => toggleAccordion('sort')}
@@ -112,7 +120,7 @@ export default function FilterModal({ isOpen, onClose, category, onApplyFilters 
                 )}
               </div>
 
-              {/* Sección de Precio */}
+              {/* Rango de Precio */}
               <div className="mb-6">
                 <button 
                   onClick={() => toggleAccordion('price')}
@@ -122,29 +130,27 @@ export default function FilterModal({ isOpen, onClose, category, onApplyFilters 
                   <ChevronDownIcon className={`h-5 w-5 transform ${activeAccordion === 'price' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeAccordion === 'price' && (
-                  <div className="mt-2">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <input
-                        type="number"
-                        value={priceRange[0]}
-                        onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                        className="w-full border rounded p-2"
-                        placeholder="Mínimo"
-                      />
-                      <span>a</span>
-                      <input
-                        type="number"
-                        value={priceRange[1]}
-                        onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                        className="w-full border rounded p-2"
-                        placeholder="Máximo"
-                      />
-                    </div>
+                  <div className="mt-2 flex items-center justify-between gap-2 mb-2">
+                    <input
+                      type="number"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                      className="w-full border rounded p-2"
+                      placeholder="Mínimo"
+                    />
+                    <span>a</span>
+                    <input
+                      type="number"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      className="w-full border rounded p-2"
+                      placeholder="Máximo"
+                    />
                   </div>
                 )}
               </div>
 
-              {/* Sección de Tallas */}
+              {/* Tallas */}
               <div className="mb-6">
                 <button 
                   onClick={() => toggleAccordion('sizes')}
@@ -172,7 +178,7 @@ export default function FilterModal({ isOpen, onClose, category, onApplyFilters 
                 )}
               </div>
 
-              {/* Sección de Colores */}
+              {/* Colores */}
               <div className="mb-6">
                 <button 
                   onClick={() => toggleAccordion('colors')}
@@ -202,6 +208,7 @@ export default function FilterModal({ isOpen, onClose, category, onApplyFilters 
             </div>
           </div>
 
+          {/* Botones */}
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               onClick={handleApply}
