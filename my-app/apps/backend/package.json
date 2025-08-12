@@ -10,8 +10,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-   "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
-   "start:dev": "npm run prisma:generate && nest start --watch",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
+    "start:dev": "npm run prisma:generate && nest start --watch",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "ts-node prisma/seed.ts"
@@ -45,6 +45,9 @@
   },
   "compilerOptions": {
     "paths": {
-      "@prisma/client": ["./node_modules/@prisma/client"]
-    }}
+      "@prisma/client": [
+        "./node_modules/@prisma/client"
+      ]
+    }
+  }
 }
