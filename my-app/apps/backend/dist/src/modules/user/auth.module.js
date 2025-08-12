@@ -12,40 +12,37 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthController = void 0;
-// apps/backend/src/auth/auth.controller.ts
+exports.AuthModule = exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../prisma/prisma.service");
-let AuthController = class AuthController {
+let UserController = class UserController {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async register(data) {
-        try {
-            const user = await this.prisma.user.create({
-                data: {
-                    email: data.email,
-                    password: data.password, // En producción usa bcrypt!
-                    name: data.name,
-                },
-            });
-            return { success: true, user };
-        }
-        catch (error) {
-            return { success: false, error: 'El email ya existe' };
-        }
+    async createUser(data) {
+        const user = await this.prisma.user.create({
+            data: {
+                email: data.email,
+                password: data.password,
+                name: data.name,
+            },
+        });
+        return { success: true, user };
     }
 };
-exports.AuthController = AuthController;
+exports.UserController = UserController;
 __decorate([
-    (0, common_1.Post)('register'),
+    (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "register", null);
-exports.AuthController = AuthController = __decorate([
-    (0, common_1.Controller)('auth'),
+], UserController.prototype, "createUser", null);
+exports.UserController = UserController = __decorate([
+    (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
-], AuthController);
+], UserController);
+class AuthModule {
+}
+exports.AuthModule = AuthModule;

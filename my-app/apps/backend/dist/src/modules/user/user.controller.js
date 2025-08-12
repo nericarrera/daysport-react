@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthModule = exports.UserController = void 0;
+exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../prisma/prisma.service");
 let UserController = class UserController {
@@ -43,6 +43,3 @@ exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], UserController);
-class AuthModule {
-}
-exports.AuthModule = AuthModule;
