@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
@@ -15,7 +16,7 @@ model User {
   name      String?
   createdAt DateTime @default(now())
 
-  carts Cart[] // <-- Relación inversa hacia Cart
+  carts     Cart[]   // <-- Relación inversa hacia Cart
 }
 
 model Product {
