@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "scripts": {
     "start": "nest start",
-    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "build": "nest build",
@@ -11,7 +10,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "prisma:generate": "prisma generate",
+   "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
+   "start:dev": "npm run prisma:generate && nest start --watch",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "ts-node prisma/seed.ts"
