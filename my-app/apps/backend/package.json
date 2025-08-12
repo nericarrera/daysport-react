@@ -19,10 +19,15 @@
   "dependencies": {
     "@apollo/client": "^3.13.9",
     "@nestjs/common": "^11.1.6",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.13.0",
+    "bcrypt": "^6.0.0",
     "body-parser": "^1.20.3",
     "cookie": "^0.7.0",
     "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "path-to-regexp": "^3.2.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
@@ -31,6 +36,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^9.0.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "^29.5.14",
     "@types/node": "^16.18.126",
