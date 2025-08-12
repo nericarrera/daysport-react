@@ -1,14 +1,17 @@
 export async function testBackendConnection() {
   try {
-    const res = await fetch('http://localhost:3001/auth/register', {
+    const res = await fetch('http://localhost:3001/api/test', {
       method: 'GET',
     });
+
     if (!res.ok) {
-      throw new Error(`Error: ${res.status}`);
+      throw new Error(`Error HTTP: ${res.status}`);
     }
-    return await res.json();
-  } catch (err) {
-    console.error("Error conectando al backend:", err);
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error conectando al backend:', error);
     return null;
   }
 }
