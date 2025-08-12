@@ -1,11 +1,11 @@
 'use client';
 import { useEffect } from 'react';
-import { testBackendConnection } from '@/lib/api/testConnection';
+import { testBackendConnection } from '../../lib/api/test-connection';
 
 export default function TestPage() {
   useEffect(() => {
     testBackendConnection().then(console.log);
   }, []);
 
-  return <div>Verifica la consola del navegador (F12 > Console)</div>;
+
 }
