@@ -8,7 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -16,7 +15,7 @@ model User {
   name      String?
   createdAt DateTime @default(now())
 
-  carts     Cart[]   // <-- Relación inversa hacia Cart
+  carts Cart[] // <-- Relación inversa hacia Cart
 }
 
 model Product {
@@ -33,13 +32,14 @@ model Product {
 }
 
 model Cart {
-  id        Int    @id @default(autoincrement())
-  user      User   @relation(fields: [userId], references: [id])
-  userId    Int    @unique
+  id       Int        @id @default(autoincrement())
+  user     User       @relation(fields: [userId], references: [id])
+  userId   Int        @unique
+  CartItem CartItem[]
 }
 
 model CartItem {
-  id        Int     @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
   cartId    Int
   productId Int
   quantity  Int
