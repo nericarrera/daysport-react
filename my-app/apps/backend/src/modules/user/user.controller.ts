@@ -17,3 +17,5 @@ export class UserController {
     return { success: true, user };
   }
 }
+
+export class AuthModule {}
