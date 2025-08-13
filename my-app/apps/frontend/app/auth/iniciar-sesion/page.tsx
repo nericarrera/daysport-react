@@ -1,53 +1,49 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function IniciarSesionPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const [cargando, setCargando] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mensaje, setMensaje] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const loginUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCargando(true);
-    setMensaje('');
+    setMensaje("");
 
     try {
-      const res = await fetch('http://localhost:3001/auth/login', { // fijate que sea la ruta correcta en tu backend
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://192.168.1.34:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (res.ok) {
-        setMensaje('✅ Login exitoso!');
-        console.log('Token JWT:', data.token); // guardalo en localStorage si querés
-        setEmail('');
-        setPassword('');
+      if (response.ok) {
+        setMensaje("✅ Inicio de sesión correcto: " + data.user.email);
+        setEmail("");
+        setPassword("");
       } else {
-        setMensaje('❌ ' + (data.message || 'Credenciales incorrectas'));
+        setMensaje("❌ Error: " + data.message);
       }
     } catch (error) {
-      console.error(error);
-      setMensaje('❌ Error de conexión al backend');
-    } finally {
-      setCargando(false);
+      console.error("Error al iniciar sesión:", error);
+      setMensaje("❌ Error al conectar con el backend");
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', textAlign: 'center' }}>
+    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
       <h1>Iniciar Sesión</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <form onSubmit={loginUsuario} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
         <input
           type="password"
@@ -55,12 +51,13 @@ export default function IniciarSesionPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
-        <button type="submit" disabled={cargando}>
-          {cargando ? 'Ingresando...' : 'Iniciar Sesión'}
+        <button type="submit" style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}>
+          Iniciar sesión
         </button>
       </form>
-      {mensaje && <p style={{ marginTop: '10px' }}>{mensaje}</p>}
+      {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
     </div>
   );
 }
