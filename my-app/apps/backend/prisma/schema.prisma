@@ -17,7 +17,7 @@ model User {
   phone      String?
   address    String?
   postalCode String?
-  birthDate  DateTime?
+  birthDate  Date?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
