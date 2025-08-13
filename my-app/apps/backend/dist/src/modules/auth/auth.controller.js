@@ -20,30 +20,28 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    register(email, password, name) {
-        return this.authService.register(email, password, name);
+    async register(body) {
+        return this.authService.register(body.email, body.password, body.name);
     }
-    login(email, password) {
-        return this.authService.login(email, password);
+    async login(body) {
+        // usamos el método login de AuthService
+        return this.authService.login(body.email, body.password);
     }
 };
 exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('register'),
-    __param(0, (0, common_1.Body)('email')),
-    __param(1, (0, common_1.Body)('password')),
-    __param(2, (0, common_1.Body)('name')),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.Post)('login'),
-    __param(0, (0, common_1.Body)('email')),
-    __param(1, (0, common_1.Body)('password')),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),

@@ -6,10 +6,12 @@ export default function IniciarSesionPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [token, setToken] = useState("");
 
   const loginUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
+    setToken("");
 
     try {
       const response = await fetch("http://192.168.1.34:3001/auth/login", {
@@ -21,11 +23,12 @@ export default function IniciarSesionPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setMensaje("✅ Inicio de sesión correcto: " + data.user.email);
+        setMensaje(`✅ Inicio de sesión correcto: ${email}`);
+        setToken(data.token); // guardamos el token JWT
         setEmail("");
         setPassword("");
       } else {
-        setMensaje("❌ Error: " + data.message);
+        setMensaje(`❌ Error: ${data.message}`);
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
@@ -57,7 +60,14 @@ export default function IniciarSesionPage() {
           Iniciar sesión
         </button>
       </form>
+
       {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
+      {token && (
+        <div style={{ marginTop: "10px", wordBreak: "break-word" }}>
+          <strong>Token JWT:</strong>
+          <p>{token}</p>
+        </div>
+      )}
     </div>
   );
 }
