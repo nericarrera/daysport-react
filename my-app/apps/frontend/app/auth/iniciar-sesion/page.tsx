@@ -14,7 +14,7 @@ export default function IniciarSesionPage() {
     setToken("");
 
     try {
-      const response = await fetch("http://192.168.1.34:3001/app/auth/login", {
+      const response = await fetch("http://192.168.1.34:3001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
