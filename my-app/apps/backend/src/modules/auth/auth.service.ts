@@ -10,7 +10,8 @@ export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
   // Registro
-  async register(registerDto: RegisterDto) {
+async register(registerDto: RegisterDto) {
+  try {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
     const user = await this.prisma.user.create({
@@ -26,7 +27,11 @@ export class AuthService {
     });
 
     return { message: 'User registered successfully', user };
+  } catch (error) {
+    console.error('Error en register:', error);
+    throw error;
   }
+}
 
   // Login
   async login(email: string, password: string) {
