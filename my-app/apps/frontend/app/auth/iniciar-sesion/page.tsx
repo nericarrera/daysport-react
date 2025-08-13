@@ -14,7 +14,7 @@ export default function IniciarSesionPage() {
     setMensaje('');
 
     try {
-      const res = await fetch('http://localhost:3001/auth/iniciar-sesion', {
+      const res = await fetch('http://localhost:3001/auth/login', { // fijate que sea la ruta correcta en tu backend
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -24,14 +24,14 @@ export default function IniciarSesionPage() {
 
       if (res.ok) {
         setMensaje('✅ Login exitoso!');
-        console.log('Token JWT:', data.token); // lo podés guardar en localStorage después
+        console.log('Token JWT:', data.token); // guardalo en localStorage si querés
         setEmail('');
         setPassword('');
       } else {
         setMensaje('❌ ' + (data.message || 'Credenciales incorrectas'));
       }
     } catch (error) {
-        console.error(error);
+      console.error(error);
       setMensaje('❌ Error de conexión al backend');
     } finally {
       setCargando(false);
@@ -64,4 +64,3 @@ export default function IniciarSesionPage() {
     </div>
   );
 }
-
