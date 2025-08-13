@@ -57,19 +57,25 @@ let AuthService = class AuthService {
     }
     // Registro
     async register(registerDto) {
-        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-        const user = await this.prisma.user.create({
-            data: {
-                email: registerDto.email,
-                password: hashedPassword,
-                name: registerDto.name,
-                phone: registerDto.phone,
-                address: registerDto.address,
-                postalCode: registerDto.postalCode,
-                birthDate: registerDto.birthDate ? new Date(registerDto.birthDate) : null,
-            },
-        });
-        return { message: 'User registered successfully', user };
+        try {
+            const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+            const user = await this.prisma.user.create({
+                data: {
+                    email: registerDto.email,
+                    password: hashedPassword,
+                    name: registerDto.name,
+                    phone: registerDto.phone,
+                    address: registerDto.address,
+                    postalCode: registerDto.postalCode,
+                    birthDate: registerDto.birthDate ? new Date(registerDto.birthDate) : null,
+                },
+            });
+            return { message: 'User registered successfully', user };
+        }
+        catch (error) {
+            console.error('Error en register:', error);
+            throw error;
+        }
     }
     // Login
     async login(email, password) {
