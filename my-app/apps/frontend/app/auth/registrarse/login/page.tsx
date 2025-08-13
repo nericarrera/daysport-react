@@ -9,7 +9,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch('/api/auth/registrarse', {
+      const res = await fetch('/api/auth/registrarse/page.tsx', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
