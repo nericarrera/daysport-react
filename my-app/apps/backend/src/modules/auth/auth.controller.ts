@@ -12,7 +12,16 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    // usamos el método login de AuthService
     return this.authService.login(body.email, body.password);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: { email: string }) {
+    return this.authService.sendResetPasswordEmail(body.email);
+  }
+
+  @Post('new-password')
+  async newPassword(@Body() body: { token: string; password: string }) {
+    return this.authService.resetPassword(body.token, body.password);
   }
 }
