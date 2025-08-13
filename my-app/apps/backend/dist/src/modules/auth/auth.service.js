@@ -38,32 +38,42 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../../../prisma/prisma.service");
+const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
-const users_mock_1 = require("./users.mock");
 let AuthService = class AuthService {
-    // Método que ya tenías para registro
-    async register(email, password) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = { id: Date.now(), email, password: hashedPassword };
-        users_mock_1.users.push(newUser); // guardalo en tu "BD"
-        return { message: 'User registered successfully', user: newUser };
+    prisma;
+    jwtService;
+    constructor(prisma, jwtService) {
+        this.prisma = prisma;
+        this.jwtService = jwtService;
     }
-    // 🔹 Método para validar login
-    async validateUser(email, password) {
-        const user = users_mock_1.users.find(u => u.email === email);
+    async register(email, password, name) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await this.prisma.user.create({
+            data: { email, password: hashedPassword, name },
+        });
+        return { message: 'User registered successfully', user };
+    }
+    async login(email, password) {
+        const user = await this.prisma.user.findUnique({ where: { email } });
         if (!user)
-            return null;
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch)
-            return null;
-        // devolvemos solo información segura
-        return { id: user.id, email: user.email };
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        const passwordValid = await bcrypt.compare(password, user.password);
+        if (!passwordValid)
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        const token = this.jwtService.sign({ sub: user.id, email: user.email });
+        return { message: 'Login successful', token };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService])
 ], AuthService);
