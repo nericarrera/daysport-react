@@ -10,7 +10,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch('http://localhost:3001/auth/registrarse', {
+    const res = await fetch('http://localhost:3001/auth/registrarse/page.tsx', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
