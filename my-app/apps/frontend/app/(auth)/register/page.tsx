@@ -11,10 +11,15 @@ export default function RegisterPage() {
     e.preventDefault();
 
     const res = await fetch('http://localhost:3001/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'test@example.com',
+    password: '123456',
+  }),
+})
+
+
 
     const data = await res.json();
 
