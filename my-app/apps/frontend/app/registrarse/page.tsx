@@ -12,7 +12,7 @@ export default function RegistrarsePage() {
     setMensaje("");
 
     try {
-  const response = await fetch("http://192.168.1.34:3001/register", {
+  const response = await fetch("http://192.168.1.34:3001/registrarse", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
