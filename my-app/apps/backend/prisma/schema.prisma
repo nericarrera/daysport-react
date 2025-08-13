@@ -52,8 +52,9 @@ model CartItem {
 }
 
 model ResetToken {
-  token   String @id
-  userId  Int
+  id     Int      @id @default(autoincrement())
+  token  String   @unique
+  userId Int
   expires DateTime
-  user    User   @relation(fields: [userId], references: [id])
+  user   User     @relation(fields: [userId], references: [id])
 }
