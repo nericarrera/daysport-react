@@ -15,6 +15,7 @@ model User {
   password  String
   name      String?
   createdAt DateTime @default(now())
+  resetTokens ResetToken[]
 
   carts     Cart[]   // <-- Relación inversa hacia Cart
 }
@@ -52,9 +53,9 @@ model CartItem {
 }
 
 model ResetToken {
-  id     Int      @id @default(autoincrement())
-  token  String   @unique
-  userId Int
+  id      Int      @id @default(autoincrement())
+  token   String   @unique
+  userId  Int
   expires DateTime
-  user   User     @relation(fields: [userId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
 }
