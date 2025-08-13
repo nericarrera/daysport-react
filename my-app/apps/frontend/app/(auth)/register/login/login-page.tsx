@@ -1,63 +1,53 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // si usás Next.js
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const router = useRouter();
+export default function RegisterPage() {
+  const [form, setForm] = useState({ email: '', password: '' });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch('http://localhost:3000/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    const data = await res.json();
-
-    if (res.ok && data.token) {
-      localStorage.setItem('token', data.token);
-      setMessage('Login exitoso');
-      // Redirigir a otra página, por ej. home o dashboard
-      router.push('/shop');
-    } else {
-      setMessage(data.message || 'Credenciales inválidas');
+      if (!res.ok) throw new Error('Error al registrar');
+      alert('Usuario registrado con éxito');
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un problema al registrarte');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Iniciar sesión</h1>
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow">
+      <h1 className="text-2xl font-bold mb-4">Crear cuenta</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
           placeholder="Correo electrónico"
           className="w-full p-2 border rounded"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
         <input
           type="password"
           placeholder="Contraseña"
           className="w-full p-2 border rounded"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
         >
-          Iniciar sesión
+          Registrarse
         </button>
       </form>
-      {message && <p className="mt-4 text-center text-red-600">{message}</p>}
     </div>
   );
 }
