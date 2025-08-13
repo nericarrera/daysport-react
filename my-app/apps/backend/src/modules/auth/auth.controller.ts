@@ -8,22 +8,23 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() body: { email: string; password: string; name?: string }) {
-    return this.authService.register(body.email, body.password, body.name);
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    return this.authService.login(body.email, body.password);
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto.email, loginDto.password);
+  }
+
+  // Recuperación de contraseña
+  @Post('send-reset-password')
+  async sendResetPasswordEmail(@Body('email') email: string) {
+    return this.authService.sendResetPasswordEmail(email);
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() body: { email: string }) {
-    return this.authService.sendResetPasswordEmail(body.email);
-  }
-
-  @Post('new-password')
-  async newPassword(@Body() body: { token: string; password: string }) {
+  async resetPassword(@Body() body: { token: string; password: string }) {
     return this.authService.resetPassword(body.token, body.password);
   }
 }

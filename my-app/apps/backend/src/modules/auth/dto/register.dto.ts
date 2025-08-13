@@ -1,5 +1,4 @@
-
-import { IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, MinLength, IsDateString } from 'class-validator';
 
 export class RegisterDto {
   @IsEmail()
@@ -24,5 +23,6 @@ export class RegisterDto {
   postalCode?: string;
 
   @IsOptional()
-  birthDate?: Date;
+  @IsDateString()
+  birthDate?: string; // Usamos string para que se pueda enviar desde JSON y parsear después
 }
