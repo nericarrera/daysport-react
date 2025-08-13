@@ -31,6 +31,7 @@ export default function IniciarSesionPage() {
         setMensaje('❌ ' + (data.message || 'Credenciales incorrectas'));
       }
     } catch (error) {
+    console.error(error); 
       setMensaje('❌ Error de conexión al backend');
     } finally {
       setCargando(false);
