@@ -47,6 +47,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../prisma/prisma.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
+const crypto_1 = require("crypto");
 let AuthService = class AuthService {
     prisma;
     jwtService;
@@ -65,11 +66,42 @@ let AuthService = class AuthService {
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (!user)
             throw new common_1.UnauthorizedException('Invalid credentials');
-        const passwordValid = await bcrypt.compare(password, user.password);
-        if (!passwordValid)
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid)
             throw new common_1.UnauthorizedException('Invalid credentials');
         const token = this.jwtService.sign({ sub: user.id, email: user.email });
         return { message: 'Login successful', token };
+    }
+    // Recuperación de contraseña
+    async sendResetPasswordEmail(email) {
+        const user = await this.prisma.user.findUnique({ where: { email } });
+        if (!user)
+            throw new common_1.NotFoundException('Email not found');
+        const token = (0, crypto_1.randomBytes)(32).toString('hex');
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1);
+        await this.prisma.resetToken.create({
+            data: {
+                token,
+                userId: user.id,
+                expires,
+            },
+        });
+        // Aquí enviarías email con el link: http://tu-frontend/reset-password?token=...
+        return { message: 'Reset password email sent', token }; // temporalmente devuelvo token para testing
+    }
+    async resetPassword(token, password) {
+        const tokenRecord = await this.prisma.resetToken.findUnique({ where: { token } });
+        if (!tokenRecord || tokenRecord.expires < new Date()) {
+            throw new common_1.UnauthorizedException('Invalid or expired token');
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await this.prisma.user.update({
+            where: { id: tokenRecord.userId },
+            data: { password: hashedPassword },
+        });
+        await this.prisma.resetToken.delete({ where: { token } });
+        return { message: 'Password updated successfully' };
     }
 };
 exports.AuthService = AuthService;

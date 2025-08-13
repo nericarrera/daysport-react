@@ -24,8 +24,13 @@ let AuthController = class AuthController {
         return this.authService.register(body.email, body.password, body.name);
     }
     async login(body) {
-        // usamos el método login de AuthService
         return this.authService.login(body.email, body.password);
+    }
+    async resetPassword(body) {
+        return this.authService.sendResetPasswordEmail(body.email);
+    }
+    async newPassword(body) {
+        return this.authService.resetPassword(body.token, body.password);
     }
 };
 exports.AuthController = AuthController;
@@ -43,6 +48,20 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Post)('new-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "newPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
