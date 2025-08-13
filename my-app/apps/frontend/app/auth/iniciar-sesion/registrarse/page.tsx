@@ -12,11 +12,15 @@ export default function RegistrarsePage() {
     setMensaje("");
 
     try {
-      const response = await fetch("http://192.168.1.34:3001/app/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const response =    await fetch("http://192.168.1.34:3001/auth/register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    email: email,
+    password: password,
+    name: name // si tu backend lo acepta opcional
+  }),
+});
 
       const data = await response.json();
 
