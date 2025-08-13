@@ -50,3 +50,10 @@ model CartItem {
 
   @@unique([cartId, productId], name: "cartId_productId")
 }
+
+model ResetToken {
+  token   String @id
+  userId  Int
+  expires DateTime
+  user    User   @relation(fields: [userId], references: [id])
+}
