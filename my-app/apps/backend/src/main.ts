@@ -10,7 +10,7 @@ async function bootstrap() {
     credentials: true, // para enviar cookies si después las usamos
   });
 
-  await app.listen(3001);
+  await app.listen(3001, '0.0.0.0');
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

@@ -14,7 +14,7 @@ export default function RegistrarsePage() {
     setMensaje('');
 
     try {
-      const res = await fetch('http://localhost:3001/auth/registrarse', {
+      const res = await fetch('http://localhost:3001/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
