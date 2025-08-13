@@ -30,7 +30,7 @@ export default function RegistrarsePage() {
         setMensaje('❌ ' + (data.message || 'Error en el registro'));
       }
     } catch (error) {
-      console.error(error); 
+      console.error(error);
       setMensaje('❌ Error de conexión al backend');
     } finally {
       setCargando(false);
