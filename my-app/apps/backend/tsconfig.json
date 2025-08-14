@@ -17,6 +17,6 @@
     },
     
   },
-  "include": ["src/**/*", "prisma.config.ts"],
+  "include": ["src/**/*", "prisma.config.ts", "scripts"],
   "exclude": ["../../node_modules", "test", "dist"]
 }
