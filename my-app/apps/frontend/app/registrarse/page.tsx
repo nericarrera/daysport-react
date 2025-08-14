@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const router = useRouter();
 
   const validarPassword = (pass: string) => {
     const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}[\]:;<>,.?/~\-]).{8,}$/;
@@ -34,10 +36,15 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setMensaje("✅ Usuario registrado correctamente");
+        setMensaje("✅ Usuario registrado correctamente. Redirigiendo al login...");
         setEmail("");
         setPassword("");
         setName("");
+
+        // Redirigir a login después de 2 segundos
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 2000);
       } else {
         setMensaje(`❌ Error: ${data.message}`);
       }
