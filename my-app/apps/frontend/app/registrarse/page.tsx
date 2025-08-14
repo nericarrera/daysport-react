@@ -8,9 +8,9 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // <-- estado para el ojito
   const router = useRouter();
 
-  // Validaciones individuales
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[!@#$%^&*()_+{}[\]:;<>,.?/~\-]/.test(password);
@@ -73,16 +73,34 @@ export default function RegisterPage() {
           required
           style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
 
-        {/* Validación visual en tiempo real */}
+        {/* Input de contraseña con ojito */}
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ padding: "8px 35px 8px 8px", borderRadius: "5px", border: "1px solid #ccc", width: "100%" }}
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "8px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              fontSize: "16px",
+              color: "#555"
+            }}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
+
+        {/* Validación visual */}
         <div style={{ fontSize: "14px", marginBottom: "10px" }}>
           <p style={{ color: hasUppercase ? "green" : "red" }}>✔️ Al menos una mayúscula</p>
           <p style={{ color: hasNumber ? "green" : "red" }}>✔️ Al menos un número</p>
