@@ -148,17 +148,7 @@ export default function Navbar() {
     }, 200);
   }, [isHoveringMegaMenu]);
 
-  const handleMegaMenuEnter = useCallback(() => {
-    clearTimeout(megaMenuTimeout.current!);
-    setIsHoveringMegaMenu(true);
-  }, []);
-
-  const handleMegaMenuLeave = useCallback(() => {
-    setIsHoveringMegaMenu(false);
-    setIsMegaMenuOpen(false);
-    setActiveCategory(null);
-  }, []);
-
+  
   return (
     <UserContext.Provider value={{ ...userState, login, logout }}>
       <>
@@ -511,70 +501,17 @@ export default function Navbar() {
           </div>
         </nav>
 
-        {/* MegaMenu desktop */}
-        {!isMobileView && isMegaMenuOpen && activeCategory !== null && (
-          <div 
-            className="absolute left-0 right-0 bg-white shadow-lg z-40 border-t border-gray-200"
-            onMouseEnter={handleMegaMenuEnter}
-            onMouseLeave={handleMegaMenuLeave}
-            style={{
-              transition: 'opacity 0.2s ease, transform 0.2s ease',
-              transform: isMegaMenuOpen ? 'translateY(0)' : 'translateY(-10px)',
-              opacity: isMegaMenuOpen ? 1 : 0,
-              pointerEvents: isMegaMenuOpen ? 'auto' : 'none'
-            }}
-          >
-            <div className="max-w-7xl mx-auto px-8 py-6">
-              <div className="grid grid-cols-4 gap-8">
-                {/* Subcategorías */}
-                <div className="col-span-1">
-                  <h3 className="text-lg font-bold mb-4 text-gray-900">{categories[activeCategory].name}</h3>
-                  <ul className="space-y-3">
-                    {categories[activeCategory].subcategories.map((subcat) => (
-                      <li key={subcat.name}>
-                        <Link 
-                          href={subcat.href} 
-                          className="text-gray-700 hover:text-yellow-500 transition-colors block py-1"
-                        >
-                          {subcat.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Destacados */}
-<div className="col-span-3 grid grid-cols-3 gap-6">
-  {categories[activeCategory].subcategories
-    .filter(subcat => subcat.image) // Filtramos primero los que tienen imagen
-    .map((subcat) => {
-      // Aseguramos que image existe y es string
-      const imageSrc = subcat.image || '/default-image-path.jpg';
-      return (
-        <div key={subcat.name} className="group">
-          <Link href={subcat.href} className="block">
-            <div className="relative aspect-square mb-2 overflow-hidden rounded-lg">
-              <Image 
-                src={imageSrc} 
-                alt={subcat.name} 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-            </div>
-            <h4 className="text-gray-900 font-medium group-hover:text-yellow-500 transition-colors">
-              {subcat.name}
-            </h4>
-          </Link>
-        </div>
-      );
-    })}
-</div>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
-    </UserContext.Provider>
-  );
-}
+     {/* MegaMenu desktop */}
+{!isMobileView && (
+  <MegaMenu
+    isOpen={isMegaMenuOpen && activeCategory !== null}
+    onClose={() => {
+      setIsMegaMenuOpen(false);
+      setActiveCategory(null);
+    }}
+    categoryData={activeCategory !== null ? categories[activeCategory] : null}
+  />
+)}
+   </>
+  </UserContext.Provider>
+)};
