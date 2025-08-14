@@ -9,9 +9,10 @@ import { RegisterDto } from './dto/register.dto';
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  // Registro
+  // -------------------- Registro --------------------
   async register(registerDto: RegisterDto) {
     try {
+      // Hash de la contraseña
       const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
       const user = await this.prisma.user.create({
@@ -33,28 +34,30 @@ export class AuthService {
     }
   }
 
-  // Login con debug
+  // -------------------- Login --------------------
   async login(email: string, password: string) {
     try {
       const user = await this.prisma.user.findUnique({ where: { email } });
       console.log('Usuario encontrado en login:', user);
 
       if (!user) {
-        console.log('No se encontró usuario con ese email');
+        console.log('No se encontró usuario con ese email:', email);
         throw new UnauthorizedException('Invalid credentials');
       }
 
+      // Verificar la contraseña
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) {
         console.log('Contraseña incorrecta para el usuario:', email);
         throw new UnauthorizedException('Invalid credentials');
       }
 
+      // Generar JWT
       const token = this.jwtService.sign({ sub: user.id, email: user.email });
+
       return { message: 'Login successful', token };
     } catch (error) {
       console.error('Error en login:', error);
-      // Lanzamos Unauthorized si es un error esperado, sino lo dejamos pasar
       if (error instanceof UnauthorizedException) {
         throw error;
       }
@@ -62,14 +65,14 @@ export class AuthService {
     }
   }
 
-  // Recuperación de contraseña
+  // -------------------- Recuperación de contraseña --------------------
   async sendResetPasswordEmail(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new NotFoundException('Email not found');
 
     const token = randomBytes(32).toString('hex');
     const expires = new Date();
-    expires.setHours(expires.getHours() + 1);
+    expires.setHours(expires.getHours() + 1); // Expira en 1 hora
 
     await this.prisma.resetToken.create({
       data: {
@@ -79,7 +82,8 @@ export class AuthService {
       },
     });
 
-    return { message: 'Reset password email sent', token }; // temporalmente devuelvo token para testing
+    // Temporal: devolver token para testing
+    return { message: 'Reset password email sent', token };
   }
 
   async resetPassword(token: string, password: string) {
@@ -88,12 +92,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
+    // Hash de la nueva contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
     await this.prisma.user.update({
       where: { id: tokenRecord.userId },
       data: { password: hashedPassword },
     });
 
+    // Eliminar token usado
     await this.prisma.resetToken.delete({ where: { token } });
 
     return { message: 'Password updated successfully' };

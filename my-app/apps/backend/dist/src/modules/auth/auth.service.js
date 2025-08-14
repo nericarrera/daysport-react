@@ -55,9 +55,10 @@ let AuthService = class AuthService {
         this.prisma = prisma;
         this.jwtService = jwtService;
     }
-    // Registro
+    // -------------------- Registro --------------------
     async register(registerDto) {
         try {
+            // Hash de la contraseña
             const hashedPassword = await bcrypt.hash(registerDto.password, 10);
             const user = await this.prisma.user.create({
                 data: {
@@ -77,40 +78,41 @@ let AuthService = class AuthService {
             throw error;
         }
     }
-    // Login con debug
+    // -------------------- Login --------------------
     async login(email, password) {
         try {
             const user = await this.prisma.user.findUnique({ where: { email } });
             console.log('Usuario encontrado en login:', user);
             if (!user) {
-                console.log('No se encontró usuario con ese email');
+                console.log('No se encontró usuario con ese email:', email);
                 throw new common_1.UnauthorizedException('Invalid credentials');
             }
+            // Verificar la contraseña
             const valid = await bcrypt.compare(password, user.password);
             if (!valid) {
                 console.log('Contraseña incorrecta para el usuario:', email);
                 throw new common_1.UnauthorizedException('Invalid credentials');
             }
+            // Generar JWT
             const token = this.jwtService.sign({ sub: user.id, email: user.email });
             return { message: 'Login successful', token };
         }
         catch (error) {
             console.error('Error en login:', error);
-            // Lanzamos Unauthorized si es un error esperado, sino lo dejamos pasar
             if (error instanceof common_1.UnauthorizedException) {
                 throw error;
             }
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
     }
-    // Recuperación de contraseña
+    // -------------------- Recuperación de contraseña --------------------
     async sendResetPasswordEmail(email) {
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (!user)
             throw new common_1.NotFoundException('Email not found');
         const token = (0, crypto_1.randomBytes)(32).toString('hex');
         const expires = new Date();
-        expires.setHours(expires.getHours() + 1);
+        expires.setHours(expires.getHours() + 1); // Expira en 1 hora
         await this.prisma.resetToken.create({
             data: {
                 token,
@@ -118,18 +120,21 @@ let AuthService = class AuthService {
                 expires,
             },
         });
-        return { message: 'Reset password email sent', token }; // temporalmente devuelvo token para testing
+        // Temporal: devolver token para testing
+        return { message: 'Reset password email sent', token };
     }
     async resetPassword(token, password) {
         const tokenRecord = await this.prisma.resetToken.findUnique({ where: { token } });
         if (!tokenRecord || tokenRecord.expires < new Date()) {
             throw new common_1.UnauthorizedException('Invalid or expired token');
         }
+        // Hash de la nueva contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
         await this.prisma.user.update({
             where: { id: tokenRecord.userId },
             data: { password: hashedPassword },
         });
+        // Eliminar token usado
         await this.prisma.resetToken.delete({ where: { token } });
         return { message: 'Password updated successfully' };
     }
