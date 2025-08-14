@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,12 +10,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const iniciarSesion = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
 
+    if (!email || !password) {
+      setMensaje("❌ Por favor completa todos los campos.");
+      return;
+    }
+
     try {
-      const response = await fetch("http://192.168.1.34:3001/login", {
+      const response = await fetch("http://192.168.1.34:3001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -26,72 +30,92 @@ export default function LoginPage() {
 
       if (response.ok) {
         setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
+        // Aquí puedes guardar token o datos de usuario en localStorage
+        localStorage.setItem("token", data.token);
+
         setTimeout(() => {
-          router.push("/"); // Redirigir al home o dashboard
+          router.push("/"); // Redirige a la página principal
         }, 1500);
       } else {
         setMensaje(`❌ Error: ${data.message}`);
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      setMensaje("❌ Error al conectar con el backend");
+      setMensaje("❌ Error al conectar con el servidor.");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 border rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h1>
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
+    <div
+      style={{
+        maxWidth: "400px",
+        margin: "50px auto",
+        padding: "20px",
+        border: "1px solid #ccc",
+        borderRadius: "10px",
+      }}
+    >
+      <h1>Iniciar Sesión</h1>
+      <form
+        onSubmit={iniciarSesion}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
         <input
           type="email"
           placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            padding: "8px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
         />
-
-        {/* Contraseña con ojo */}
-        <div className="relative">
+        <div style={{ position: "relative" }}>
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+            style={{
+              padding: "8px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
           />
           <span
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600 hover:text-blue-500 transition-colors"
             onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              color: "#555",
+              fontSize: "14px",
+            }}
           >
-            {showPassword ? (
-              <EyeSlashIcon className="h-5 w-5" />
-            ) : (
-              <EyeIcon className="h-5 w-5" />
-            )}
+            {showPassword ? "🙈" : "👁️"}
           </span>
         </div>
-
         <button
           type="submit"
-          className="py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            backgroundColor: "#1d4ed8",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+          }}
         >
           Iniciar Sesión
         </button>
       </form>
-
-      <p className="mt-4 text-center">
-        ¿No tenés cuenta?{" "}
-        <a
-          href="/auth/registrarse"
-          className="text-blue-600 hover:underline"
-        >
-          Registrate aquí
-        </a>
-      </p>
-
-      {mensaje && <p className="mt-4 text-center">{mensaje}</p>}
+      {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
     </div>
   );
 }
