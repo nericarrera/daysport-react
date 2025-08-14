@@ -11,8 +11,6 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
-const auth_controller_1 = require("./auth.controller");
-const prisma_service_1 = require("../../../prisma/prisma.service");
 const jwt_strategy_1 = require("./jwt.strategy");
 let AuthModule = class AuthModule {
 };
@@ -22,11 +20,11 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             passport_1.PassportModule,
             jwt_1.JwtModule.register({
-                secret: process.env.JWT_SECRET || 'secretKey', // 🔹 usar variable de entorno real
-                signOptions: { expiresIn: '1d' },
+                secret: 'TU_SECRETO', // mismo que usaste al generar los tokens
+                signOptions: { expiresIn: '1h' },
             }),
         ],
-        providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_strategy_1.JwtStrategy],
-        controllers: [auth_controller_1.AuthController],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
+        exports: [auth_service_1.AuthService],
     })
 ], AuthModule);
