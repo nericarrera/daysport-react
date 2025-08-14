@@ -10,19 +10,20 @@ export default function RegisterPage() {
   const [mensaje, setMensaje] = useState("");
   const router = useRouter();
 
-  const validarPassword = (pass: string) => {
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}[\]:;<>,.?/~\-]).{8,}$/;
-    return regex.test(pass);
-  };
+  // Validaciones individuales
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+{}[\]:;<>,.?/~\-]/.test(password);
+  const hasMinLength = password.length >= 8;
+
+  const validarPassword = () => hasUppercase && hasNumber && hasSpecial && hasMinLength;
 
   const registrarUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
 
-    if (!validarPassword(password)) {
-      setMensaje(
-        "❌ La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial."
-      );
+    if (!validarPassword()) {
+      setMensaje("❌ La contraseña no cumple con los requisitos.");
       return;
     }
 
@@ -40,8 +41,6 @@ export default function RegisterPage() {
         setEmail("");
         setPassword("");
         setName("");
-
-        // Redirigir a login después de 2 segundos
         setTimeout(() => {
           router.push("/auth/login");
         }, 2000);
@@ -58,10 +57,43 @@ export default function RegisterPage() {
     <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
       <h1>Registrar Usuario</h1>
       <form onSubmit={registrarUsuario} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input type="text" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} required style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }} />
-        <input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }} />
-        <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }} />
-        <button type="submit" style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}>
+        <input
+          type="text"
+          placeholder="Nombre"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+        />
+        <input
+          type="email"
+          placeholder="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+        />
+
+        {/* Validación visual en tiempo real */}
+        <div style={{ fontSize: "14px", marginBottom: "10px" }}>
+          <p style={{ color: hasUppercase ? "green" : "red" }}>✔️ Al menos una mayúscula</p>
+          <p style={{ color: hasNumber ? "green" : "red" }}>✔️ Al menos un número</p>
+          <p style={{ color: hasSpecial ? "green" : "red" }}>✔️ Al menos un carácter especial</p>
+          <p style={{ color: hasMinLength ? "green" : "red" }}>✔️ Al menos 8 caracteres</p>
+        </div>
+
+        <button
+          type="submit"
+          style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}
+        >
           Registrarse
         </button>
       </form>
