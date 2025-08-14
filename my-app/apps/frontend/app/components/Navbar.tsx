@@ -63,12 +63,24 @@ export default function Navbar() {
     user: null
   });
 
+  // LOGIN - guarda en localStorage
   const login = useCallback((userData: User) => {
     setUserState({ isLoggedIn: true, user: userData });
+    localStorage.setItem("user", JSON.stringify(userData));
   }, []);
 
+  // LOGOUT - borra de localStorage
   const logout = useCallback(() => {
     setUserState({ isLoggedIn: false, user: null });
+    localStorage.removeItem("user");
+  }, []);
+
+  // Cargar usuario de localStorage al entrar
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUserState({ isLoggedIn: true, user: JSON.parse(storedUser) });
+    }
   }, []);
 
   // Textos animados del banner
