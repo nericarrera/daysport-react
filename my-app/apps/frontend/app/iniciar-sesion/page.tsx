@@ -1,14 +1,15 @@
-"use client";
-
+'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "../components/Navbar"; // Ajusta la ruta según donde esté tu Navbar
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useUser(); // Contexto de usuario
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
 
   const iniciarSesion = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,12 +31,13 @@ export default function LoginPage() {
 
       if (response.ok) {
         setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
-        // Aquí puedes guardar token o datos de usuario en localStorage
-        localStorage.setItem("token", data.token);
+
+        // Guardar usuario en el contexto y en localStorage automáticamente
+        login({ name: data.name, email: data.email });
 
         setTimeout(() => {
           router.push("/"); // Redirige a la página principal
-        }, 1500);
+        }, 1000);
       } else {
         setMensaje(`❌ Error: ${data.message}`);
       }
