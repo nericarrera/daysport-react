@@ -10,39 +10,56 @@ export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
   // Registro
-async register(registerDto: RegisterDto) {
-  try {
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+  async register(registerDto: RegisterDto) {
+    try {
+      const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-    const user = await this.prisma.user.create({
-      data: { 
-        email: registerDto.email,
-        password: hashedPassword,
-        name: registerDto.name,
-        phone: registerDto.phone,
-        address: registerDto.address,
-        postalCode: registerDto.postalCode,
-        birthDate: registerDto.birthDate ? new Date(registerDto.birthDate) : null,
-      },
-    });
+      const user = await this.prisma.user.create({
+        data: { 
+          email: registerDto.email,
+          password: hashedPassword,
+          name: registerDto.name,
+          phone: registerDto.phone,
+          address: registerDto.address,
+          postalCode: registerDto.postalCode,
+          birthDate: registerDto.birthDate ? new Date(registerDto.birthDate) : null,
+        },
+      });
 
-    return { message: 'User registered successfully', user };
-  } catch (error) {
-    console.error('Error en register:', error);
-    throw error;
+      return { message: 'User registered successfully', user };
+    } catch (error) {
+      console.error('Error en register:', error);
+      throw error;
+    }
   }
-}
 
-  // Login
+  // Login con debug
   async login(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    try {
+      const user = await this.prisma.user.findUnique({ where: { email } });
+      console.log('Usuario encontrado en login:', user);
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new UnauthorizedException('Invalid credentials');
+      if (!user) {
+        console.log('No se encontró usuario con ese email');
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-    const token = this.jwtService.sign({ sub: user.id, email: user.email });
-    return { message: 'Login successful', token };
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) {
+        console.log('Contraseña incorrecta para el usuario:', email);
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const token = this.jwtService.sign({ sub: user.id, email: user.email });
+      return { message: 'Login successful', token };
+    } catch (error) {
+      console.error('Error en login:', error);
+      // Lanzamos Unauthorized si es un error esperado, sino lo dejamos pasar
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Invalid credentials');
+    }
   }
 
   // Recuperación de contraseña
@@ -62,7 +79,6 @@ async register(registerDto: RegisterDto) {
       },
     });
 
-    // Aquí enviarías email con el link: http://tu-frontend/reset-password?token=...
     return { message: 'Reset password email sent', token }; // temporalmente devuelvo token para testing
   }
 

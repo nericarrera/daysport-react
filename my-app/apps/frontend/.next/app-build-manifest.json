@@ -11,15 +11,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
+    "/iniciar-sesion/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/iniciar-sesion/page.js"
+    ],
     "/registrarse/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/registrarse/page.js"
     ],
-    "/iniciar-sesion/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/iniciar-sesion/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
