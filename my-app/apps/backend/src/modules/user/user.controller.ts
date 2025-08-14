@@ -24,8 +24,12 @@ export class UserController {
 @UseGuards(AuthGuard('jwt'))
 @Get('profile')
 async getProfile(@Req() req: Request) {
-  // req.user no tiene tipado, usamos "as any"
-  const userId = (req.user as any).sub;
+  console.log('req.user:', req.user); // 👈 esto nos dice si viene algo del JWT
+
+  const userId = (req.user as any)?.sub;
+  if (!userId) {
+    throw new Error('Usuario no encontrado en el token');
+  }
 
   const user = await this.prisma.user.findUnique({
     where: { id: userId },
