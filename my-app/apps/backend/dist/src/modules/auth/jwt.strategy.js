@@ -12,17 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
-const passport_jwt_1 = require("passport-jwt"); // 🔹 Importar ExtractJwt y Strategy de passport-jwt
+const passport_jwt_1 = require("passport-jwt");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor() {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'secretKey',
+            secretOrKey: 'TU_SECRETO',
         });
     }
     async validate(payload) {
-        return { userId: payload.sub, email: payload.email };
+        // payload es lo que pusiste en el token al hacer login
+        return payload; // esto hace que req.user = payload
     }
 };
 exports.JwtStrategy = JwtStrategy;
