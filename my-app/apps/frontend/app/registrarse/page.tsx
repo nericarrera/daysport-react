@@ -1,16 +1,19 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"; // íconos SVG de Heroicons
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useUser } from "../components/Navbar"; // Ajusta según la ubicación real
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { login } = useUser(); // Contexto de usuario
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
 
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
@@ -38,13 +41,18 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setMensaje("✅ Usuario registrado correctamente. Redirigiendo al login...");
+        setMensaje("✅ Registro exitoso. Iniciando sesión automáticamente...");
         setEmail("");
         setPassword("");
         setName("");
+
+        // Llamar al contexto de usuario para loguear automáticamente
+        login({ name: data.name, email: data.email });
+
+        // Redirigir al home
         setTimeout(() => {
-          router.push("/auth/login");
-        }, 2000);
+          router.push("/");
+        }, 1000);
       } else {
         setMensaje(`❌ Error: ${data.message}`);
       }
@@ -74,8 +82,6 @@ export default function RegisterPage() {
           required
           className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
-        {/* Input de contraseña con SVG animado */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -89,22 +95,15 @@ export default function RegisterPage() {
             className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600 hover:text-blue-500 transition-colors"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? (
-              <EyeSlashIcon className="h-5 w-5" />
-            ) : (
-              <EyeIcon className="h-5 w-5" />
-            )}
+            {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
           </span>
         </div>
-
-        {/* Validación de contraseña */}
         <div className="text-sm space-y-1">
           <p className={hasUppercase ? "text-green-600" : "text-red-600"}>✔️ Al menos una mayúscula</p>
           <p className={hasNumber ? "text-green-600" : "text-red-600"}>✔️ Al menos un número</p>
           <p className={hasSpecial ? "text-green-600" : "text-red-600"}>✔️ Al menos un carácter especial</p>
           <p className={hasMinLength ? "text-green-600" : "text-red-600"}>✔️ Al menos 8 caracteres</p>
         </div>
-
         <button
           type="submit"
           className="py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
