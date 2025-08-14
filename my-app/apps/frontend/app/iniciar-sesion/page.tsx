@@ -2,18 +2,31 @@
 
 import { useState } from "react";
 
+type UsuarioPerfil = {
+  id: number;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  address: string | null;
+  birthDate: string | null;
+  createdAt: string;
+};
+
 export default function IniciarSesionPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [token, setToken] = useState("");
+  const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
 
   const loginUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
     setToken("");
+    setPerfil(null);
 
     try {
+      // 1️⃣ Hacemos login
       const response = await fetch("http://192.168.1.34:3001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,6 +40,21 @@ export default function IniciarSesionPage() {
         setToken(data.token); // guardamos el token JWT
         setEmail("");
         setPassword("");
+
+        // 2️⃣ Traemos el perfil del usuario usando el token
+        const perfilRes = await fetch("http://192.168.1.34:3001/users/profile", {
+          headers: {
+            "Authorization": `Bearer ${data.token}`
+          },
+        });
+
+        if (perfilRes.ok) {
+          const perfilData = await perfilRes.json();
+          setPerfil(perfilData);
+        } else {
+          const errorData = await perfilRes.json();
+          setMensaje(`❌ Error al obtener perfil: ${errorData.message}`);
+        }
       } else {
         setMensaje(`❌ Error: ${data.message}`);
       }
@@ -62,10 +90,24 @@ export default function IniciarSesionPage() {
       </form>
 
       {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
+
       {token && (
         <div style={{ marginTop: "10px", wordBreak: "break-word" }}>
           <strong>Token JWT:</strong>
           <p>{token}</p>
+        </div>
+      )}
+
+      {perfil && (
+        <div style={{ marginTop: "15px" }}>
+          <h3>Perfil del usuario:</h3>
+          <p><strong>ID:</strong> {perfil.id}</p>
+          <p><strong>Email:</strong> {perfil.email}</p>
+          <p><strong>Nombre:</strong> {perfil.name || "No definido"}</p>
+          <p><strong>Teléfono:</strong> {perfil.phone || "No definido"}</p>
+          <p><strong>Dirección:</strong> {perfil.address || "No definido"}</p>
+          <p><strong>Fecha de nacimiento:</strong> {perfil.birthDate || "No definido"}</p>
+          <p><strong>Creado el:</strong> {new Date(perfil.createdAt).toLocaleString()}</p>
         </div>
       )}
     </div>
