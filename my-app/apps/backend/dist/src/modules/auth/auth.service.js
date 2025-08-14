@@ -77,16 +77,31 @@ let AuthService = class AuthService {
             throw error;
         }
     }
-    // Login
+    // Login con debug
     async login(email, password) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
-        if (!user)
+        try {
+            const user = await this.prisma.user.findUnique({ where: { email } });
+            console.log('Usuario encontrado en login:', user);
+            if (!user) {
+                console.log('No se encontró usuario con ese email');
+                throw new common_1.UnauthorizedException('Invalid credentials');
+            }
+            const valid = await bcrypt.compare(password, user.password);
+            if (!valid) {
+                console.log('Contraseña incorrecta para el usuario:', email);
+                throw new common_1.UnauthorizedException('Invalid credentials');
+            }
+            const token = this.jwtService.sign({ sub: user.id, email: user.email });
+            return { message: 'Login successful', token };
+        }
+        catch (error) {
+            console.error('Error en login:', error);
+            // Lanzamos Unauthorized si es un error esperado, sino lo dejamos pasar
+            if (error instanceof common_1.UnauthorizedException) {
+                throw error;
+            }
             throw new common_1.UnauthorizedException('Invalid credentials');
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid)
-            throw new common_1.UnauthorizedException('Invalid credentials');
-        const token = this.jwtService.sign({ sub: user.id, email: user.email });
-        return { message: 'Login successful', token };
+        }
     }
     // Recuperación de contraseña
     async sendResetPasswordEmail(email) {
@@ -103,7 +118,6 @@ let AuthService = class AuthService {
                 expires,
             },
         });
-        // Aquí enviarías email con el link: http://tu-frontend/reset-password?token=...
         return { message: 'Reset password email sent', token }; // temporalmente devuelvo token para testing
     }
     async resetPassword(token, password) {
