@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"; // íconos SVG de Heroicons
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[!@#$%^&*()_+{}[\]:;<>,.?/~\-]/.test(password);
   const hasMinLength = password.length >= 8;
-
   const validarPassword = () => hasUppercase && hasNumber && hasSpecial && hasMinLength;
 
   const registrarUsuario = async (e: React.FormEvent) => {
@@ -75,7 +74,7 @@ export default function RegisterPage() {
           className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Input de contraseña con SVG animado */}
+        {/* Contraseña con ojo */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -97,12 +96,36 @@ export default function RegisterPage() {
           </span>
         </div>
 
-        {/* Validación de contraseña */}
-        <div className="text-sm space-y-1">
-          <p className={hasUppercase ? "text-green-600" : "text-red-600"}>✔️ Al menos una mayúscula</p>
-          <p className={hasNumber ? "text-green-600" : "text-red-600"}>✔️ Al menos un número</p>
-          <p className={hasSpecial ? "text-green-600" : "text-red-600"}>✔️ Al menos un carácter especial</p>
-          <p className={hasMinLength ? "text-green-600" : "text-red-600"}>✔️ Al menos 8 caracteres</p>
+        {/* Validación dinámica */}
+        <div className="text-sm space-y-1 mt-1">
+          <p
+            className={`transition-opacity duration-300 ${
+              password ? hasUppercase ? "text-green-600 opacity-100" : "text-red-600 opacity-100" : "opacity-0"
+            }`}
+          >
+            ✔️ Al menos una mayúscula
+          </p>
+          <p
+            className={`transition-opacity duration-300 ${
+              password ? hasNumber ? "text-green-600 opacity-100" : "text-red-600 opacity-100" : "opacity-0"
+            }`}
+          >
+            ✔️ Al menos un número
+          </p>
+          <p
+            className={`transition-opacity duration-300 ${
+              password ? hasSpecial ? "text-green-600 opacity-100" : "text-red-600 opacity-100" : "opacity-0"
+            }`}
+          >
+            ✔️ Al menos un carácter especial
+          </p>
+          <p
+            className={`transition-opacity duration-300 ${
+              password ? hasMinLength ? "text-green-600 opacity-100" : "text-red-600 opacity-100" : "opacity-0"
+            }`}
+          >
+            ✔️ Al menos 8 caracteres
+          </p>
         </div>
 
         <button
