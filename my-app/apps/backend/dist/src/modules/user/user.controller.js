@@ -15,11 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../prisma/prisma.service");
+const passport_1 = require("@nestjs/passport");
 let UserController = class UserController {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
+    // Crear usuario manualmente
     async createUser(data) {
         const user = await this.prisma.user.create({
             data: {
@@ -30,6 +32,14 @@ let UserController = class UserController {
         });
         return { success: true, user };
     }
+    // Obtener perfil del usuario autenticado
+    async getProfile(req) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: req.user.sub }, // req.user no está tipado por default
+            select: { id: true, email: true, name: true, phone: true, address: true, birthDate: true, createdAt: true }
+        });
+        return user;
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -39,6 +49,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "createUser", null);
+__decorate([
+    (0, common_1.Get)('profile'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getProfile", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
