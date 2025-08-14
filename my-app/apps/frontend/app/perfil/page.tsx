@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface UsuarioPerfil {
   id: number;
@@ -13,34 +14,45 @@ interface UsuarioPerfil {
 }
 
 export default function PerfilPage() {
+  const router = useRouter();
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
-
-  const cargarPerfil = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      const response = await fetch("http://192.168.1.34:3001/users/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPerfil(data);
-      }
-    } catch (error) {
-      console.error("Error al cargar perfil:", error);
-    }
-  };
+  const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
-    cargarPerfil();
-  }, []); // ✅ solo se ejecuta al montar el componente
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/iniciar-sesion");
+      return;
+    }
 
-  if (!perfil) return <p>Cargando perfil...</p>;
+    const cargarPerfil = async () => {
+      try {
+        const res = await fetch("http://192.168.1.34:3001/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setPerfil(data);
+        } else {
+          setMensaje("❌ Error al cargar perfil, inicia sesión nuevamente");
+          localStorage.removeItem("token");
+          router.push("/iniciar-sesion");
+        }
+      } catch (error) {
+        console.error(error);
+        setMensaje("❌ Error al conectar con el backend");
+      }
+    };
+
+    cargarPerfil();
+  }, [router]);
+
+  if (!perfil) return <p>{mensaje || "Cargando perfil..."}</p>;
 
   return (
-    <div style={{ maxWidth: "600px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
-      <h1>Perfil del Usuario</h1>
+    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
+      <h1>Perfil del usuario</h1>
       <p><strong>ID:</strong> {perfil.id}</p>
       <p><strong>Email:</strong> {perfil.email}</p>
       <p><strong>Nombre:</strong> {perfil.name || "No definido"}</p>

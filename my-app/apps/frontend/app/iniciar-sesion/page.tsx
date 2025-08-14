@@ -1,29 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-interface UsuarioPerfil {
-  id: number;
-  email: string;
-  name?: string | null;
-  phone?: string | null;
-  address?: string | null;
-  birthDate?: string | null;
-  createdAt: string;
-}
-
-export default function LoginPage() {
+export default function IniciarSesionPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState("");
-  const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
   const [mensaje, setMensaje] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
-    setToken("");
-    setPerfil(null);
 
     try {
       const response = await fetch("http://192.168.1.34:3001/auth/login", {
@@ -35,26 +24,17 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setToken(data.token);
+        // Guardamos el token en localStorage
+        localStorage.setItem("token", data.token);
+
+        setMensaje("✅ Inicio de sesión correcto, redirigiendo...");
         setEmail("");
         setPassword("");
 
-        // Traer perfil
-        const perfilRes = await fetch("http://192.168.1.34:3001/users/profile", {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-        });
-
-        if (perfilRes.ok) {
-          const perfilData = await perfilRes.json();
-          setPerfil(perfilData);
-        } else {
-          const errorData = await perfilRes.json();
-          setMensaje(`❌ Error al obtener perfil: ${errorData.message}`);
-        }
+        // Redirigimos automáticamente al perfil
+        router.push("/perfil");
       } else {
-        setMensaje(`❌ Error: ${data.message}`);
+        setMensaje("❌ Usuario o contraseña incorrecta");
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
@@ -74,40 +54,29 @@ export default function LoginPage() {
           required
           style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ marginLeft: "5px", padding: "5px", cursor: "pointer" }}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </button>
+        </div>
         <button type="submit" style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}>
           Iniciar sesión
         </button>
       </form>
 
       {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
-
-      {token && (
-        <div style={{ marginTop: "10px", wordBreak: "break-word" }}>
-          <strong>Token JWT:</strong>
-          <p>{token}</p>
-        </div>
-      )}
-
-      {perfil && (
-        <div style={{ marginTop: "15px" }}>
-          <h3>Perfil del usuario:</h3>
-          <p><strong>ID:</strong> {perfil.id}</p>
-          <p><strong>Email:</strong> {perfil.email}</p>
-          <p><strong>Nombre:</strong> {perfil.name || "No definido"}</p>
-          <p><strong>Teléfono:</strong> {perfil.phone || "No definido"}</p>
-          <p><strong>Dirección:</strong> {perfil.address || "No definido"}</p>
-          <p><strong>Fecha de nacimiento:</strong> {perfil.birthDate || "No definido"}</p>
-          <p><strong>Creado el:</strong> {new Date(perfil.createdAt).toLocaleString()}</p>
-        </div>
-      )}
     </div>
   );
 }
