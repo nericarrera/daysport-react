@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface UsuarioPerfil {
   id: number;
@@ -13,14 +12,12 @@ interface UsuarioPerfil {
   createdAt: string;
 }
 
-export default function IniciarSesionPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mensaje, setMensaje] = useState("");
   const [token, setToken] = useState("");
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
-
-  const router = useRouter();
+  const [mensaje, setMensaje] = useState("");
 
   const loginUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +26,6 @@ export default function IniciarSesionPage() {
     setPerfil(null);
 
     try {
-      // 1️⃣ Hacemos login
       const response = await fetch("http://192.168.1.34:3001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,24 +35,20 @@ export default function IniciarSesionPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setMensaje(`✅ Inicio de sesión correcto: ${email}`);
-        setToken(data.token); // guardamos el token JWT
+        setToken(data.token);
         setEmail("");
         setPassword("");
 
-        // 2️⃣ Traemos el perfil del usuario usando el token
+        // Traer perfil
         const perfilRes = await fetch("http://192.168.1.34:3001/users/profile", {
           headers: {
-            "Authorization": `Bearer ${data.token}`,
+            Authorization: `Bearer ${data.token}`,
           },
         });
 
         if (perfilRes.ok) {
           const perfilData = await perfilRes.json();
           setPerfil(perfilData);
-
-          // 3️⃣ Redirigir automáticamente a la página de perfil
-          router.push("/perfil"); // <-- cambiar a "/tienda" si querés ir directo a comprar
         } else {
           const errorData = await perfilRes.json();
           setMensaje(`❌ Error al obtener perfil: ${errorData.message}`);
@@ -90,10 +82,7 @@ export default function IniciarSesionPage() {
           required
           style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
         />
-        <button
-          type="submit"
-          style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}
-        >
+        <button type="submit" style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}>
           Iniciar sesión
         </button>
       </form>
