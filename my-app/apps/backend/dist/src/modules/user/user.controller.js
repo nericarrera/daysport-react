@@ -34,8 +34,11 @@ let UserController = class UserController {
     }
     // Obtener perfil del usuario autenticado
     async getProfile(req) {
-        // req.user no tiene tipado, usamos "as any"
-        const userId = req.user.sub;
+        console.log('req.user:', req.user); // 👈 esto nos dice si viene algo del JWT
+        const userId = req.user?.sub;
+        if (!userId) {
+            throw new Error('Usuario no encontrado en el token');
+        }
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
             select: {
