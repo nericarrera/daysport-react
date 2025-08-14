@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface UsuarioPerfil {
   id: number;
@@ -16,17 +16,47 @@ export default function IniciarSesionPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mensaje, setMensaje] = useState("");
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState<string | null>(null);
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
+
+  // Cargar token desde localStorage al iniciar
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      cargarPerfil(storedToken);
+    }
+  }, []);
+
+  const cargarPerfil = async (jwtToken: string) => {
+    try {
+      const perfilRes = await fetch("http://192.168.1.34:3001/users/profile", {
+        headers: { "Authorization": `Bearer ${jwtToken}` },
+      });
+
+      if (perfilRes.ok) {
+        const perfilData = await perfilRes.json();
+        setPerfil(perfilData);
+      } else {
+        const errorData = await perfilRes.json();
+        setMensaje(`❌ Error al obtener perfil: ${errorData.message}`);
+        setToken(null);
+        localStorage.removeItem("token");
+      }
+    } catch (error) {
+      console.error("Error al obtener perfil:", error);
+      setMensaje("❌ Error al conectar con el backend");
+      setToken(null);
+      localStorage.removeItem("token");
+    }
+  };
 
   const loginUsuario = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
-    setToken("");
     setPerfil(null);
 
     try {
-      // 1️⃣ Hacemos login
       const response = await fetch("http://192.168.1.34:3001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,23 +68,10 @@ export default function IniciarSesionPage() {
       if (response.ok) {
         setMensaje(`✅ Inicio de sesión correcto: ${email}`);
         setToken(data.token);
+        localStorage.setItem("token", data.token); // Guardamos token
         setEmail("");
         setPassword("");
-
-        // 2️⃣ Traemos el perfil del usuario usando el token
-        const perfilRes = await fetch("http://192.168.1.34:3001/users/profile", {
-          headers: {
-            "Authorization": `Bearer ${data.token}`,
-          },
-        });
-
-        if (perfilRes.ok) {
-          const perfilData = await perfilRes.json();
-          setPerfil(perfilData);
-        } else {
-          const errorData = await perfilRes.json();
-          setMensaje(`❌ Error al obtener perfil: ${errorData.message}`);
-        }
+        cargarPerfil(data.token); // Cargamos perfil automáticamente
       } else {
         setMensaje(`❌ Error: ${data.message}`);
       }
@@ -64,30 +81,47 @@ export default function IniciarSesionPage() {
     }
   };
 
+  const cerrarSesion = () => {
+    setToken(null);
+    setPerfil(null);
+    localStorage.removeItem("token");
+    setMensaje("Sesión cerrada.");
+  };
+
   return (
     <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
       <h1>Iniciar Sesión</h1>
-      <form onSubmit={loginUsuario} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
-        <button type="submit" style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}>
-          Iniciar sesión
+
+      {!token ? (
+        <form onSubmit={loginUsuario} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          />
+          <button type="submit" style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}>
+            Iniciar sesión
+          </button>
+        </form>
+      ) : (
+        <button
+          onClick={cerrarSesion}
+          style={{ marginTop: "10px", padding: "10px", borderRadius: "5px", backgroundColor: "#dc2626", color: "#fff", border: "none", cursor: "pointer" }}
+        >
+          Cerrar sesión
         </button>
-      </form>
+      )}
 
       {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
 
