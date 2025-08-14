@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface UsuarioPerfil {
   id: number;
@@ -14,66 +13,44 @@ interface UsuarioPerfil {
 }
 
 export default function PerfilPage() {
-  const router = useRouter();
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
   const [mensaje, setMensaje] = useState("");
-  const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+  const cargarPerfil = async () => {
+    const token = localStorage.getItem("token");
 
-    if (!storedToken) {
-      router.push("/(auth)/login");
+    if (!token) {
+      setMensaje("❌ No hay token guardado. Inicia sesión primero.");
       return;
     }
 
-    setToken(storedToken);
+    try {
+      const res = await fetch("http://192.168.1.34:3001/users/profile", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-    // Definimos la función dentro del useEffect
-    const cargarPerfil = async () => {
-      try {
-        const res = await fetch("http://192.168.1.34:3001/users/profile", {
-          headers: { "Authorization": `Bearer ${storedToken}` },
-        });
+      const data = await res.json();
 
-        if (res.ok) {
-          const data = await res.json();
-          setPerfil(data);
-        } else {
-          const errorData = await res.json();
-          setMensaje(`❌ Error al obtener perfil: ${errorData.message}`);
-          localStorage.removeItem("token");
-          router.push("/(auth)/login");
-        }
-      } catch (error) {
-        console.error("Error al obtener perfil:", error);
-        setMensaje("❌ Error al conectar con el backend");
-        localStorage.removeItem("token");
-        router.push("/(auth)/login");
+      if (res.ok) {
+        setPerfil(data);
+      } else {
+        setMensaje(`❌ Error al cargar perfil: ${data.message}`);
       }
-    };
-
-    cargarPerfil();
-  }, [router]);
-
-  const cerrarSesion = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-    router.push("/(auth)/login");
+    } catch (error) {
+      console.error("Error al cargar perfil:", error);
+      setMensaje("❌ Error al conectar con el backend");
+    }
   };
 
-  if (!token) return null; // Evita renderizar mientras redirige
+  useEffect(() => {
+    cargarPerfil();
+  }, []);
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
-      <h1>Perfil del Usuario</h1>
-
-      <button
-        onClick={cerrarSesion}
-        style={{ marginBottom: "15px", padding: "10px", borderRadius: "5px", backgroundColor: "#dc2626", color: "#fff", border: "none", cursor: "pointer" }}
-      >
-        Cerrar sesión
-      </button>
+    <div style={{ maxWidth: "600px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
+      <h1>Perfil del usuario</h1>
 
       {mensaje && <p>{mensaje}</p>}
 
@@ -88,7 +65,7 @@ export default function PerfilPage() {
           <p><strong>Creado el:</strong> {new Date(perfil.createdAt).toLocaleString()}</p>
         </div>
       ) : (
-        <p>Cargando perfil...</p>
+        !mensaje && <p>Cargando perfil...</p>
       )}
     </div>
   );
