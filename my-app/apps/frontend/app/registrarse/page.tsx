@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"; // íconos SVG de Heroicons
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [mensaje, setMensaje] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // <-- estado para el ojito
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const hasUppercase = /[A-Z]/.test(password);
@@ -54,16 +55,16 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
-      <h1>Registrar Usuario</h1>
-      <form onSubmit={registrarUsuario} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div className="max-w-md mx-auto mt-12 p-6 border rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6 text-center">Registrar Usuario</h1>
+      <form onSubmit={registrarUsuario} className="flex flex-col gap-4">
         <input
           type="text"
           placeholder="Nombre"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="email"
@@ -71,51 +72,47 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Input de contraseña con ojito */}
-        <div style={{ position: "relative" }}>
+        {/* Input de contraseña con SVG animado */}
+        <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ padding: "8px 35px 8px 8px", borderRadius: "5px", border: "1px solid #ccc", width: "100%" }}
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           />
           <span
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600 hover:text-blue-500 transition-colors"
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: "absolute",
-              right: "8px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              cursor: "pointer",
-              fontSize: "16px",
-              color: "#555"
-            }}
           >
-            {showPassword ? "🙈" : "👁️"}
+            {showPassword ? (
+              <EyeSlashIcon className="h-5 w-5" />
+            ) : (
+              <EyeIcon className="h-5 w-5" />
+            )}
           </span>
         </div>
 
-        {/* Validación visual */}
-        <div style={{ fontSize: "14px", marginBottom: "10px" }}>
-          <p style={{ color: hasUppercase ? "green" : "red" }}>✔️ Al menos una mayúscula</p>
-          <p style={{ color: hasNumber ? "green" : "red" }}>✔️ Al menos un número</p>
-          <p style={{ color: hasSpecial ? "green" : "red" }}>✔️ Al menos un carácter especial</p>
-          <p style={{ color: hasMinLength ? "green" : "red" }}>✔️ Al menos 8 caracteres</p>
+        {/* Validación de contraseña */}
+        <div className="text-sm space-y-1">
+          <p className={hasUppercase ? "text-green-600" : "text-red-600"}>✔️ Al menos una mayúscula</p>
+          <p className={hasNumber ? "text-green-600" : "text-red-600"}>✔️ Al menos un número</p>
+          <p className={hasSpecial ? "text-green-600" : "text-red-600"}>✔️ Al menos un carácter especial</p>
+          <p className={hasMinLength ? "text-green-600" : "text-red-600"}>✔️ Al menos 8 caracteres</p>
         </div>
 
         <button
           type="submit"
-          style={{ padding: "10px", borderRadius: "5px", backgroundColor: "#1d4ed8", color: "#fff", border: "none", cursor: "pointer" }}
+          className="py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
           Registrarse
         </button>
       </form>
-      {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
+      {mensaje && <p className="mt-4 text-center">{mensaje}</p>}
     </div>
   );
 }
