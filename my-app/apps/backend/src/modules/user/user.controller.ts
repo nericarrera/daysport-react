@@ -21,13 +21,25 @@ export class UserController {
   }
 
   // Obtener perfil del usuario autenticado
-@Get('profile')
 @UseGuards(AuthGuard('jwt'))
+@Get('profile')
 async getProfile(@Req() req: Request) {
+  // req.user no tiene tipado, usamos "as any"
+  const userId = (req.user as any).sub;
+
   const user = await this.prisma.user.findUnique({
-    where: { id: (req.user as any).sub }, // req.user no está tipado por default
-    select: { id: true, email: true, name: true, phone: true, address: true, birthDate: true, createdAt: true }
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      phone: true,
+      address: true,
+      birthDate: true,
+      createdAt: true
+    }
   });
+
   return user;
 }
 }
