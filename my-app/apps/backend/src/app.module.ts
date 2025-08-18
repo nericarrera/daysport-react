@@ -1,22 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config'; // Importa ConfigModule
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
-import { PrismaModule } from '../prisma/prisma.module'; // Asumo que usas Prisma
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
-    // Configuración del módulo de configuración (debe ir primero)
+    // ConfigModule global para poder usar ConfigService en cualquier módulo
     ConfigModule.forRoot({
-      isGlobal: true, // Hace que ConfigService esté disponible en toda la aplicación
-      envFilePath: '.env', // Ruta del archivo .env
-      expandVariables: true, // Permite usar variables anidadas en .env
+      isGlobal: true,            // Disponible en toda la app
+      envFilePath: '.env',       // Archivo de variables de entorno
+      expandVariables: true,     // Permite usar variables anidadas
     }),
 
-    // Módulos de tu aplicación
+    // Módulos de la aplicación
     AuthModule,
     UserModule,
-    PrismaModule, // Si usas Prisma
+    PrismaModule,
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

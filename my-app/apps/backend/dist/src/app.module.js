@@ -8,26 +8,28 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config"); // Importa ConfigModule
+const config_1 = require("@nestjs/config");
 const auth_module_1 = require("./modules/auth/auth.module");
 const user_module_1 = require("./modules/user/user.module");
-const prisma_module_1 = require("../prisma/prisma.module"); // Asumo que usas Prisma
+const prisma_module_1 = require("../prisma/prisma.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            // Configuración del módulo de configuración (debe ir primero)
+            // ConfigModule global para poder usar ConfigService en cualquier módulo
             config_1.ConfigModule.forRoot({
-                isGlobal: true, // Hace que ConfigService esté disponible en toda la aplicación
-                envFilePath: '.env', // Ruta del archivo .env
-                expandVariables: true, // Permite usar variables anidadas en .env
+                isGlobal: true, // Disponible en toda la app
+                envFilePath: '.env', // Archivo de variables de entorno
+                expandVariables: true, // Permite usar variables anidadas
             }),
-            // Módulos de tu aplicación
+            // Módulos de la aplicación
             auth_module_1.AuthModule,
             user_module_1.UserModule,
-            prisma_module_1.PrismaModule, // Si usas Prisma
+            prisma_module_1.PrismaModule,
         ],
+        controllers: [],
+        providers: [],
     })
 ], AppModule);

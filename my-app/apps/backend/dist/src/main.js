@@ -8,11 +8,12 @@ const common_2 = require("@nestjs/common");
 async function bootstrap() {
     const logger = new common_2.Logger('Bootstrap'); // Logger para mensajes estructurados
     try {
+        // Crear la app con logging completo
         const app = await core_1.NestFactory.create(app_module_1.AppModule, {
-            logger: ['log', 'error', 'warn', 'debug'], // Configuración de logs
+            logger: ['log', 'error', 'warn', 'debug'],
         });
         const configService = app.get(config_1.ConfigService);
-        // 1. Configuración CORS mejorada
+        // 1️⃣ Configuración CORS
         const corsOptions = {
             origin: configService.get('FRONTEND_URL')?.split(',') || [
                 'http://localhost:3000',
@@ -24,17 +25,15 @@ async function bootstrap() {
         };
         app.enableCors(corsOptions);
         logger.log(`CORS configurado para: ${corsOptions.origin.join(', ')}`);
-        // 2. Validación global con mensajes detallados
+        // 2️⃣ Validación global
         app.useGlobalPipes(new common_1.ValidationPipe({
-            whitelist: true,
-            forbidNonWhitelisted: true,
-            transform: true,
-            transformOptions: {
-                enableImplicitConversion: true,
-            },
-            disableErrorMessages: configService.get('NODE_ENV') === 'production', // Oculta mensajes en producción
+            whitelist: true, // Solo permite propiedades definidas en DTO
+            forbidNonWhitelisted: true, // Lanza error si vienen propiedades extra
+            transform: true, // Convierte tipos automáticamente
+            transformOptions: { enableImplicitConversion: true },
+            disableErrorMessages: configService.get('NODE_ENV') === 'production',
         }));
-        // 3. Configuración del puerto y host
+        // 3️⃣ Configuración de puerto y host
         const port = configService.get('PORT') || 3001;
         const host = configService.get('HOST') || '0.0.0.0';
         await app.listen(port, host);
@@ -44,7 +43,7 @@ async function bootstrap() {
     }
     catch (error) {
         logger.error('❌ Error al iniciar la aplicación:', error);
-        process.exit(1); // Cierra la aplicación con código de error
+        process.exit(1); // Cierra la app con error
     }
 }
 bootstrap();

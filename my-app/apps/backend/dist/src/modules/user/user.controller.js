@@ -21,12 +21,22 @@ let UserController = class UserController {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    // Crear usuario manualmente
+    // Crear usuario
     async createUser(data) {
+        if (!data.email || !data.password) {
+            throw new common_1.BadRequestException('Email y contraseña son obligatorios');
+        }
+        // Validar si el email ya existe
+        const existingUser = await this.prisma.user.findUnique({
+            where: { email: data.email },
+        });
+        if (existingUser) {
+            throw new common_1.BadRequestException('El email ya está registrado');
+        }
         const user = await this.prisma.user.create({
             data: {
                 email: data.email,
-                password: data.password,
+                password: data.password, // ✅ en producción deberías hashear la contraseña
                 name: data.name,
             },
         });
@@ -34,11 +44,9 @@ let UserController = class UserController {
     }
     // Obtener perfil del usuario autenticado
     async getProfile(req) {
-        console.log('req.user:', req.user); // 👈 para debug del JWT
         const userId = req.user?.sub;
-        if (!userId) {
-            throw new Error('Usuario no encontrado en el token');
-        }
+        if (!userId)
+            throw new common_1.BadRequestException('Usuario no encontrado en el token');
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
             select: {
@@ -57,7 +65,7 @@ let UserController = class UserController {
     async updateProfile(req, data) {
         const userId = req.user?.sub;
         if (!userId)
-            throw new Error('Usuario no encontrado en el token');
+            throw new common_1.BadRequestException('Usuario no encontrado en el token');
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
             data: {

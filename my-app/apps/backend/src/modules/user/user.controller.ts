@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -7,16 +7,30 @@ import { Request } from 'express';
 export class UserController {
   constructor(private prisma: PrismaService) {}
 
-  // Crear usuario manualmente
+  // Crear usuario
   @Post()
   async createUser(@Body() data: { email: string; password: string; name?: string }) {
+    if (!data.email || !data.password) {
+      throw new BadRequestException('Email y contraseña son obligatorios');
+    }
+
+    // Validar si el email ya existe
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('El email ya está registrado');
+    }
+
     const user = await this.prisma.user.create({
       data: {
         email: data.email,
-        password: data.password,
+        password: data.password, // ✅ en producción deberías hashear la contraseña
         name: data.name,
       },
     });
+
     return { success: true, user };
   }
 
@@ -24,12 +38,8 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   async getProfile(@Req() req: Request) {
-    console.log('req.user:', req.user); // 👈 para debug del JWT
-
     const userId = (req.user as any)?.sub;
-    if (!userId) {
-      throw new Error('Usuario no encontrado en el token');
-    }
+    if (!userId) throw new BadRequestException('Usuario no encontrado en el token');
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -55,7 +65,7 @@ export class UserController {
     @Body() data: { name?: string; phone?: string; address?: string; birthDate?: string },
   ) {
     const userId = (req.user as any)?.sub;
-    if (!userId) throw new Error('Usuario no encontrado en el token');
+    if (!userId) throw new BadRequestException('Usuario no encontrado en el token');
 
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
@@ -79,5 +89,4 @@ export class UserController {
     return updatedUser;
   }
 }
-
 
