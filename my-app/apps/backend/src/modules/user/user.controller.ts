@@ -1,7 +1,17 @@
-import { Controller, Post, Body, Get, Patch, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Patch,
+  Req,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import * as bcrypt from 'bcrypt';
 
 @Controller('users')
 export class UserController {
@@ -23,15 +33,27 @@ export class UserController {
       throw new BadRequestException('El email ya está registrado');
     }
 
+    // 🔹 Hashear la contraseña antes de guardar
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
     const user = await this.prisma.user.create({
       data: {
         email: data.email,
-        password: data.password, // ✅ en producción deberías hashear la contraseña
+        password: hashedPassword,
         name: data.name,
       },
     });
 
-    return { success: true, user };
+    return {
+      success: true,
+      message: 'Usuario creado correctamente',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt,
+      },
+    };
   }
 
   // Obtener perfil del usuario autenticado
@@ -89,4 +111,3 @@ export class UserController {
     return updatedUser;
   }
 }
-

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -7,15 +7,31 @@ import { LoginDto } from './dto/login.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-    @Post('register')
-  async register(@Body() body: any) {
+  // Registro de usuario
+  @Post('register')
+  async register(@Body() body: RegisterDto) {
+    // Llama al servicio para registrar usuario
     return this.authService.register(body);
   }
 
-  @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    return this.authService.login(body.email, body.password);
+  // Login de usuario
+ @Post('login')
+async login(@Body() body: LoginDto) {
+  const user = await this.authService.validateUser(body.email, body.password);
+
+  if (!user) {
+    throw new UnauthorizedException('Credenciales inválidas');
   }
+
+  // Mapear user para evitar null en el tipo
+  const safeUser = {
+    id: user.id,
+    email: user.email,
+    name: user.name ?? undefined, // si es null, lo convertimos a undefined
+  };
+
+  return this.authService.login(safeUser);
+}
 
   // Recuperación de contraseña
   @Post('send-reset-password')
