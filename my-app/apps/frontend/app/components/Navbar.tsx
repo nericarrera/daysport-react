@@ -1,15 +1,17 @@
 'use client';
+
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import MegaMenu from './MegaMenu';
 import { categories } from './Category';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"; // Para iconos SVG si los usas en algún modal o login
+
 
 // Tipos para el contexto de usuario
 type User = {
   name: string;
   email: string;
-  // Agrega más propiedades según necesites
 };
 
 type UserContextType = {
