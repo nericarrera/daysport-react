@@ -5,8 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MegaMenu from './MegaMenu';
 import { categories } from './Category';
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"; // Para iconos SVG si los usas en algún modal o login
-
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 // Tipos para el contexto de usuario
 type User = {
@@ -21,7 +20,6 @@ type UserContextType = {
   logout: () => void;
 };
 
-// Creamos un contexto tipado para el usuario
 const UserContext = createContext<UserContextType>({
   isLoggedIn: false,
   user: null,
@@ -31,7 +29,6 @@ const UserContext = createContext<UserContextType>({
 
 export const useUser = () => useContext(UserContext);
 
-// Tipo para los items del carrito
 type CartItem = {
   id: number;
   name: string;
@@ -41,7 +38,6 @@ type CartItem = {
 };
 
 export default function Navbar() {
-  // Estados
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -50,34 +46,29 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
-  const [isHoveringMegaMenu, setIsHoveringMegaMenu] = useState(false);
   
-  // Refs
   const cartRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const megaMenuTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Manejo de sesión de usuario
   const [userState, setUserState] = useState<{ isLoggedIn: boolean; user: User | null }>({
     isLoggedIn: false,
     user: null
   });
 
-  // LOGIN - guarda en localStorage
   const login = useCallback((userData: User) => {
     setUserState({ isLoggedIn: true, user: userData });
     localStorage.setItem("user", JSON.stringify(userData));
   }, []);
 
-  // LOGOUT - borra de localStorage
   const logout = useCallback(() => {
     setUserState({ isLoggedIn: false, user: null });
     localStorage.removeItem("user");
   }, []);
 
-  // Cargar usuario de localStorage al entrar
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -85,7 +76,6 @@ export default function Navbar() {
     }
   }, []);
 
-  // Textos animados del banner
   const texts = [
     { content: "ENVIOS A TODO EL PAÍS!", style: "text-yellow-400" },
     { content: "¡COMPRA EN 3 CUOTAS SIN INTERÉS!", style: "text-green-400 font-bold" },
@@ -93,7 +83,6 @@ export default function Navbar() {
   ];
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
 
-  // Datos del carrito
   const [cartItems, setCartItems] = useState<CartItem[]>([
     { id: 1, name: 'Remera Deportiva Mujer', price: 5990, image: '/img/products/remera-mujer.jpg', quantity: 1 },
     { id: 2, name: 'Short Deportivo Hombre', price: 4990, image: '/img/products/short-hombre.jpg', quantity: 2 }
@@ -101,9 +90,7 @@ export default function Navbar() {
 
   const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
-  // Efectos
   useEffect(() => {
-    // Limpieza de timeouts al desmontar
     return () => {
       if (megaMenuTimeout.current) {
         clearTimeout(megaMenuTimeout.current);
@@ -111,7 +98,6 @@ export default function Navbar() {
     };
   }, []);
 
-  // Cierre de menús al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -129,7 +115,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Detección de vista móvil
   useEffect(() => {
     const checkMobile = () => setIsMobileView(window.innerWidth < 768);
     checkMobile();
@@ -137,7 +122,6 @@ export default function Navbar() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Rotador de banners
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTextIndex(prev => (prev + 1) % texts.length);
@@ -145,24 +129,37 @@ export default function Navbar() {
     return () => clearInterval(interval);
   }, [texts.length]);
 
-  // Manejadores de eventos
+  // Manejadores mejorados para el hover del menú
   const handleCategoryHover = useCallback((index: number) => {
-    clearTimeout(megaMenuTimeout.current!);
+    if (megaMenuTimeout.current) {
+      clearTimeout(megaMenuTimeout.current);
+    }
     setActiveCategory(index);
     setIsMegaMenuOpen(true);
-    setIsHoveringMegaMenu(false);
   }, []);
 
   const handleCategoryLeave = useCallback(() => {
     megaMenuTimeout.current = setTimeout(() => {
-      if (!isHoveringMegaMenu) {
+      if (!megaMenuRef.current?.matches(':hover')) {
         setIsMegaMenuOpen(false);
         setActiveCategory(null);
       }
     }, 200);
-  }, [isHoveringMegaMenu]);
+  }, []);
 
-  
+  const handleMegaMenuEnter = useCallback(() => {
+    if (megaMenuTimeout.current) {
+      clearTimeout(megaMenuTimeout.current);
+    }
+  }, []);
+
+  const handleMegaMenuLeave = useCallback(() => {
+    megaMenuTimeout.current = setTimeout(() => {
+      setIsMegaMenuOpen(false);
+      setActiveCategory(null);
+    }, 200);
+  }, []);
+
   return (
     <UserContext.Provider value={{ ...userState, login, logout }}>
       <>
@@ -183,7 +180,11 @@ export default function Navbar() {
         </div>
 
         {/* Main navbar */}
-        <nav className="bg-white shadow-md relative" ref={megaMenuRef}>
+        <nav 
+          className="bg-white shadow-md relative" 
+          ref={navRef}
+          onMouseLeave={handleCategoryLeave}
+        >
           <div className="max-w-7xl mx-auto px-4 pl-6">
             <div className="flex justify-between items-center h-18">
               {/* Mobile menu button */}
@@ -226,7 +227,6 @@ export default function Navbar() {
                           key={category.name}
                           className="relative"
                           onMouseEnter={() => handleCategoryHover(index)}
-                          onMouseLeave={handleCategoryLeave}
                         >
                           <Link 
                             href={category.href} 
@@ -515,17 +515,24 @@ export default function Navbar() {
           </div>
         </nav>
 
-     {/* MegaMenu desktop */}
-{!isMobileView && (
-  <MegaMenu
-    isOpen={isMegaMenuOpen && activeCategory !== null}
-    onClose={() => {
-      setIsMegaMenuOpen(false);
-      setActiveCategory(null);
-    }}
-    categoryData={activeCategory !== null ? categories[activeCategory] : null}
-  />
-)}
-   </>
-  </UserContext.Provider>
-)};
+        {/* MegaMenu desktop */}
+        {!isMobileView && (
+          <div 
+            ref={megaMenuRef}
+            onMouseEnter={handleMegaMenuEnter}
+            onMouseLeave={handleMegaMenuLeave}
+          >
+            <MegaMenu
+              isOpen={isMegaMenuOpen && activeCategory !== null}
+              onClose={() => {
+                setIsMegaMenuOpen(false);
+                setActiveCategory(null);
+              }}
+              categoryData={activeCategory !== null ? categories[activeCategory] : null}
+            />
+          </div>
+        )}
+      </>
+    </UserContext.Provider>
+  );
+}
