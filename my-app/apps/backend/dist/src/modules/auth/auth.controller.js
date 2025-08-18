@@ -29,7 +29,12 @@ let AuthController = class AuthController {
     }
     // Login de usuario
     async login(body) {
-        return this.authService.login(body.email, body.password);
+        const user = await this.authService.validateUser(body.email, body.password);
+        if (!user) {
+            throw new common_1.UnauthorizedException('Credenciales inválidas');
+        }
+        // Retorna token JWT + info del usuario
+        return this.authService.login(user);
     }
     // Recuperación de contraseña
     async sendResetPasswordEmail(email) {

@@ -17,9 +17,16 @@ export class AuthController {
 
   // Login de usuario
   @Post('login')
-  async login(@Body() body: LoginDto) {
-    return this.authService.login(body.email, body.password);
+async login(@Body() body: LoginDto) {
+  const user = await this.authService.validateUser(body.email, body.password);
+
+  if (!user) {
+    throw new UnauthorizedException('Credenciales inválidas');
   }
+
+  // Retorna token JWT + info del usuario
+  return this.authService.login(user);
+}
 
   // Recuperación de contraseña
   @Post('send-reset-password')

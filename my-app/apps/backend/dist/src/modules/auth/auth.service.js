@@ -75,20 +75,35 @@ let AuthService = class AuthService {
                 birthDate: registerDto.birthDate ? new Date(registerDto.birthDate) : null,
             },
         });
-        return { message: 'Usuario registrado correctamente', user: { id: user.id, email: user.email, name: user.name } };
+        return { message: 'Usuario registrado correctamente', user: { id: user.id, email: user.email, name: user.name ?? undefined } };
+    }
+    // -------------------- Validación de usuario --------------------
+    async validateUser(email, password) {
+        const user = await this.prisma.user.findUnique({ where: { email } });
+        if (!user)
+            return null;
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid)
+            return null;
+        return { id: user.id, email: user.email, name: user.name ?? undefined };
     }
     // -------------------- Login --------------------
-    async login(email, password) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
-        if (!user) {
-            throw new common_1.UnauthorizedException('Credenciales inválidas');
+    async login(userOrEmail) {
+        let payload;
+        // Guard: si tiene password, es email+password
+        if ('password' in userOrEmail && userOrEmail.password !== undefined) {
+            const user = await this.validateUser(userOrEmail.email, userOrEmail.password);
+            if (!user)
+                throw new common_1.UnauthorizedException('Credenciales inválidas');
+            payload = { sub: user.id, email: user.email };
+            return { message: 'Login exitoso', token: this.jwtService.sign(payload), user };
         }
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid) {
-            throw new common_1.UnauthorizedException('Credenciales inválidas');
+        else {
+            // Guard: sabemos que es el objeto usuario con id
+            const user = userOrEmail;
+            payload = { sub: user.id, email: user.email };
+            return { message: 'Login exitoso', token: this.jwtService.sign(payload), user };
         }
-        const token = this.jwtService.sign({ sub: user.id, email: user.email });
-        return { message: 'Login exitoso', token, user: { id: user.id, email: user.email, name: user.name } };
     }
     // -------------------- Obtener perfil --------------------
     async getProfile(userId) {
@@ -118,11 +133,7 @@ let AuthService = class AuthService {
         const expires = new Date();
         expires.setHours(expires.getHours() + 1);
         await this.prisma.resetToken.create({
-            data: {
-                token,
-                userId: user.id,
-                expires,
-            },
+            data: { token, userId: user.id, expires },
         });
         return { message: 'Token de recuperación generado', token };
     }
