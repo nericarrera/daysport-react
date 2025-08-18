@@ -27,7 +27,7 @@ export default function PerfilPage() {
 
     const cargarPerfil = async () => {
       try {
-        const res = await fetch("http://192.168.1.34:3001/users/profile", {
+        const res = await fetch("http://192.168.1.35:3001/users/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
