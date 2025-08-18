@@ -8,13 +8,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config"); // Importa ConfigModule
 const auth_module_1 = require("./modules/auth/auth.module");
 const user_module_1 = require("./modules/user/user.module");
+const prisma_module_1 = require("../prisma/prisma.module"); // Asumo que usas Prisma
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule, user_module_1.UserModule],
+        imports: [
+            // Configuración del módulo de configuración (debe ir primero)
+            config_1.ConfigModule.forRoot({
+                isGlobal: true, // Hace que ConfigService esté disponible en toda la aplicación
+                envFilePath: '.env', // Ruta del archivo .env
+                expandVariables: true, // Permite usar variables anidadas en .env
+            }),
+            // Módulos de tu aplicación
+            auth_module_1.AuthModule,
+            user_module_1.UserModule,
+            prisma_module_1.PrismaModule, // Si usas Prisma
+        ],
     })
 ], AppModule);
