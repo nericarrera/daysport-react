@@ -57,50 +57,66 @@ let AuthService = class AuthService {
     }
     // -------------------- Registro --------------------
     async register(registerDto) {
-        const { email, password, name, phone, address, postalCode, birthDate } = registerDto;
-        // Validar si ya existe
-        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        const existingUser = await this.prisma.user.findUnique({
+            where: { email: registerDto.email },
+        });
         if (existingUser) {
             throw new common_1.BadRequestException('El email ya está registrado');
         }
-        // Hash de la contraseña
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         const user = await this.prisma.user.create({
             data: {
-                email,
+                email: registerDto.email,
                 password: hashedPassword,
-                name,
-                phone,
-                address,
-                postalCode,
-                birthDate: birthDate ? new Date(birthDate) : null,
+                name: registerDto.name ?? null,
+                phone: registerDto.phone ?? null,
+                address: registerDto.address ?? null,
+                postalCode: registerDto.postalCode ?? null,
+                birthDate: registerDto.birthDate ? new Date(registerDto.birthDate) : null,
             },
         });
-        return { message: 'User registered successfully', user: { ...user, password: undefined } };
-    }
-    // -------------------- Validación de usuario --------------------
-    async validateUser(email, password) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
-        if (!user)
-            return null;
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid)
-            return null;
-        return user;
+        return { message: 'Usuario registrado correctamente', user: { id: user.id, email: user.email, name: user.name } };
     }
     // -------------------- Login --------------------
-    async login(user) {
+    async login(email, password) {
+        const user = await this.prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            throw new common_1.UnauthorizedException('Credenciales inválidas');
+        }
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) {
+            throw new common_1.UnauthorizedException('Credenciales inválidas');
+        }
         const token = this.jwtService.sign({ sub: user.id, email: user.email });
-        return { message: 'Login successful', access_token: token, user: { id: user.id, email: user.email, name: user.name } };
+        return { message: 'Login exitoso', token, user: { id: user.id, email: user.email, name: user.name } };
+    }
+    // -------------------- Obtener perfil --------------------
+    async getProfile(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                phone: true,
+                address: true,
+                postalCode: true,
+                birthDate: true,
+                createdAt: true,
+            },
+        });
+        if (!user)
+            throw new common_1.NotFoundException('Usuario no encontrado');
+        return user;
     }
     // -------------------- Recuperación de contraseña --------------------
     async sendResetPasswordEmail(email) {
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (!user)
-            throw new common_1.NotFoundException('Email not found');
+            throw new common_1.NotFoundException('Email no encontrado');
         const token = (0, crypto_1.randomBytes)(32).toString('hex');
         const expires = new Date();
-        expires.setHours(expires.getHours() + 1); // Expira en 1 hora
+        expires.setHours(expires.getHours() + 1);
         await this.prisma.resetToken.create({
             data: {
                 token,
@@ -108,13 +124,12 @@ let AuthService = class AuthService {
                 expires,
             },
         });
-        // Temporal: devolver token para testing
-        return { message: 'Reset password email sent', token };
+        return { message: 'Token de recuperación generado', token };
     }
     async resetPassword(token, password) {
         const tokenRecord = await this.prisma.resetToken.findUnique({ where: { token } });
         if (!tokenRecord || tokenRecord.expires < new Date()) {
-            throw new common_1.UnauthorizedException('Invalid or expired token');
+            throw new common_1.UnauthorizedException('Token inválido o expirado');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         await this.prisma.user.update({
@@ -122,7 +137,7 @@ let AuthService = class AuthService {
             data: { password: hashedPassword },
         });
         await this.prisma.resetToken.delete({ where: { token } });
-        return { message: 'Password updated successfully' };
+        return { message: 'Contraseña actualizada correctamente' };
     }
 };
 exports.AuthService = AuthService;
