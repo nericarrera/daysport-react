@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MegaMenu from './MegaMenu';
 import { categories } from './Category';
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 // Tipos para el contexto de usuario
 type User = {
