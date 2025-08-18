@@ -25,8 +25,11 @@ async function bootstrap() {
       credentials: true,
       allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
     };
-    app.enableCors(corsOptions);
-    logger.log(`CORS configurado para: ${corsOptions.origin.join(', ')}`);
+    app.enableCors({
+  origin: ['http://localhost:3000', 'http://192.168.1.35:3000'],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: true,
+});
 
     // 2️⃣ Validación global
     app.useGlobalPipes(
