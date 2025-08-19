@@ -17,7 +17,7 @@ import * as bcrypt from 'bcrypt';
 export class UserController {
   constructor(private prisma: PrismaService) {}
 
-  // Crear usuario
+  // -------------------- Crear usuario --------------------
   @Post()
   async createUser(@Body() data: { email: string; password: string; name?: string }) {
     if (!data.email || !data.password) {
@@ -25,22 +25,19 @@ export class UserController {
     }
 
     // Validar si el email ya existe
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: data.email },
-    });
-
+    const existingUser = await this.prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
       throw new BadRequestException('El email ya está registrado');
     }
 
-    // 🔹 Hashear la contraseña antes de guardar
+    // Hashear la contraseña antes de guardar
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const user = await this.prisma.user.create({
       data: {
         email: data.email,
         password: hashedPassword,
-        name: data.name,
+        name: data.name ?? null,
       },
     });
 
@@ -56,7 +53,7 @@ export class UserController {
     };
   }
 
-  // Obtener perfil del usuario autenticado
+  // -------------------- Obtener perfil --------------------
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   async getProfile(@Req() req: Request) {
@@ -71,20 +68,29 @@ export class UserController {
         name: true,
         phone: true,
         address: true,
+        postalCode: true,
         birthDate: true,
         createdAt: true,
       },
     });
 
+    if (!user) throw new BadRequestException('Usuario no encontrado');
+
     return user;
   }
 
-  // Actualizar perfil del usuario autenticado
+  // -------------------- Actualizar perfil --------------------
   @UseGuards(AuthGuard('jwt'))
   @Patch('profile')
   async updateProfile(
     @Req() req: Request,
-    @Body() data: { name?: string; phone?: string; address?: string; birthDate?: string },
+    @Body() data: {
+      name?: string;
+      phone?: string;
+      address?: string;
+      postalCode?: string;
+      birthDate?: string;
+    },
   ) {
     const userId = (req.user as any)?.sub;
     if (!userId) throw new BadRequestException('Usuario no encontrado en el token');
@@ -92,10 +98,11 @@ export class UserController {
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: {
-        name: data.name,
-        phone: data.phone,
-        address: data.address,
-        birthDate: data.birthDate,
+        name: data.name ?? undefined,
+        phone: data.phone ?? undefined,
+        address: data.address ?? undefined,
+        postalCode: data.postalCode ?? undefined,
+        birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
       },
       select: {
         id: true,
@@ -103,6 +110,7 @@ export class UserController {
         name: true,
         phone: true,
         address: true,
+        postalCode: true,
         birthDate: true,
         createdAt: true,
       },

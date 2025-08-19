@@ -55,25 +55,23 @@ let UserController = class UserController {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    // Crear usuario
+    // -------------------- Crear usuario --------------------
     async createUser(data) {
         if (!data.email || !data.password) {
             throw new common_1.BadRequestException('Email y contraseña son obligatorios');
         }
         // Validar si el email ya existe
-        const existingUser = await this.prisma.user.findUnique({
-            where: { email: data.email },
-        });
+        const existingUser = await this.prisma.user.findUnique({ where: { email: data.email } });
         if (existingUser) {
             throw new common_1.BadRequestException('El email ya está registrado');
         }
-        // 🔹 Hashear la contraseña antes de guardar
+        // Hashear la contraseña antes de guardar
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const user = await this.prisma.user.create({
             data: {
                 email: data.email,
                 password: hashedPassword,
-                name: data.name,
+                name: data.name ?? null,
             },
         });
         return {
@@ -87,7 +85,7 @@ let UserController = class UserController {
             },
         };
     }
-    // Obtener perfil del usuario autenticado
+    // -------------------- Obtener perfil --------------------
     async getProfile(req) {
         const userId = req.user?.sub;
         if (!userId)
@@ -100,13 +98,16 @@ let UserController = class UserController {
                 name: true,
                 phone: true,
                 address: true,
+                postalCode: true,
                 birthDate: true,
                 createdAt: true,
             },
         });
+        if (!user)
+            throw new common_1.BadRequestException('Usuario no encontrado');
         return user;
     }
-    // Actualizar perfil del usuario autenticado
+    // -------------------- Actualizar perfil --------------------
     async updateProfile(req, data) {
         const userId = req.user?.sub;
         if (!userId)
@@ -114,10 +115,11 @@ let UserController = class UserController {
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
             data: {
-                name: data.name,
-                phone: data.phone,
-                address: data.address,
-                birthDate: data.birthDate,
+                name: data.name ?? undefined,
+                phone: data.phone ?? undefined,
+                address: data.address ?? undefined,
+                postalCode: data.postalCode ?? undefined,
+                birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
             },
             select: {
                 id: true,
@@ -125,6 +127,7 @@ let UserController = class UserController {
                 name: true,
                 phone: true,
                 address: true,
+                postalCode: true,
                 birthDate: true,
                 createdAt: true,
             },
