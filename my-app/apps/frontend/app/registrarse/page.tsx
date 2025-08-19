@@ -15,7 +15,8 @@ export default function RegisterPage() {
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+  // Variable de entorno con fallback
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
   console.log("API Base URL:", API_BASE_URL);
 
   const hasUppercase = /[A-Z]/.test(password);
@@ -35,13 +36,14 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users`, { // <- URL dinámica
+      const response = await fetch(`${API_BASE_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name }),
       });
 
-      const data = await response.json();
+      // Verifica si la respuesta es JSON antes de parsear
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
         setMensaje("✅ Registro exitoso. Iniciando sesión automáticamente...");
@@ -50,18 +52,18 @@ export default function RegisterPage() {
         setName("");
 
         // Guardar usuario en el contexto y localStorage
-        login({ name: data.user.name, email: data.user.email });
+        login({ name: data.user?.name, email: data.user?.email });
 
         // Redirigir al home
         setTimeout(() => {
           router.push("/");
         }, 1000);
       } else {
-        setMensaje(`❌ Error: ${data.message}`);
+        setMensaje(`❌ Error: ${data.message || "Error desconocido"}`);
       }
     } catch (error) {
       console.error("Error al registrar usuario:", error);
-      setMensaje("❌ Error al conectar con el backend");
+      setMensaje("❌ Error al conectar con el backend. Revisa tu navegador o VPN.");
     }
   };
 

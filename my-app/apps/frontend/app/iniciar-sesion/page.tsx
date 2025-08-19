@@ -1,7 +1,8 @@
 'use client';
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "../components/Navbar"; // Ajusta la ruta según donde esté tu Navbar
+import { useUser } from "../components/Navbar"; // Ajusta la ruta según tu Navbar
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,7 +12,8 @@ export default function LoginPage() {
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+  // Variable de entorno con fallback
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
   console.log("API Base URL:", API_BASE_URL);
 
   const iniciarSesion = async (e: React.FormEvent) => {
@@ -24,29 +26,30 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, { // <- URL dinámica
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      // Verifica si la respuesta es JSON antes de parsear
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
         setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
 
-        // Guardar usuario en el contexto y en localStorage automáticamente
-        login({ name: data.user.name, email: data.user.email });
+        // Guardar usuario en el contexto y en localStorage
+        login({ name: data.user?.name, email: data.user?.email });
 
         setTimeout(() => {
           router.push("/"); // Redirige a la página principal
         }, 1000);
       } else {
-        setMensaje(`❌ Error: ${data.message}`);
+        setMensaje(`❌ Error: ${data.message || "Error desconocido"}`);
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      setMensaje("❌ Error al conectar con el servidor.");
+      setMensaje("❌ Error al conectar con el servidor. Revisa tu navegador o VPN.");
     }
   };
 

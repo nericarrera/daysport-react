@@ -18,8 +18,8 @@ export default function PerfilPage() {
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
   const [mensaje, setMensaje] = useState("");
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
-  
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+  console.log("API Base URL:", API_BASE_URL);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -30,21 +30,23 @@ export default function PerfilPage() {
 
     const cargarPerfil = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/profile`, { // <- URL dinámica
+        const res = await fetch(`${API_BASE_URL}/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        // Manejo seguro de JSON
+        const data = await res.json().catch(() => ({}));
+
         if (res.ok) {
-          const data = await res.json();
           setPerfil(data);
         } else {
-          setMensaje("❌ Error al cargar perfil, inicia sesión nuevamente");
+          setMensaje(`❌ Error al cargar perfil: ${data.message || "Inicia sesión nuevamente"}`);
           localStorage.removeItem("token");
-          router.push("/iniciar-sesion");
+          setTimeout(() => router.push("/iniciar-sesion"), 1500);
         }
       } catch (error) {
-        console.error(error);
-        setMensaje("❌ Error al conectar con el backend");
+        console.error("Error al conectar con el backend:", error);
+        setMensaje("❌ Error al conectar con el backend. Revisa tu conexión.");
       }
     };
 
