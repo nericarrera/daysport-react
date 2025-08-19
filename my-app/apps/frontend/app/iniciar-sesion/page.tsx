@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+
   const iniciarSesion = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
@@ -21,7 +23,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.35:3001/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, { // <- URL dinámica
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -33,7 +35,7 @@ export default function LoginPage() {
         setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
 
         // Guardar usuario en el contexto y en localStorage automáticamente
-        login({ name: data.name, email: data.email });
+        login({ name: data.user.name, email: data.user.email });
 
         setTimeout(() => {
           router.push("/"); // Redirige a la página principal

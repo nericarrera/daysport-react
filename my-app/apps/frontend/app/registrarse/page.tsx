@@ -15,6 +15,8 @@ export default function RegisterPage() {
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[!@#$%^&*()_+{}[\]:;<>,.?/~\-]/.test(password);
@@ -32,7 +34,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.35:3001/users", {
+      const response = await fetch(`${API_BASE_URL}/users`, { // <- URL dinámica
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name }),
@@ -46,8 +48,8 @@ export default function RegisterPage() {
         setPassword("");
         setName("");
 
-        // Llamar al contexto de usuario para loguear automáticamente
-        login({ name: data.name, email: data.email });
+        // Guardar usuario en el contexto y localStorage
+        login({ name: data.user.name, email: data.user.email });
 
         // Redirigir al home
         setTimeout(() => {

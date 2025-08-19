@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ export default function PerfilPage() {
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
   const [mensaje, setMensaje] = useState("");
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -27,7 +29,7 @@ export default function PerfilPage() {
 
     const cargarPerfil = async () => {
       try {
-        const res = await fetch("http://192.168.1.35:3001/users/profile", {
+        const res = await fetch(`${API_BASE_URL}/users/profile`, { // <- URL dinámica
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -46,7 +48,7 @@ export default function PerfilPage() {
     };
 
     cargarPerfil();
-  }, [router]);
+  }, [router, API_BASE_URL]);
 
   if (!perfil) return <p>{mensaje || "Cargando perfil..."}</p>;
 
