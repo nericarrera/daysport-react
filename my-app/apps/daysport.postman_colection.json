@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "Daysport API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Registro Usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"prueba@correo.com\",\n  \"password\": \"123456\",\n  \"name\": \"Neri\",\n  \"phone\": \"12345678\",\n  \"address\": \"Calle Falsa 123\",\n  \"postalCode\": \"1000\",\n  \"birthDate\": \"1990-01-01\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/auth/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["auth","register"]
+        }
+      }
+    },
+    {
+      "name": "Login Usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"prueba@correo.com\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["auth","login"]
+        }
+      }
+    },
+    {
+      "name": "Obtener Perfil",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:3001/users/profile",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["users","profile"]
+        }
+      }
+    },
+    {
+      "name": "Actualizar Perfil",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Neri Carrera\",\n  \"phone\": \"87654321\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/users/profile",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["users","profile"]
+        }
+      }
+    },
+    {
+      "name": "Enviar Email Reset Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"prueba@correo.com\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/auth/send-reset-password",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["auth","send-reset-password"]
+        }
+      }
+    },
+    {
+      "name": "Reset Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{RESET_TOKEN}}\",\n  \"password\": \"nuevaPassword123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/auth/reset-password",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["auth","reset-password"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "JWT_TOKEN",
+      "value": ""
+    },
+    {
+      "key": "RESET_TOKEN",
+      "value": ""
+    }
+  ]
+}
