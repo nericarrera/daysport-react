@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
     
     console.log('📨 Forwarding to backend:', body);
     
-    // Hacemos la petición al backend NestJS
     const response = await fetch('http://localhost:3001/users', {
       method: 'POST',
       headers: {
@@ -15,7 +14,6 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    // Si el backend responde con error, forwardeamos el error
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
@@ -42,16 +40,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Opcional: manejar preflight CORS
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
 }
