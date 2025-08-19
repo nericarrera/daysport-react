@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:3001";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
 export const ENDPOINTS = {
   login: "/auth/login",
@@ -18,7 +18,7 @@ interface ApiResponse {
   [key: string]: unknown;
 }
 
-// Función genérica mejorada para llamadas a la API
+// Función genérica mejorada para llamadas a la API con mejor manejo de errores
 export async function apiFetch<T = ApiResponse>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
@@ -27,6 +27,14 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
     const url = `${API_BASE_URL}${endpoint}`;
     console.log(`🔄 API Call: ${options.method || 'GET'} ${url}`);
     
+    // Debug: verificar URL y opciones
+    console.log('🔍 Request details:', {
+      url,
+      method: options.method || 'GET',
+      hasBody: !!options.body,
+      headers: options.headers
+    });
+
     const res = await fetch(url, {
       ...options,
       signal: controller.signal,
@@ -34,6 +42,8 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      // Agregar credenciales para CORS
+      credentials: 'include' as RequestCredentials,
     });
 
     clearTimeout(timeoutId);
@@ -43,7 +53,12 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
     let data: T | string;
     
     if (contentType?.includes('application/json')) {
-      data = await res.json() as T;
+      try {
+        data = await res.json() as T;
+      } catch (jsonError) {
+        console.error('❌ Error parsing JSON:', jsonError);
+        throw new Error(`Error parsing JSON response: ${res.status} ${res.statusText}`);
+      }
     } else {
       data = await res.text();
     }
@@ -56,7 +71,7 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
       throw new Error(errorMessage);
     }
 
-    console.log(`✅ API Success: ${options.method || 'GET'} ${endpoint}`);
+    console.log(`✅ API Success: ${options.method || 'GET'} ${endpoint} - Status: ${res.status}`);
     return data as T;
   } catch (error: unknown) {
     clearTimeout(timeoutId);
@@ -68,6 +83,10 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
     console.error('❌ API Fetch Error:', error);
     
     if (error instanceof Error) {
+      // Mejorar mensajes de error para CORS
+      if (error.message.includes('Failed to fetch')) {
+        throw new Error('Error de conexión: No se pudo conectar al servidor. Verifica que el backend esté corriendo y la configuración CORS.');
+      }
       throw error;
     } else {
       throw new Error('Error desconocido en la API');
@@ -82,14 +101,19 @@ interface LoginResponse {
     email?: string;
   };
   access_token?: string;
+  message?: string;
+  success?: boolean;
 }
 
 interface RegisterResponse {
   user?: {
+    id?: number;
     name?: string;
     email?: string;
+    createdAt?: string;
   };
   success?: boolean;
+  message?: string;
 }
 
 interface ProfileResponse {
@@ -118,6 +142,31 @@ export const apiAuth = {
 
   getProfile: (token: string) => 
     apiFetch<ProfileResponse>(ENDPOINTS.profile, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
     }),
+};
+
+// Función de utilidad para verificar la conexión con el backend
+export const checkBackendConnection = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}`, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(3000)
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('❌ Backend no disponible:', error);
+    return false;
+  }
+};
+
+// Función para obtener el token del localStorage de forma segura
+export const getAuthToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('token');
+  }
+  return null;
 };
