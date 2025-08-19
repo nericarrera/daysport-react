@@ -18,33 +18,63 @@ interface ApiResponse {
   [key: string]: unknown;
 }
 
-// Función genérica mejorada para llamadas a la API con mejor manejo de errores
+// Función de diagnóstico de conexión
+export const checkBackendConnection = async (): Promise<{ connected: boolean; error?: string }> => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const response = await fetch(API_BASE_URL, {
+      method: 'GET',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    clearTimeout(timeoutId);
+    return { connected: response.ok };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { 
+        connected: false, 
+        error: error.name === 'AbortError' 
+          ? 'Timeout: El backend no respondió en 3 segundos' 
+          : `Error de conexión: ${error.message}` 
+      };
+    }
+    return { connected: false, error: 'Error desconocido de conexión' };
+  }
+};
+
+// Función genérica mejorada para llamadas a la API
 export async function apiFetch<T = ApiResponse>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  // Primero verificar la conexión
+  const connection = await checkBackendConnection();
+  if (!connection.connected) {
+    throw new Error(connection.error || 'El backend no está disponible');
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log(`🔄 API Call: ${options.method || 'GET'} ${url}`);
-    
-    // Debug: verificar URL y opciones
-    console.log('🔍 Request details:', {
-      url,
-      method: options.method || 'GET',
-      hasBody: !!options.body,
-      headers: options.headers
-    });
 
-    const res = await fetch(url, {
+    // Opciones de fetch con manejo mejorado de CORS
+    const fetchOptions: RequestInit = {
       ...options,
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      // Agregar credenciales para CORS
-      credentials: 'include' as RequestCredentials,
-    });
+      // Modo cors para mejor compatibilidad
+      mode: 'cors' as RequestMode,
+    };
+
+    const res = await fetch(url, fetchOptions);
 
     clearTimeout(timeoutId);
 
@@ -83,10 +113,6 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
     console.error('❌ API Fetch Error:', error);
     
     if (error instanceof Error) {
-      // Mejorar mensajes de error para CORS
-      if (error.message.includes('Failed to fetch')) {
-        throw new Error('Error de conexión: No se pudo conectar al servidor. Verifica que el backend esté corriendo y la configuración CORS.');
-      }
       throw error;
     } else {
       throw new Error('Error desconocido en la API');
@@ -147,20 +173,6 @@ export const apiAuth = {
         'Content-Type': 'application/json'
       },
     }),
-};
-
-// Función de utilidad para verificar la conexión con el backend
-export const checkBackendConnection = async (): Promise<boolean> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}`, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(3000)
-    });
-    return response.ok;
-  } catch (error) {
-    console.error('❌ Backend no disponible:', error);
-    return false;
-  }
 };
 
 // Función para obtener el token del localStorage de forma segura
