@@ -19,6 +19,7 @@ export default function PerfilPage() {
   const [mensaje, setMensaje] = useState("");
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
