@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // <- variable de entorno
+  console.log("API Base URL:", API_BASE_URL);
 
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
