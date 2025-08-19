@@ -18,63 +18,25 @@ interface ApiResponse {
   [key: string]: unknown;
 }
 
-// Función de diagnóstico de conexión
-export const checkBackendConnection = async (): Promise<{ connected: boolean; error?: string }> => {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-    const response = await fetch(API_BASE_URL, {
-      method: 'GET',
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    clearTimeout(timeoutId);
-    return { connected: response.ok };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return { 
-        connected: false, 
-        error: error.name === 'AbortError' 
-          ? 'Timeout: El backend no respondió en 3 segundos' 
-          : `Error de conexión: ${error.message}` 
-      };
-    }
-    return { connected: false, error: 'Error desconocido de conexión' };
-  }
-};
-
-// Función genérica mejorada para llamadas a la API
+// Función genérica SIMPLIFICADA para evitar bucles de error
 export async function apiFetch<T = ApiResponse>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  // Primero verificar la conexión
-  const connection = await checkBackendConnection();
-  if (!connection.connected) {
-    throw new Error(connection.error || 'El backend no está disponible');
-  }
-
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
 
   try {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log(`🔄 API Call: ${options.method || 'GET'} ${url}`);
 
-    // Opciones de fetch con manejo mejorado de CORS
-    const fetchOptions: RequestInit = {
+    // Opciones básicas sin verificación previa
+    const res = await fetch(url, {
       ...options,
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      // Modo cors para mejor compatibilidad
-      mode: 'cors' as RequestMode,
-    };
-
-    const res = await fetch(url, fetchOptions);
+      mode: 'cors', // Importantísimo para CORS
+    });
 
     clearTimeout(timeoutId);
 
@@ -106,13 +68,19 @@ export async function apiFetch<T = ApiResponse>(endpoint: string, options: Reque
   } catch (error: unknown) {
     clearTimeout(timeoutId);
     
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Timeout: El servidor no respondió en 8 segundos');
-    }
-    
-    console.error('❌ API Fetch Error:', error);
-    
     if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Timeout: El servidor no respondió en 10 segundos');
+      }
+      
+      // Mensajes de error más específicos
+      if (error.message.includes('Failed to fetch')) {
+        throw new Error(`No se pudo conectar al servidor backend. Verifica que:
+        1. El servidor NestJS esté corriendo en puerto 3001
+        2. La URL sea correcta: ${API_BASE_URL}
+        3. No haya problemas de firewall o red`);
+      }
+      
       throw error;
     } else {
       throw new Error('Error desconocido en la API');
@@ -152,7 +120,7 @@ interface ProfileResponse {
   createdAt: string;
 }
 
-// Funciones específicas para mejor reutilización
+// Funciones específicas
 export const apiAuth = {
   login: (credentials: { email: string; password: string }) => 
     apiFetch<LoginResponse>(ENDPOINTS.login, {
@@ -175,7 +143,33 @@ export const apiAuth = {
     }),
 };
 
-// Función para obtener el token del localStorage de forma segura
+// Función de diagnóstico INDEPENDIENTE
+export const checkBackendConnection = async (): Promise<{ connected: boolean; error?: string }> => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const response = await fetch(API_BASE_URL, {
+      method: 'GET',
+      signal: controller.signal,
+      mode: 'cors',
+    });
+
+    clearTimeout(timeoutId);
+    return { connected: response.ok };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { 
+        connected: false, 
+        error: error.name === 'AbortError' 
+          ? 'Timeout: El backend no respondió en 3 segundos' 
+          : `Error de conexión: ${error.message}` 
+      };
+    }
+    return { connected: false, error: 'Error desconocido de conexión' };
+  }
+};
+
 export const getAuthToken = (): string | null => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('token');

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useUser } from "../components/Navbar";
-import { apiAuth } from "../../utils/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -48,7 +47,21 @@ export default function RegisterPage() {
     }
 
     try {
-      const data = await apiAuth.register(formData);
+      // LLAMADA MODIFICADA: Usa la API Route de Next.js en lugar del backend directo
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
 
       setMensaje("✅ Registro exitoso. Iniciando sesión automáticamente...");
       
@@ -57,6 +70,11 @@ export default function RegisterPage() {
         name: data.user?.name || formData.name, 
         email: data.user?.email || formData.email 
       });
+
+      // Guardar token si viene en la respuesta
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+      }
 
       // Limpiar formulario
       setFormData({ email: "", password: "", name: "" });
@@ -69,9 +87,9 @@ export default function RegisterPage() {
       console.error("Error al registrar usuario:", error);
       
       if (error instanceof Error) {
-        setMensaje(`❌ ${error.message || "Error al conectar con el backend"}`);
+        setMensaje(`❌ ${error.message || "Error al conectar con el servidor"}`);
       } else {
-        setMensaje("❌ Error desconocido al conectar con el backend");
+        setMensaje("❌ Error desconocido al conectar con el servidor");
       }
     } finally {
       setIsLoading(false);
