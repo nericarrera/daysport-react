@@ -15,13 +15,11 @@ async function bootstrap() {
 
     // ✅ Configuración CORS unificada
     const corsOptions = {
-  origin: configService.get('FRONTEND_URL')?.split(',') || ['http://localhost:3000'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true,
-  allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
-};
-
-app.enableCors(corsOptions);
+      origin: configService.get('FRONTEND_URL')?.split(',') || ['http://localhost:3000'],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      credentials: true,
+      allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
+    };
 
     app.enableCors(corsOptions);
 

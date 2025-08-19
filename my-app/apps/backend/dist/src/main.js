@@ -19,7 +19,6 @@ async function bootstrap() {
             allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
         };
         app.enableCors(corsOptions);
-        app.enableCors(corsOptions);
         // ✅ Validación global
         app.useGlobalPipes(new common_1.ValidationPipe({
             whitelist: true,
