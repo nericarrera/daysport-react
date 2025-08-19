@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiAuth } from "../../utils/api";
 
 interface UsuarioPerfil {
   id: number;
@@ -17,54 +18,128 @@ export default function PerfilPage() {
   const router = useRouter();
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
   const [mensaje, setMensaje] = useState("");
-
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
-  console.log("API Base URL:", API_BASE_URL);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/iniciar-sesion");
+      setMensaje("❌ No has iniciado sesión. Redirigiendo...");
+      setTimeout(() => router.push("/iniciar-sesion"), 1500);
       return;
     }
 
     const cargarPerfil = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        // Manejo seguro de JSON
-        const data = await res.json().catch(() => ({}));
-
-        if (res.ok) {
-          setPerfil(data);
+        setIsLoading(true);
+        const data = await apiAuth.getProfile(token);
+        setPerfil(data);
+      } catch (error: unknown) {
+        console.error("Error al cargar perfil:", error);
+        
+        if (error instanceof Error) {
+          if (error.message.includes('401') || error.message.includes('403')) {
+            setMensaje("❌ Sesión expirada. Redirigiendo al login...");
+            localStorage.removeItem("token");
+            setTimeout(() => router.push("/iniciar-sesion"), 1500);
+          } else {
+            setMensaje(`❌ ${error.message || "Error al cargar el perfil"}`);
+          }
         } else {
-          setMensaje(`❌ Error al cargar perfil: ${data.message || "Inicia sesión nuevamente"}`);
-          localStorage.removeItem("token");
-          setTimeout(() => router.push("/iniciar-sesion"), 1500);
+          setMensaje("❌ Error desconocido al cargar el perfil");
         }
-      } catch (error) {
-        console.error("Error al conectar con el backend:", error);
-        setMensaje("❌ Error al conectar con el backend. Revisa tu conexión.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     cargarPerfil();
-  }, [router, API_BASE_URL]);
+  }, [router]);
 
-  if (!perfil) return <p>{mensaje || "Cargando perfil..."}</p>;
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/iniciar-sesion");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto mt-12 p-6 text-center">
+        <p>Cargando perfil...</p>
+      </div>
+    );
+  }
+
+  if (!perfil) {
+    return (
+      <div className="max-w-md mx-auto mt-12 p-6 text-center">
+        <p className="text-red-600">{mensaje}</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
-      <h1>Perfil del usuario</h1>
-      <p><strong>ID:</strong> {perfil.id}</p>
-      <p><strong>Email:</strong> {perfil.email}</p>
-      <p><strong>Nombre:</strong> {perfil.name || "No definido"}</p>
-      <p><strong>Teléfono:</strong> {perfil.phone || "No definido"}</p>
-      <p><strong>Dirección:</strong> {perfil.address || "No definido"}</p>
-      <p><strong>Fecha de nacimiento:</strong> {perfil.birthDate || "No definido"}</p>
-      <p><strong>Creado el:</strong> {new Date(perfil.createdAt).toLocaleString()}</p>
+    <div className="max-w-md mx-auto mt-12 p-6 border rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6 text-center">Perfil de Usuario</h1>
+      
+      <div className="space-y-3">
+        <div className="flex justify-between">
+          <span className="font-semibold">ID:</span>
+          <span>{perfil.id}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="font-semibold">Email:</span>
+          <span>{perfil.email}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="font-semibold">Nombre:</span>
+          <span>{perfil.name || "No definido"}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="font-semibold">Teléfono:</span>
+          <span>{perfil.phone || "No definido"}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="font-semibold">Dirección:</span>
+          <span>{perfil.address || "No definido"}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="font-semibold">Fecha de nacimiento:</span>
+          <span>{perfil.birthDate ? new Date(perfil.birthDate).toLocaleDateString() : "No definido"}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="font-semibold">Miembro desde:</span>
+          <span>{new Date(perfil.createdAt).toLocaleDateString()}</span>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3">
+        <button
+          onClick={() => router.push('/editar-perfil')}
+          className="py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+        >
+          Editar Perfil
+        </button>
+        
+        <button
+          onClick={handleLogout}
+          className="py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          Cerrar Sesión
+        </button>
+      </div>
+
+      {mensaje && (
+        <div className={`mt-4 p-3 rounded text-center ${
+          mensaje.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {mensaje}
+        </div>
+      )}
     </div>
   );
 }

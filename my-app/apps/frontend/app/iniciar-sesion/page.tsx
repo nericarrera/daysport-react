@@ -2,128 +2,140 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "../components/Navbar"; // Ajusta la ruta según tu Navbar
+import { useUser } from "../components/Navbar";
+import { apiAuth } from "../../utils/api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useUser(); // Contexto de usuario
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { login } = useUser();
+  
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [mensaje, setMensaje] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Variable de entorno con fallback
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
-  console.log("API Base URL:", API_BASE_URL);
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const iniciarSesion = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje("");
+    setIsLoading(true);
 
-    if (!email || !password) {
+    if (!formData.email || !formData.password) {
       setMensaje("❌ Por favor completa todos los campos.");
+      setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const data = await apiAuth.login(formData);
+
+      setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
+
+      // Guardar usuario en el contexto
+      login({ 
+        name: data.user?.name || formData.email.split('@')[0], 
+        email: data.user?.email || formData.email 
       });
 
-      // Verifica si la respuesta es JSON antes de parsear
-      const data = await response.json().catch(() => ({}));
-
-      if (response.ok) {
-        setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
-
-        // Guardar usuario en el contexto y en localStorage
-        login({ name: data.user?.name, email: data.user?.email });
-
-        setTimeout(() => {
-          router.push("/"); // Redirige a la página principal
-        }, 1000);
-      } else {
-        setMensaje(`❌ Error: ${data.message || "Error desconocido"}`);
+      // Guardar token si viene en la respuesta
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
       }
-    } catch (error) {
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } catch (error: unknown) {
       console.error("Error al iniciar sesión:", error);
-      setMensaje("❌ Error al conectar con el servidor. Revisa tu navegador o VPN.");
+      
+      if (error instanceof Error) {
+        setMensaje(`❌ ${error.message || "Error al conectar con el servidor"}`);
+      } else {
+        setMensaje("❌ Error desconocido al conectar con el servidor");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "50px auto",
-        padding: "20px",
-        border: "1px solid #ccc",
-        borderRadius: "10px",
-      }}
-    >
-      <h1>Iniciar Sesión</h1>
-      <form
-        onSubmit={iniciarSesion}
-        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-      >
+    <div className="max-w-md mx-auto mt-12 p-6 border rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h1>
+      
+      <form onSubmit={iniciarSesion} className="flex flex-col gap-4">
         <input
           type="email"
           placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={(e) => handleInputChange('email', e.target.value)}
           required
-          style={{
-            padding: "8px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-          }}
+          className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isLoading}
         />
-        <div style={{ position: "relative" }}>
+        
+        <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
             required
-            style={{
-              padding: "8px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              width: "100%",
-            }}
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+            disabled={isLoading}
           />
           <span
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600 hover:text-blue-500 transition-colors"
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              cursor: "pointer",
-              color: "#555",
-              fontSize: "14px",
-            }}
           >
             {showPassword ? "🙈" : "👁️"}
           </span>
         </div>
+
         <button
           type="submit"
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            backgroundColor: "#1d4ed8",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-          }}
+          disabled={isLoading}
+          className={`py-2 text-white rounded transition-colors ${
+            isLoading 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
-          Iniciar Sesión
+          {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </button>
       </form>
-      {mensaje && <p style={{ marginTop: "15px" }}>{mensaje}</p>}
+
+      {mensaje && (
+        <div className={`mt-4 p-3 rounded text-center ${
+          mensaje.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {mensaje}
+        </div>
+      )}
+
+      <div className="mt-6 text-center text-sm text-gray-600">
+        <p>¿No tienes cuenta? </p>
+        <button
+          onClick={() => router.push('/registrarse')}
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          Regístrate aquí
+        </button>
+      </div>
+
+      <div className="mt-4 text-center">
+        <button
+          onClick={() => router.push('/recuperar-contrasena')}
+          className="text-sm text-gray-600 hover:text-gray-800 underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
+      </div>
     </div>
   );
 }
