@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import MegaMenu from './MegaMenu';
 import { categories } from './Category';
 
@@ -15,7 +16,7 @@ type User = {
 type UserContextType = {
   isLoggedIn: boolean;
   user: User | null;
-  login: (userData: User) => void;
+  login: (userData: User, token: string) => void;
   logout: () => void;
 };
 
@@ -37,6 +38,7 @@ type CartItem = {
 };
 
 export default function Navbar() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -58,22 +60,54 @@ export default function Navbar() {
     user: null
   });
 
-  const login = useCallback((userData: User) => {
+  // MEJORA: Función de login mejorada
+  const login = useCallback((userData: User, token: string) => {
     setUserState({ isLoggedIn: true, user: userData });
     localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", token);
   }, []);
 
+  // MEJORA: Función de logout mejorada
   const logout = useCallback(() => {
     setUserState({ isLoggedIn: false, user: null });
     localStorage.removeItem("user");
-  }, []);
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart");
+    router.push('/');
+    router.refresh();
+  }, [router]);
 
+  // MEJORA: Cargar estado de sesión al iniciar
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUserState({ isLoggedIn: true, user: JSON.parse(storedUser) });
-    }
-  }, []);
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem("token");
+      const userData = localStorage.getItem("user");
+      
+      if (token && userData) {
+        try {
+          setUserState({ 
+            isLoggedIn: true, 
+            user: JSON.parse(userData) 
+          });
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          logout();
+        }
+      }
+    };
+
+    checkAuthStatus();
+    
+    // Escuchar eventos de login/logout desde otras partes de la app
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token' || e.key === 'user') {
+        checkAuthStatus();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [logout]);
 
   const texts = [
     { content: "ENVIOS A TODO EL PAÍS!", style: "text-yellow-400" },
@@ -355,16 +389,23 @@ export default function Navbar() {
                         <div className="absolute right-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md z-50 cursor-pointer border-t">
                           {userState.isLoggedIn ? (
                             <>
-                              <div className="px-4 py-3 border-b hover:bg-yellow-300 cursor-pointer">
+                              <div className="px-4 py-3 border-b">
                                 <p className="text-sm font-medium text-black">Hola, {userState.user?.name || 'Usuario'}</p>
                                 <p className="text-xs text-gray-500 truncate">{userState.user?.email || 'usuario@example.com'}</p>
                               </div>
                               <Link 
-                                href="/mi-cuenta" 
+                                href="/perfil" 
                                 className="block px-4 py-2 text-sm text-black hover:bg-yellow-300" 
                                 onClick={() => setUserMenuOpen(false)}
                               >
-                                Mi Cuenta
+                                Mi Perfil
+                              </Link>
+                              <Link 
+                                href="/editar-perfil" 
+                                className="block px-4 py-2 text-sm text-black hover:bg-yellow-300" 
+                                onClick={() => setUserMenuOpen(false)}
+                              >
+                                Editar Perfil
                               </Link>
                               <Link 
                                 href="/mis-pedidos" 
@@ -467,11 +508,18 @@ export default function Navbar() {
                         {userState.isLoggedIn ? (
                           <>
                             <Link 
-                              href="/mi-cuenta" 
+                              href="/perfil" 
                               className="block py-3 px-4 text-black hover:bg-yellow-400 rounded-lg mb-2" 
                               onClick={() => setUserMenuOpen(false)}
                             >
                               Mi Perfil
+                            </Link>
+                            <Link 
+                              href="/editar-perfil" 
+                              className="block py-3 px-4 text-black hover:bg-yellow-400 rounded-lg mb-2" 
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              Editar Perfil
                             </Link>
                             <Link 
                               href="/mis-pedidos" 

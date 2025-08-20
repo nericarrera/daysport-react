@@ -50,19 +50,20 @@ export default function LoginPage() {
 
       setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
 
-      // Guardar usuario en el contexto
+      // CORRECCIÓN: Pasar ambos argumentos a la función login
       login({ 
         name: data.user?.name || formData.email.split('@')[0], 
         email: data.user?.email || formData.email 
-      });
+      }, data.access_token); // ← Añadir el token como segundo argumento
 
-      // Guardar token si viene en la respuesta
+      // Guardar token si viene en la respuesta (ya se hace en el login, pero por si acaso)
       if (data.access_token) {
         localStorage.setItem("token", data.access_token);
       }
 
       setTimeout(() => {
-        router.push("/");
+        router.push("/perfil"); // Redirigir al perfil en lugar del home
+        router.refresh(); // Forzar actualización del navbar
       }, 1000);
     } catch (error: unknown) {
       console.error("Error al iniciar sesión:", error);

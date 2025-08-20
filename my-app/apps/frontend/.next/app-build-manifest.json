@@ -21,15 +21,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/register/route.js"
     ],
+    "/perfil/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/perfil/page.js"
+    ],
     "/iniciar-sesion/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/iniciar-sesion/page.js"
     ],
-    "/_not-found/page": [
+    "/api/login/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/api/login/route.js"
     ]
   }
 }

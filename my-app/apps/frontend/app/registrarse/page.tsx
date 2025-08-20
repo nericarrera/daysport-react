@@ -65,13 +65,13 @@ export default function RegisterPage() {
 
       setMensaje("✅ Registro exitoso. Iniciando sesión automáticamente...");
       
-      // Guardar usuario en el contexto
+      // CORRECCIÓN: Pasar ambos argumentos a la función login
       login({ 
         name: data.user?.name || formData.name, 
         email: data.user?.email || formData.email 
-      });
+      }, data.access_token); // ← Añadir el token como segundo argumento
 
-      // Guardar token si viene en la respuesta
+      // Guardar token si viene en la respuesta (ya se hace en el login, pero por si acaso)
       if (data.access_token) {
         localStorage.setItem("token", data.access_token);
       }
@@ -79,9 +79,10 @@ export default function RegisterPage() {
       // Limpiar formulario
       setFormData({ email: "", password: "", name: "" });
 
-      // Redirigir al home
+      // Redirigir al perfil en lugar del home
       setTimeout(() => {
-        router.push("/");
+        router.push("/perfil");
+        router.refresh(); // Forzar actualización del navbar
       }, 1000);
     } catch (error: unknown) {
       console.error("Error al registrar usuario:", error);
