@@ -1,3 +1,4 @@
+// app/iniciar-sesion/page.tsx - VERSIÓN COMPLETA CON DEBUG
 'use client';
 
 import { useState } from "react";
@@ -32,6 +33,7 @@ export default function LoginPage() {
     }
 
     try {
+      console.log('🔄 Haciendo login para:', formData.email);
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 
@@ -46,26 +48,40 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
+      console.log('✅ Login API response:', data);
 
       setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
 
-      // CORRECCIÓN: Forzar actualización del estado global
+      // DEBUG: Verificar los datos recibidos
+      console.log('🔐 Token recibido:', data.access_token);
+      console.log('👤 User data recibido:', data.user);
+
+      if (!data.access_token) {
+        console.warn('⚠️ No se recibió token del servidor');
+      }
+
+      // Guardar usuario en el contexto
       login({ 
         name: data.user?.name || formData.email.split('@')[0], 
         email: data.user?.email || formData.email 
       }, data.access_token);
 
-      // Guardar también en localStorage directamente para asegurar
-      localStorage.setItem("token", data.access_token);
+      // Guardar en localStorage
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        console.log('💾 Token guardado en localStorage');
+      } else {
+        console.warn('⚠️ No hay token para guardar en localStorage');
+      }
+
       localStorage.setItem("user", JSON.stringify({
         name: data.user?.name || formData.email.split('@')[0],
         email: data.user?.email || formData.email
       }));
 
-      // CORRECCIÓN MEJORADA: Redirección con timeout más corto
+      // Redirección
       setTimeout(() => {
-        // Forzar recarga completa de la aplicación
-        window.location.href = "/perfil"; // ← Esto SÍ funciona
+        window.location.href = "/perfil";
       }, 800);
 
     } catch (error: unknown) {
