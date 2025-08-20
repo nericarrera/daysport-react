@@ -1,6 +1,6 @@
 {
-  "/iniciar-sesion/page": "app/iniciar-sesion/page.js",
+  "/page": "app/page.js",
   "/perfil/page": "app/perfil/page.js",
   "/registrarse/page": "app/registrarse/page.js",
-  "/page": "app/page.js"
+  "/iniciar-sesion/page": "app/iniciar-sesion/page.js"
 }
