@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "../components/Navbar";
-import { apiAuth } from "../../utils/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,7 +32,21 @@ export default function LoginPage() {
     }
 
     try {
-      const data = await apiAuth.login(formData);
+      // LLAMADA MODIFICADA: Usa el API Route de Next.js
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
 
       setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
 

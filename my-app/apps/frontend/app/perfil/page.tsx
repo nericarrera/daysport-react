@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiAuth } from "../../utils/api";
 
 interface UsuarioPerfil {
   id: number;
@@ -31,13 +30,29 @@ export default function PerfilPage() {
     const cargarPerfil = async () => {
       try {
         setIsLoading(true);
-        const data = await apiAuth.getProfile(token);
+        
+        // LLAMADA MODIFICADA: Usa el API Route de Next.js
+        const response = await fetch('/api/profile', {
+          method: 'GET',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
         setPerfil(data);
+        
       } catch (error: unknown) {
         console.error("Error al cargar perfil:", error);
         
         if (error instanceof Error) {
-          if (error.message.includes('401') || error.message.includes('403')) {
+          if (error.message.includes('401') || error.message.includes('403') || error.message.includes('Token')) {
             setMensaje("❌ Sesión expirada. Redirigiendo al login...");
             localStorage.removeItem("token");
             setTimeout(() => router.push("/iniciar-sesion"), 1500);
