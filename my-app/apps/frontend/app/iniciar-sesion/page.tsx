@@ -32,7 +32,6 @@ export default function LoginPage() {
     }
 
     try {
-      // LLAMADA MODIFICADA: Usa el API Route de Next.js
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 
@@ -50,21 +49,25 @@ export default function LoginPage() {
 
       setMensaje("✅ Inicio de sesión exitoso. Redirigiendo...");
 
-      // CORRECCIÓN: Pasar ambos argumentos a la función login
+      // CORRECCIÓN: Forzar actualización del estado global
       login({ 
         name: data.user?.name || formData.email.split('@')[0], 
         email: data.user?.email || formData.email 
-      }, data.access_token); // ← Añadir el token como segundo argumento
+      }, data.access_token);
 
-      // Guardar token si viene en la respuesta (ya se hace en el login, pero por si acaso)
-      if (data.access_token) {
-        localStorage.setItem("token", data.access_token);
-      }
+      // Guardar también en localStorage directamente para asegurar
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify({
+        name: data.user?.name || formData.email.split('@')[0],
+        email: data.user?.email || formData.email
+      }));
 
+      // CORRECCIÓN MEJORADA: Redirección con timeout más corto
       setTimeout(() => {
-        router.push("/perfil"); // Redirigir al perfil en lugar del home
-        router.refresh(); // Forzar actualización del navbar
-      }, 1000);
+        // Forzar recarga completa de la aplicación
+        window.location.href = "/perfil"; // ← Esto SÍ funciona
+      }, 800);
+
     } catch (error: unknown) {
       console.error("Error al iniciar sesión:", error);
       
