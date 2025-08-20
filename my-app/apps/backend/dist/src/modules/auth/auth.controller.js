@@ -27,14 +27,26 @@ let AuthController = class AuthController {
     async register(body) {
         return this.authService.register(body);
     }
-    // Login de usuario
+    // Login de usuario - VERSIÓN CORREGIDA
     async login(body) {
         const user = await this.authService.validateUser(body.email, body.password);
         if (!user) {
             throw new common_1.UnauthorizedException('Credenciales inválidas');
         }
-        // Retorna token JWT + info del usuario
-        return this.authService.login(user);
+        // CORRECCIÓN: Convertir null a undefined para consistencia
+        const normalizedUser = {
+            id: user.id,
+            email: user.email,
+            name: user.name ?? undefined // Convierte null a undefined
+        };
+        // CORRECCIÓN: Usar access_token en lugar de token
+        const loginResult = await this.authService.login(normalizedUser);
+        // Devolver en el formato que espera el frontend
+        return {
+            access_token: loginResult.access_token, // ← Cambiado de token a access_token
+            user: loginResult.user,
+            message: loginResult.message
+        };
     }
     // Recuperación de contraseña
     async sendResetPasswordEmail(email) {

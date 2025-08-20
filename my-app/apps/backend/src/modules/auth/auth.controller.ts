@@ -15,18 +15,32 @@ export class AuthController {
     return this.authService.register(body);
   }
 
-  // Login de usuario
+  // Login de usuario - VERSIÓN CORREGIDA
   @Post('login')
-async login(@Body() body: LoginDto) {
-  const user = await this.authService.validateUser(body.email, body.password);
+  async login(@Body() body: LoginDto) {
+    const user = await this.authService.validateUser(body.email, body.password);
 
-  if (!user) {
-    throw new UnauthorizedException('Credenciales inválidas');
+    if (!user) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    // CORRECCIÓN: Convertir null a undefined para consistencia
+    const normalizedUser = {
+      id: user.id,
+      email: user.email,
+      name: user.name ?? undefined // Convierte null a undefined
+    };
+
+    // CORRECCIÓN: Usar access_token en lugar de token
+    const loginResult = await this.authService.login(normalizedUser);
+    
+    // Devolver en el formato que espera el frontend
+    return {
+      access_token: loginResult.access_token,  // ← Cambiado de token a access_token
+      user: loginResult.user,
+      message: loginResult.message
+    };
   }
-
-  // Retorna token JWT + info del usuario
-  return this.authService.login(user);
-}
 
   // Recuperación de contraseña
   @Post('send-reset-password')
@@ -47,4 +61,3 @@ async login(@Body() body: LoginDto) {
     return this.authService.getProfile(userId);
   }
 }
-

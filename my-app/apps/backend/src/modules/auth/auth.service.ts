@@ -1,3 +1,4 @@
+// auth.service.ts - VERSIÓN CORREGIDA
 import { Injectable, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -33,7 +34,16 @@ export class AuthService {
       },
     });
 
-    return { message: 'Usuario registrado correctamente', user: { id: user.id, email: user.email, name: user.name ?? undefined } };
+    // MEJORA: Devolver formato consistente y convertir null a undefined
+    return { 
+      success: true,
+      message: 'Usuario creado correctamente', 
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        name: user.name ?? undefined // Convierte null a undefined
+      } 
+    };
   }
 
   // -------------------- Validación de usuario --------------------
@@ -44,27 +54,34 @@ export class AuthService {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return null;
 
-    return { id: user.id, email: user.email, name: user.name ?? undefined };
+    // CORRECCIÓN: Convertir null a undefined
+    return { 
+      id: user.id, 
+      email: user.email, 
+      name: user.name ?? undefined 
+    };
   }
 
   // -------------------- Login --------------------
-async login(userOrEmail: { email: string; password?: string } | { id: number; email: string; name?: string }) {
-  let payload;
-  
-  // Guard: si tiene password, es email+password
-  if ('password' in userOrEmail && userOrEmail.password !== undefined) {
-    const user = await this.validateUser(userOrEmail.email, userOrEmail.password);
-    if (!user) throw new UnauthorizedException('Credenciales inválidas');
-
-    payload = { sub: user.id, email: user.email };
-    return { message: 'Login exitoso', token: this.jwtService.sign(payload), user };
-  } else {
-    // Guard: sabemos que es el objeto usuario con id
-    const user = userOrEmail as { id: number; email: string; name?: string };
-    payload = { sub: user.id, email: user.email };
-    return { message: 'Login exitoso', token: this.jwtService.sign(payload), user };
+  async login(user: { id: number; email: string; name?: string }) {
+    const payload = { 
+      sub: user.id, 
+      email: user.email,
+      name: user.name 
+    };
+    
+    // MEJORA: Formato claro y consistente
+    return {
+      success: true,
+      message: 'Login exitoso',
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    };
   }
-}
 
   // -------------------- Obtener perfil --------------------
   async getProfile(userId: number) {
@@ -83,7 +100,18 @@ async login(userOrEmail: { email: string; password?: string } | { id: number; em
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
-    return user;
+    
+    // CORRECCIÓN: Convertir null a undefined
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name ?? undefined,
+      phone: user.phone ?? undefined,
+      address: user.address ?? undefined,
+      postalCode: user.postalCode ?? undefined,
+      birthDate: user.birthDate ?? undefined,
+      createdAt: user.createdAt
+    };
   }
 
   // -------------------- Recuperación de contraseña --------------------

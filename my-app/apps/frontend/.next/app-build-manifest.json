@@ -11,11 +11,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
-    "/iniciar-sesion/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/iniciar-sesion/page.js"
-    ],
     "/registrarse/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -31,6 +26,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/perfil/page.js"
     ],
+    "/iniciar-sesion/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/iniciar-sesion/page.js"
+    ],
     "/api/login/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -40,6 +40,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/profile/route.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
