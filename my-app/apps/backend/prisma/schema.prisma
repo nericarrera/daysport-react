@@ -30,7 +30,6 @@ model Product {
   name        String
   price       Float
   description String?
-  category    String
   images      String[]
   category    String   // 'mujer', 'hombre', 'niños', 'accesorios'
   subcategory String   // 'remeras', 'shorts', 'calzas', 'buzos'
