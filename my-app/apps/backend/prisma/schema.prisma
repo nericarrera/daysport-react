@@ -32,6 +32,8 @@ model Product {
   description String?
   category    String
   images      String[]
+  category    String   // 'mujer', 'hombre', 'niños', 'accesorios'
+  subcategory String   // 'remeras', 'shorts', 'calzas', 'buzos'
   stock       Int        @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

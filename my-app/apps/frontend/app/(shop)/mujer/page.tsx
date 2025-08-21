@@ -1,10 +1,10 @@
+// app/mujer/page.tsx - VERSIÓN ACTUALIZADA
 import Link from 'next/link';
 import ProductGrid from '../../components/ProductGrid';
 import FilterButton from '../../components/FilterButton';
-import { getProductsByCategory } from '../../data/Products';
+import { getProductsByCategory, convertToCompatibleProducts } from '../../data/Products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-
 
 // Datos de las categorías circulares
 const subcategories = [
@@ -15,7 +15,7 @@ const subcategories = [
   },
   {
     name: 'Joggins',
-    slug: 'joggins',
+    slug: 'joggins', 
     image: '/menu-seccion-img/mujer/menu-pantalones.webp'
   },
   {
@@ -41,7 +41,8 @@ const subcategories = [
 ];
 
 export default function MujerPage() {
-  const products = getProductsByCategory('mujer');
+  const oldProducts = getProductsByCategory('mujer');
+  const compatibleProducts = convertToCompatibleProducts(oldProducts);
 
   return (
     <div className="max-w-full mx-auto px-43 py-14 bg-white">
@@ -103,12 +104,12 @@ export default function MujerPage() {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Filtros */}
         <div className="md:w-1/4">
-  <FilterButton category="mujer" />
-</div>
+          <FilterButton category="mujer" />
+        </div>
         
         {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid products={products} />
+          <ProductGrid products={compatibleProducts} />
         </div>
       </div>
     </div>

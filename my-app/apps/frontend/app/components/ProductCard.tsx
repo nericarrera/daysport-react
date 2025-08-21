@@ -1,13 +1,14 @@
+// components/ProductCard.tsx - VERSIÓN CORREGIDA
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface Product {
-  id: number;
+  id: string | number;
   name: string;
   price: number;
-  images: string[];  // ← Ahora siempre es array
+  images: string[];
   category: string;
-  subcategory: string;
+  subcategory?: string; // ← Hacer opcional
 }
 
 interface ProductCardProps {
