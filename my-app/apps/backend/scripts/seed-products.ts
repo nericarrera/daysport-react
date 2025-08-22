@@ -1,3 +1,4 @@
+// apps/backend/scripts/seed-products.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -79,6 +80,13 @@ async function main() {
   }
 
   console.log('🎉 Seed de productos completado!');
+
+  // Mostrar todos los productos
+  const allProducts = await prisma.product.findMany();
+  console.log('📦 Total de productos en la base de datos:', allProducts.length);
+  allProducts.forEach(product => {
+    console.log(`   - ${product.name} (${product.category})`);
+  });
 }
 
 main()
