@@ -13,36 +13,54 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsController = void 0;
-const common_1 = require("@nestjs/common");
+const common_1 = require("@nestjs/common"); // ← Agregar Param aquí
 const prisma_service_1 = require("../../prisma/prisma.service");
 let ProductsController = class ProductsController {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async getProducts(category, featured) {
-        const whereClause = {};
+    async getProducts(category, subcategory, featured) {
+        const where = {};
         if (category)
-            whereClause.category = category;
+            where.category = category;
+        if (subcategory)
+            where.subcategory = subcategory;
         if (featured === 'true')
-            whereClause.featured = true;
+            where.featured = true;
         const products = await this.prisma.product.findMany({
-            where: whereClause,
+            where,
             orderBy: { createdAt: 'desc' }
         });
         return products;
     }
+    async getProductById(id) {
+        return this.prisma.product.findUnique({
+            where: { id: parseInt(id) }
+        });
+    }
 };
 exports.ProductsController = ProductsController;
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('products') // ← Endpoint: /products
+    ,
     __param(0, (0, common_1.Query)('category')),
-    __param(1, (0, common_1.Query)('featured')),
+    __param(1, (0, common_1.Query)('subcategory')),
+    __param(2, (0, common_1.Query)('featured')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "getProducts", null);
+__decorate([
+    (0, common_1.Get)('products/:id') // ← Endpoint: /products/1
+    ,
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ProductsController.prototype, "getProductById", null);
 exports.ProductsController = ProductsController = __decorate([
-    (0, common_1.Controller)('products'),
+    (0, common_1.Controller)() // ← Controlador en la raíz
+    ,
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], ProductsController);
