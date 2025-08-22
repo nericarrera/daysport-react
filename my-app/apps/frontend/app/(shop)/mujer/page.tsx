@@ -55,17 +55,6 @@ export default function MujerPage() {
     async function loadProducts() {
       try {
         console.log('🔄 Cargando productos de mujer desde la API...');
-        
-        // 1. Primero prueba la conexión directa
-        const testResponse = await fetch('http://localhost:3001/api/products?category=mujer');
-        console.log('📡 Status de la API:', testResponse.status);
-        
-        if (testResponse.ok) {
-          const testData = await testResponse.json();
-          console.log('📦 Datos crudos de la API:', testData);
-        } else {
-          console.error('❌ Error en la API:', testResponse.statusText);
-        }
 
         // 2. Usar el servicio
         const productsData = await ProductService.getProductsByCategory('mujer');

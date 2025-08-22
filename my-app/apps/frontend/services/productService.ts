@@ -1,6 +1,8 @@
 // apps/frontend/services/productService.ts
 import { Product } from '../app/Types'; // Ruta corregida
 
+export type { Product };
+
 export class ProductService {
   static async getProductsByCategory(category: string): Promise<Product[]> {
     try {

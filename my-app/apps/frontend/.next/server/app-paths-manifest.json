@@ -1,6 +1,3 @@
 {
-  "/(shop)/mujer/page": "app/(shop)/mujer/page.js",
-  "/hombre/page": "app/hombre/page.js",
-  "/ninos/page": "app/ninos/page.js",
-  "/registrarse/page": "app/registrarse/page.js"
+  "/(shop)/mujer/page": "app/(shop)/mujer/page.js"
 }
