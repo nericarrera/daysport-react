@@ -1,12 +1,28 @@
 // apps/frontend/services/productService.ts
-// Importa el tipo Product
-import { Product } from '../app/Types'; // ← Asegúrate de que la ruta sea correcta
+import { Product } from '../app/Types'; // Ruta corregida
 
 export class ProductService {
   static async getProductsByCategory(category: string): Promise<Product[]> {
-    // USAR DIRECTAMENTE DATOS MOCK MIENTRAS SE ARREGLA EL BACKEND
-    console.log('⚠️ Usando datos mock temporalmente');
-    return this.getMockProducts(category);
+    try {
+      // Intenta conectar con la API primero
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_BASE_URL}/products?category=${category}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Datos reales de API:', data);
+        return data;
+      }
+      
+      // Si la API falla, usa datos mock sin mostrar error
+      console.log('⚠️ API no disponible, usando datos mock temporalmente');
+      return this.getMockProducts(category);
+      
+    } catch (error) {
+      // Si hay error de conexión, usa datos mock silenciosamente
+      console.log('🔇 Error de conexión, usando datos mock');
+      return this.getMockProducts(category);
+    }
   }
 
   private static getMockProducts(category: string): Product[] {
@@ -28,7 +44,7 @@ export class ProductService {
         id: 2,
         name: 'Short Deportivo Mujer',
         price: 2490,
-        category: 'mujer', 
+        category: 'mujer',
         subcategory: 'shorts',
         images: ['/images/mujer/short-deportivo.jpg'],
         description: 'Short cómodo para actividades deportivas',
@@ -36,32 +52,6 @@ export class ProductService {
         colors: ['Negro', 'Gris'],
         stock: 20,
         featured: false
-      },
-      {
-        id: 3,
-        name: 'Remera Deportiva Hombre',
-        price: 2790,
-        category: 'hombre',
-        subcategory: 'remeras',
-        images: ['/images/hombre/remera-deportiva.jpg'],
-        description: 'Remera deportiva para hombre de alta calidad',
-        sizes: ['M', 'L', 'XL'],
-        colors: ['Negro', 'Blanco', 'Rojo'],
-        stock: 18,
-        featured: true
-      },
-      {
-        id: 4,
-        name: 'Pantalón Deportivo Hombre',
-        price: 3990,
-        category: 'hombre',
-        subcategory: 'pantalones',
-        images: ['/images/hombre/pantalon-deportivo.jpg'],
-        description: 'Pantalón cómodo para entrenamiento',
-        sizes: ['M', 'L', 'XL'],
-        colors: ['Negro', 'Gris'],
-        stock: 12,
-        featured: true
       }
     ];
 
