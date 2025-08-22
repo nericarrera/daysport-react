@@ -372,4 +372,8 @@ eval(__webpack_require__.ts("__webpack_require__.r(__webpack_exports__);\n/* har
 },
 /******/ __webpack_require__ => { // webpackRuntimeModules
 /******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-/******/ __webpack_require__.O(0, ["main-app"], () => (__webpack_exec__("(app-pages-browser)/../../node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cnerip%5C%5CDocuments%5C%5Cdaysport-react%5C%5Cmy-app%5C%5Capps%5C%5Cf
+/******/ __webpack_require__.O(0, ["main-app"], () => (__webpack_exec__("(app-pages-browser)/../../node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cnerip%5C%5CDocuments%5C%5Cdaysport-react%5C%5Cmy-app%5C%5Capps%5C%5Cfrontend%5C%5Capp%5C%5Chombre%5C%5Cpage.tsx%22%2C%22ids%22%3A%5B%5D%7D&server=false!")));
+/******/ var __webpack_exports__ = __webpack_require__.O();
+/******/ _N_E = __webpack_exports__;
+/******/ }
+]);
