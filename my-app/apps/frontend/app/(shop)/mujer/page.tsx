@@ -7,7 +7,8 @@ import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 
 // Importamos el servicio de productos que conecta con la API
-import { ProductService, type Product } from '../../../services/productService';
+import { ProductService } from '../../../services/productService';
+import { Product } from '../../Types';
 
 // Datos de las categorías circulares
 const subcategories = [
