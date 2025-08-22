@@ -1,3 +1,4 @@
+// apps/frontend/services/productService.ts
 import { Product } from '../app/Types'; // ← Ruta corregida
 
 export class ProductService {
@@ -18,7 +19,7 @@ export class ProductService {
       console.log('⚠️ API no disponible, usando datos mock temporalmente');
       return this.getMockProducts(category);
       
-    } catch (error) {
+    } catch {
       // Si hay error de conexión, usa datos mock silenciosamente
       console.log('🔇 Error de conexión, usando datos mock');
       return this.getMockProducts(category);
@@ -42,7 +43,7 @@ export class ProductService {
       const categoryProducts = await this.getProductsByCategory(category);
       return categoryProducts.filter(product => product.subcategory === subcategory);
       
-    } catch (error) {
+    } catch {
       console.log('🔇 Error de conexión, usando filtrado local');
       const categoryProducts = await this.getProductsByCategory(category);
       return categoryProducts.filter(product => product.subcategory === subcategory);
@@ -62,7 +63,7 @@ export class ProductService {
       console.log('⚠️ Producto no encontrado en API');
       return null;
       
-    } catch (error) {
+    } catch  {
       console.log('🔇 Error obteniendo producto por ID');
       return null;
     }
