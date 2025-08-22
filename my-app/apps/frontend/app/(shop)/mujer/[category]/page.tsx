@@ -1,4 +1,4 @@
-import { getProductsByCategory, convertToCompatibleProducts } from '../../../data/Products';
+import { getProductsByCategory, convertToCompatibleProducts } from '../../../data/products';
 import ProductGrid from '../../../components/ProductGrid';
 
 // Mapeo de nombres bonitos para subcategorías

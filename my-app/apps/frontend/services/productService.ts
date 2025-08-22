@@ -19,7 +19,10 @@ export interface Product {
 export class ProductService {
   static async getProductsByCategory(category: string): Promise<Product[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/products?category=${category}`);
+      // Mapear "niños" a "ninos" para la API
+      const apiCategory = category === 'niños' ? 'ninos' : category;
+      
+      const response = await fetch(`${API_BASE_URL}/api/products?category=${apiCategory}`);
       if (!response.ok) throw new Error('Error fetching products');
       return await response.json();
     } catch (error) {

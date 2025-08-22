@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
 import FilterButton from '../components/FilterButton';
-import { getProductsByCategory, convertToCompatibleProducts } from '../data/Products';
+import { getProductsByCategory, convertToCompatibleProducts } from '../data/products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { useState } from 'react';

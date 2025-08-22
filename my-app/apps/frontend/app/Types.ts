@@ -1,14 +1,19 @@
 export interface Product {
-  id: string;
-  slug: string;
+  id: number;           
   name: string;
   price: number;
-  image: string;
   category: string;
+  subcategory: string | null;  
+  images: string[];     
   description?: string;
-  sizes?: string[];
-  colors?: string[];
-  // ... otras propiedades
+  sizes: string[];      
+  colors: string[];     
+  stock: number;
+  featured: boolean;
+  slug?: string;        
+  image?: string;       
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {
@@ -21,4 +26,5 @@ export interface Subcategory {
   name: string;
   href: string;
   image?: string;
+  slug?: string;       // ← Agregado para consistencia
 }

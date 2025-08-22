@@ -1,15 +1,17 @@
+// apps/frontend/components/ProductCarousel.tsx
 'use client';
 import React from 'react';
 import Image from 'next/image';
 import Carousel from './Carousel';
 import { useCart } from './CartContext';
 
-// Asegúrate de que esta interfaz coincida con lo que espera addToCart
+// Actualiza la interfaz para que coincida con el backend
 interface Product {
-  id: string; // Cambiado a solo string para coincidir con CartItem
+  id: number;        // ← Cambiado a number para coincidir con Prisma
   name: string;
   price: number;
-  image: string;
+  images: string[];  // ← Cambiado a plural (array)
+  image?: string;    // ← Opcional por compatibilidad
 }
 
 interface ProductCarouselProps {
@@ -29,7 +31,7 @@ export default function ProductCarousel({ title, products }: ProductCarouselProp
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow mx-2">
           <div className="relative h-48">
             <Image
-              src={product.image}
+              src={product.images?.[0] || '/placeholder.jpg'} // ← Toma la primera imagen
               alt={product.name}
               fill
               className="object-cover"
@@ -41,10 +43,10 @@ export default function ProductCarousel({ title, products }: ProductCarouselProp
             <p className="text-gray-600 mb-3">${product.price}</p>
             <button
               onClick={() => addToCart({
-                ...product,
-                // Asegúrate de que el objeto cumple con Omit<CartItem, "quantity">
-                // Si necesitas transformar el ID a string:
-                id: String(product.id)
+                id: String(product.id), // Convertir a string para el carrito
+                name: product.name,
+                price: product.price,
+                image: product.images?.[0] || '', // ← Pasar la primera imagen
               })}
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
             >
