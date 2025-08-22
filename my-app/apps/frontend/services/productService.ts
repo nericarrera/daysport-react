@@ -71,14 +71,14 @@ export class ProductService {
 
   // Datos mock de respaldo
   private static getMockProducts(category: string): Product[] {
-    const mockProducts: Product[] = [
-      {
-        id: 1,
-        name: 'Remera Deportiva Mujer Fit',
-        price: 2990,
-        category: 'mujer',
-        subcategory: 'remeras',
-        images: ['/images/mujer/remera-fit.jpg'],
+  const mockProducts: Product[] = [
+    {
+      id: 1,
+      name: 'Remera Deportiva Mujer Dry-Fit',
+      price: 3990,
+      category: 'mujer',
+      subcategory: 'remeras',
+      images: ['/images/mujer/remera-fit.jpg'],
         description: 'Remera deportiva de alta calidad',
         sizes: ['S', 'M', 'L'],
         colors: ['Negro', 'Blanco'],

@@ -1,4 +1,5 @@
-import { getProductsByCategory, convertToCompatibleProducts } from '../../../data/products';
+// apps/frontend/app/(shop)/mujer/[category]/page.tsx
+import { getProductsByCategory } from '../../../data/products'; // ← Solo esta importación
 import ProductGrid from '../../../components/ProductGrid';
 
 // Mapeo de nombres bonitos para subcategorías
@@ -13,13 +14,10 @@ const subcategoryNames: { [key: string]: string } = {
 export default function SubcategoryPage({ params }: { params: { subcategory: string } }) {
   const allProducts = getProductsByCategory('mujer');
   
-  // Filtrar por subcategoría PRIMERO
+  // Filtrar por subcategoría
   const filteredProducts = allProducts.filter(product => 
     product.subcategory === params.subcategory
   );
-
-  // LUEGO convertir al formato compatible
-  const compatibleProducts = convertToCompatibleProducts(filteredProducts);
 
   const displayName = subcategoryNames[params.subcategory] || params.subcategory;
 
@@ -27,7 +25,7 @@ export default function SubcategoryPage({ params }: { params: { subcategory: str
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">{displayName} para Mujer</h1>
       
-      <ProductGrid products={compatibleProducts} />
+      <ProductGrid products={filteredProducts} /> {/* ← Usar filteredProducts directamente */}
     </div>
   );
 }
