@@ -9,7 +9,7 @@ import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
 const CATEGORY_NAMES: Record<string, string> = {
   mujer: 'Mujer',
   hombre: 'Hombre',
-  niños: 'Niños',
+  ninos: 'Ninos',
   accesorios: 'Accesorios',
   // Agrega más categorías según necesites
 };
