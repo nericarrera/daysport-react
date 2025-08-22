@@ -14,7 +14,7 @@
     "start:dev": "npm run prisma:generate && nest start --watch",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.13.9",
