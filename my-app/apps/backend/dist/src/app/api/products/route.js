@@ -8,13 +8,10 @@ async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
-        const subcategory = searchParams.get('subcategory');
         const featured = searchParams.get('featured');
         const whereClause = {};
         if (category)
             whereClause.category = category;
-        if (subcategory)
-            whereClause.subcategory = subcategory;
         if (featured === 'true')
             whereClause.featured = true;
         const products = await prisma.product.findMany({
