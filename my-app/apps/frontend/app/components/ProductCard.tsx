@@ -2,18 +2,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface Product {
-  id: string | number;
+
+export interface Product {
+  id: number;
   name: string;
   price: number;
-  images: string[];
   category: string;
-  subcategory?: string; // ← Hacer opcional
+  subcategory: string | null;  // ← Cambiado a null
+  images: string[];
+  description?: string;
+  sizes: string[];
+  colors: string[];
+  stock: number;
+  featured: boolean;
 }
 
 interface ProductCardProps {
   product: Product;
 }
+
+
 
 export default function ProductCard({ product }: ProductCardProps) {
   const mainImage = product.images[0] || '/images/placeholder.jpg';

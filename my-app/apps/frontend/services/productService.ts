@@ -1,4 +1,4 @@
-import { fetchAPI } from '../lib/api/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export interface Product {
   id: number;
@@ -19,37 +19,12 @@ export interface Product {
 export class ProductService {
   static async getProductsByCategory(category: string): Promise<Product[]> {
     try {
-      return await fetchAPI(`/api/products?category=${category}`);
+      const response = await fetch(`${API_BASE_URL}/api/products?category=${category}`);
+      if (!response.ok) throw new Error('Error fetching products');
+      return await response.json();
     } catch (error) {
       console.error('Error fetching products by category:', error);
       return [];
-    }
-  }
-
-  static async getProductsBySubcategory(category: string, subcategory: string): Promise<Product[]> {
-    try {
-      return await fetchAPI(`/api/products?category=${category}&subcategory=${subcategory}`);
-    } catch (error) {
-      console.error('Error fetching products by subcategory:', error);
-      return [];
-    }
-  }
-
-  static async getFeaturedProducts(): Promise<Product[]> {
-    try {
-      return await fetchAPI('/api/products?featured=true');
-    } catch (error) {
-      console.error('Error fetching featured products:', error);
-      return [];
-    }
-  }
-
-  static async getProductById(id: number): Promise<Product | null> {
-    try {
-      return await fetchAPI(`/api/products/${id}`);
-    } catch (error) {
-      console.error('Error fetching product by id:', error);
-      return null;
     }
   }
 }

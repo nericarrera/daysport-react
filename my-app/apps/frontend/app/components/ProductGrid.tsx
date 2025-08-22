@@ -1,13 +1,19 @@
 import ProductCard from './ProductCard';
 
-interface CompatibleProduct {
-  id: string | number;
+export interface CompatibleProduct {
+  id: number;
   name: string;
   price: number;
-  images: string[];
   category: string;
-  subcategory?: string;
+  subcategory: string | null;  // ← Cambiado a null
+  images: string[];
+  description?: string;
+  sizes: string[];
+  colors: string[];
+  stock: number;
+  featured: boolean;
 }
+
 
 interface ProductGridProps {
   products: CompatibleProduct[];
