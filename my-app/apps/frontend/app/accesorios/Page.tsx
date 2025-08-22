@@ -1,11 +1,15 @@
+// apps/frontend/app/accesorios/page.tsx
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
 import FilterButton from '../components/FilterButton';
-import { getProductsByCategory, convertToCompatibleProducts } from '../data/products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { useState } from 'react';
+
+// Importamos el servicio de productos
+import { ProductService } from '../../services/productService';
+import { Product } from '../Types';
 
 // Datos de las categorías circulares PARA ACCESORIOS
 const subcategories = [
@@ -43,14 +47,71 @@ const subcategories = [
 
 export default function AccesoriosPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const allProducts = getProductsByCategory('accesorios');
-  
-  // Filtrar productos según la subcategoría seleccionada
-  const filteredProducts = allProducts.filter(product => 
-    selectedSubcategory === '' || product.subcategory === selectedSubcategory
-  );
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const compatibleProducts = convertToCompatibleProducts(filteredProducts);
+  // Cargar productos desde la API
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        console.log('🔄 Cargando productos de accesorios...');
+        
+        // Usar el servicio
+        const productsData = await ProductService.getProductsByCategory('accesorios');
+        console.log('🎯 Productos desde el servicio:', productsData);
+        
+        setAllProducts(productsData);
+        setFilteredProducts(productsData);
+        
+      } catch (err) {
+        console.error('💥 Error completo:', err);
+        setError('Error al cargar los productos. Verifica que el backend esté corriendo en http://localhost:3001');
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadProducts();
+  }, []);
+
+  // Filtrar productos cuando cambia la subcategoría seleccionada
+  useEffect(() => {
+    if (selectedSubcategory === '') {
+      setFilteredProducts(allProducts);
+    } else {
+      const filtered = allProducts.filter(product => 
+        product.subcategory === selectedSubcategory
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [selectedSubcategory, allProducts]);
+
+  const compatibleProducts = filteredProducts;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+        <p className="ml-4 text-gray-600">Cargando productos...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-full mx-auto px-43 py-14 bg-white">
+        <div className="text-center py-20">
+          <div className="text-red-500 text-lg mb-4">{error}</div>
+          <p className="text-gray-600">
+            Asegúrate de que el backend esté corriendo en otra terminal con: 
+            <code className="bg-gray-100 p-1 rounded ml-2">npm run start:dev</code>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-full mx-auto px-43 py-14 bg-white">
@@ -116,13 +177,11 @@ export default function AccesoriosPage() {
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="font-bold text-lg mb-4">Filtros</h3>
               
-              {/* Botón de filtro con funcionalidad completa */}
               <FilterButton 
                 category="accesorios"
                 onFilterChange={setSelectedSubcategory}
               />
               
-              {/* Mostrar filtro activo */}
               {selectedSubcategory && (
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-sm font-medium text-blue-800">
@@ -141,7 +200,6 @@ export default function AccesoriosPage() {
               )}
             </div>
 
-            {/* Contador de productos */}
             <div className="bg-white p-4 rounded-lg shadow-md text-center">
               <p className="text-lg font-semibold text-gray-800">
                 {compatibleProducts.length}
@@ -154,9 +212,15 @@ export default function AccesoriosPage() {
           </div>
         </div>
         
-        {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid products={compatibleProducts} />
+          {compatibleProducts.length > 0 ? (
+            <ProductGrid products={compatibleProducts} />
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg">No se encontraron productos</p>
+              <p className="text-gray-400">Prueba con otro filtro o categoría</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
