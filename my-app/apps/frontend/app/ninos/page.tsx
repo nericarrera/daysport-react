@@ -1,56 +1,117 @@
+// apps/frontend/app/ninos/page.tsx
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
 import FilterButton from '../components/FilterButton';
-import { getProductsByCategory, convertToCompatibleProducts } from '../data/products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { useState } from 'react';
+
+// Importamos el servicio de productos
+import { ProductService } from '../../services/productService';
+import { Product } from '../../app/Types';
 
 // Datos de las categorías circulares PARA NIÑOS
 const subcategories = [
   {
     name: 'Remeras',
     slug: 'remeras',
-    image: '/menu-seccion-img/niños/menu-remeras.jpg'
+    image: '/menu-seccion-img/ninos/menu-remeras.jpg'
   },
   {
-    name: 'Shorts', 
-    slug: 'shorts',
-    image: '/menu-seccion-img/niños/menu-shorts.jpg'
+    name: 'Pantalones',
+    slug: 'pantalones', 
+    image: '/menu-seccion-img/ninos/menu-pantalones.jpg'
   },
   {
     name: 'Buzos',
     slug: 'buzos',
-    image: '/menu-seccion-img/niños/menu-buzos.jpg'
+    image: '/menu-seccion-img/ninos/menu-buzos.jpg'
+  },
+  {
+    name: 'Camperas',
+    slug: 'camperas',
+    image: '/menu-seccion-img/ninos/menu-camperas.jpg'
+  },
+  {
+    name: 'Shorts',
+    slug: 'shorts',
+    image: '/menu-seccion-img/ninos/menu-shorts.jpg'
   },
   {
     name: 'Conjuntos',
     slug: 'conjuntos',
-    image: '/menu-seccion-img/niños/menu-conjuntos.jpg'
-  },
-  {
-    name: 'Pantalones',
-    slug: 'pantalones',
-    image: '/menu-seccion-img/niños/menu-pantalones.jpg'
-  },
-  {
-    name: 'Zapatillas',
-    slug: 'zapatillas',
-    image: '/menu-seccion-img/niños/menu-zapatillas.jpg'
+    image: '/menu-seccion-img/ninos/menu-conjuntos.jpg'
   }
 ];
 
-export default function NiñosPage() {
+export default function NinosPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const allProducts = getProductsByCategory('niños');
-  
-  // Filtrar productos según la subcategoría seleccionada
-  const filteredProducts = allProducts.filter(product => 
-    selectedSubcategory === '' || product.subcategory === selectedSubcategory
-  );
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const compatibleProducts = convertToCompatibleProducts(filteredProducts);
+  // Cargar productos desde la API
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        console.log('🔄 Cargando productos de niños...');
+        
+        // Usar el servicio
+        const productsData = await ProductService.getProductsByCategory('ninos');
+        console.log('🎯 Productos desde el servicio:', productsData);
+        
+        setAllProducts(productsData);
+        setFilteredProducts(productsData);
+        
+      } catch (err) {
+        console.error('💥 Error completo:', err);
+        setError('Error al cargar los productos. Verifica que el backend esté corriendo en http://localhost:3001');
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadProducts();
+  }, []);
+
+  // Filtrar productos cuando cambia la subcategoría seleccionada
+  useEffect(() => {
+    if (selectedSubcategory === '') {
+      setFilteredProducts(allProducts);
+    } else {
+      const filtered = allProducts.filter(product => 
+        product.subcategory === selectedSubcategory
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [selectedSubcategory, allProducts]);
+
+  const compatibleProducts = filteredProducts;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+        <p className="ml-4 text-gray-600">Cargando productos...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-full mx-auto px-43 py-14 bg-white">
+        <div className="text-center py-20">
+          <div className="text-red-500 text-lg mb-4">{error}</div>
+          <p className="text-gray-600">
+            Asegúrate de que el backend esté corriendo en otra terminal con: 
+            <code className="bg-gray-100 p-1 rounded ml-2">npm run start:dev</code>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-full mx-auto px-43 py-14 bg-white">
@@ -68,7 +129,7 @@ export default function NiñosPage() {
         <div className="flex items-center text-sm text-gray-500">
           <span className="mx-2">/</span>
           <Link 
-            href="/niños" 
+            href="/ninos" 
             className="hover:text-yellow-400 transition-colors font-medium"
           >
             Niños
@@ -79,7 +140,7 @@ export default function NiñosPage() {
       {/* Encabezado */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-1">ROPA DEPORTIVA PARA NIÑOS +</h1>
-        <p className="text-gray-600">DIVERSIÓN Y COMODIDAD PARA LOS MÁS PEQUEÑOS</p>
+        <p className="text-gray-600">DIVERTIDA Y CÓMODA PARA LOS MÁS PEQUEÑOS</p>
       </div>
 
       {/* Sección de Categorías Circulares */}
@@ -116,13 +177,11 @@ export default function NiñosPage() {
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="font-bold text-lg mb-4">Filtros</h3>
               
-              {/* Botón de filtro con funcionalidad completa */}
               <FilterButton 
-                category="ninos"  // ← CAMBIADO a "niños"
+                category="ninos"
                 onFilterChange={setSelectedSubcategory}
               />
               
-              {/* Mostrar filtro activo */}
               {selectedSubcategory && (
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-sm font-medium text-blue-800">
@@ -141,7 +200,6 @@ export default function NiñosPage() {
               )}
             </div>
 
-            {/* Contador de productos */}
             <div className="bg-white p-4 rounded-lg shadow-md text-center">
               <p className="text-lg font-semibold text-gray-800">
                 {compatibleProducts.length}
@@ -154,9 +212,15 @@ export default function NiñosPage() {
           </div>
         </div>
         
-        {/* Productos */}
         <div className="md:w-3/4">
-          <ProductGrid products={compatibleProducts} />
+          {compatibleProducts.length > 0 ? (
+            <ProductGrid products={compatibleProducts} />
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg">No se encontraron productos</p>
+              <p className="text-gray-400">Prueba con otro filtro o categoría</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
