@@ -1,10 +1,11 @@
-// app/mujer/page.tsx - VERSIÓN ACTUALIZADA
+'use client';
 import Link from 'next/link';
 import ProductGrid from '../../components/ProductGrid';
 import FilterButton from '../../components/FilterButton';
 import { getProductsByCategory, convertToCompatibleProducts } from '../../data/Products';
 import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { useState } from 'react';
 
 // Datos de las categorías circulares
 const subcategories = [
@@ -41,8 +42,15 @@ const subcategories = [
 ];
 
 export default function MujerPage() {
-  const oldProducts = getProductsByCategory('mujer');
-  const compatibleProducts = convertToCompatibleProducts(oldProducts);
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const allProducts = getProductsByCategory('mujer');
+  
+  // Filtrar productos según la subcategoría seleccionada
+  const filteredProducts = allProducts.filter(product => 
+    selectedSubcategory === '' || product.subcategory === selectedSubcategory
+  );
+
+  const compatibleProducts = convertToCompatibleProducts(filteredProducts);
 
   return (
     <div className="max-w-full mx-auto px-43 py-14 bg-white">
@@ -104,7 +112,46 @@ export default function MujerPage() {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Filtros */}
         <div className="md:w-1/4">
-          <FilterButton category="mujer" />
+          <div className="sticky top-4 space-y-4">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="font-bold text-lg mb-4">Filtros</h3>
+              
+              {/* Botón de filtro con funcionalidad completa */}
+              <FilterButton 
+                category="mujer"
+                onFilterChange={setSelectedSubcategory}
+              />
+              
+              {/* Mostrar filtro activo */}
+              {selectedSubcategory && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm font-medium text-blue-800">
+                    Filtro activo: 
+                    <span className="ml-2 capitalize font-bold">
+                      {selectedSubcategory}
+                    </span>
+                  </p>
+                  <button 
+                    onClick={() => setSelectedSubcategory('')}
+                    className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Limpiar filtro
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Contador de productos */}
+            <div className="bg-white p-4 rounded-lg shadow-md text-center">
+              <p className="text-lg font-semibold text-gray-800">
+                {compatibleProducts.length}
+              </p>
+              <p className="text-sm text-gray-600">
+                {compatibleProducts.length === 1 ? 'producto' : 'productos'} encontrado
+                {selectedSubcategory && ` en ${selectedSubcategory}`}
+              </p>
+            </div>
+          </div>
         </div>
         
         {/* Productos */}
