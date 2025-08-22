@@ -8,7 +8,6 @@ import Image from 'next/image';
 
 // Importamos el servicio de productos que conecta con la API
 import { ProductService, type Product } from '../../../services/productService';
-import { convertToCompatibleProducts } from '../../data/Products';
 
 // Datos de las categorías circulares
 const subcategories = [
