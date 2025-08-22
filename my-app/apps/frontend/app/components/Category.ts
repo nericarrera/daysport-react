@@ -29,15 +29,15 @@ export const categories = [
   },
     {
         name: "NIÑOS",
-        href: "/niños",
+        href: "/ninos",
         subcategories: [
-        { name: "Remeras", href: "/niños/remeras", image: "/menu-seccion-img/niños/menu-remeras.jpg" },
-        { name: "Buzos", href: "/niños/buzos", image: "/menu-seccion-img/niños/menu-buzos.jpg" },
-        { name: "Pantalones", href: "/niños/pantalones", image: "/menu-seccion-img/niños/menu-pantalones.jpg" },
-        { name: "Camperas", href: "/niños/camperas", image: "/menu-seccion-img/niños/menu-camperas.jpg" },
-        { name: "Shorts", href: "/niños/shorts", image: "/menu-seccion-img/niños/menu-shorts.jpg" },
-        { name: "Conjuntos", href: "/niños/conjuntos", image: "/menu-seccion-img/niños/menu-conjuntos.jpg" },
-        { name: "Zapatillas", href: "/niños/zapatillas" }
+        { name: "Remeras", href: "/ninos/remeras", image: "/menu-seccion-img/niños/menu-remeras.jpg" },
+        { name: "Buzos", href: "/ninos/buzos", image: "/menu-seccion-img/niños/menu-buzos.jpg" },
+        { name: "Pantalones", href: "/ninos/pantalones", image: "/menu-seccion-img/niños/menu-pantalones.jpg" },
+        { name: "Camperas", href: "/ninos/camperas", image: "/menu-seccion-img/niños/menu-camperas.jpg" },
+        { name: "Shorts", href: "/ninos/shorts", image: "/menu-seccion-img/niños/menu-shorts.jpg" },
+        { name: "Conjuntos", href: "/ninos/conjuntos", image: "/menu-seccion-img/niños/menu-conjuntos.jpg" },
+        { name: "Zapatillas", href: "/ninos/zapatillas" }
         ]
     },
     {

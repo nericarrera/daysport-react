@@ -88,7 +88,7 @@ export default function NiñosPage() {
           {subcategories.map((subcategory) => (
             <Link 
               key={subcategory.slug} 
-              href={`/niños/${subcategory.slug}`}
+              href={`/ninos/${subcategory.slug}`}
               className="flex flex-col items-center group min-w-[80px]"
             >
               <div className="rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 border-gray-200 group-hover:border-gray-900 transition-all duration-300">
@@ -118,7 +118,7 @@ export default function NiñosPage() {
               
               {/* Botón de filtro con funcionalidad completa */}
               <FilterButton 
-                category="niños"  // ← CAMBIADO a "niños"
+                category="ninos"  // ← CAMBIADO a "niños"
                 onFilterChange={setSelectedSubcategory}
               />
               
