@@ -1,3 +1,5 @@
+'use client'
+
 import { NextResponse } from "next/server";
 import { Product } from "../../types/product";
 

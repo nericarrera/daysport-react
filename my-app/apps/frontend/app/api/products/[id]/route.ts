@@ -1,3 +1,5 @@
+'use client'
+
 import { NextResponse } from "next/server";
 import { products } from "../../../data/Products"; // 👈 Importa tu mock
 import { Product } from "../../../types/product";   // 👈 Importa el tipo
