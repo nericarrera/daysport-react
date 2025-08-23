@@ -1,4 +1,4 @@
-// apps/frontend/components/CategoryPage.tsx
+
 'use client';
 import { useState, useEffect } from 'react';
 import ProductGrid from './ProductGrid';

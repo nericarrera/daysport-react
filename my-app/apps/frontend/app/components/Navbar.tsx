@@ -1,4 +1,4 @@
-// apps/frontend/components/Navbar.tsx (versión limpia)
+
 'use client';
 
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';

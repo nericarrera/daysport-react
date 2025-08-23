@@ -1,4 +1,4 @@
-// components/FilterButton.tsx - VERSIÓN MEJORADA
+
 'use client';
 import { useState } from 'react';
 

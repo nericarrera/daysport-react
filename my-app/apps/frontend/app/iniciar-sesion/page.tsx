@@ -1,4 +1,4 @@
-// app/iniciar-sesion/page.tsx - VERSIÓN COMPLETA CON DEBUG
+
 'use client';
 
 import { useState } from "react";

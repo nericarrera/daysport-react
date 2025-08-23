@@ -1,4 +1,4 @@
-// apps/frontend/app/producto/[id]/page.tsx
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';

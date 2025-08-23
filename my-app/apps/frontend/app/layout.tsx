@@ -1,4 +1,5 @@
-// apps/frontend/app/layout.tsx
+'use client';
+
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from './components/Navbar';

@@ -1,4 +1,5 @@
-// apps/frontend/app/(shop)/mujer/[category]/page.tsx
+'use client';
+
 import { getProductsByCategory } from '../../../data/products'; // ← Solo esta importación
 import ProductGrid from '../../../components/ProductGrid';
 

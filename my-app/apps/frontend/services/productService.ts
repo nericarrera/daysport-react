@@ -1,3 +1,4 @@
+'use client';
 import { Product } from '../app/Types';
 
 export class ProductService {
