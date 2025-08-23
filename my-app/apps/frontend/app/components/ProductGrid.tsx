@@ -1,28 +1,11 @@
 import ProductCard from './ProductCard';
-
-export interface CompatibleProduct {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  subcategory: string | null;  // ← Cambiado a null
-  images: string[];
-  description?: string;
-  sizes: string[];
-  colors: string[];
-  stock: number;
-  featured: boolean;
-}
-
+import { Product } from '../Types';
 
 interface ProductGridProps {
-  products: CompatibleProduct[];
+  products: Product[];
 }
 
 export default function ProductGrid({ products }: ProductGridProps) {
-  // ELIMINÉ la función normalizeProduct porque ya no es necesaria
-  // Los productos ahora vienen en el formato correcto
-
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
