@@ -1,7 +1,15 @@
-import type { NextConfig } from "next";
+const nextConfig = {
+  images: {
+    domains: ['picsum.photos'], // ← Agrega este dominio
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig
