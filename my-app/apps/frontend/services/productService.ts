@@ -2,6 +2,7 @@
 import { Product } from '../app/Types';
 
 export class ProductService {
+  // Asegúrate de que esta función esté definida como static
   static async getProductsByCategory(category: string): Promise<Product[]> {
     try {
       const response = await fetch(`http://localhost:3001/products?category=${category}`);
