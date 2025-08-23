@@ -17,8 +17,10 @@ let ProductsService = class ProductsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async findAll() {
-        return this.prisma.product.findMany();
+    async getByCategory(category) {
+        return this.prisma.product.findMany({
+            where: { category },
+        });
     }
 };
 exports.ProductsService = ProductsService;

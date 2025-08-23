@@ -14,19 +14,25 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsController = void 0;
 const common_1 = require("@nestjs/common");
+const products_service_1 = require("./products.service");
 let ProductsController = class ProductsController {
+    productsService;
+    constructor(productsService) {
+        this.productsService = productsService;
+    }
     async getByCategory(category) {
-        // Lógica para obtener productos por categoría
+        return this.productsService.getByCategory(category);
     }
 };
 exports.ProductsController = ProductsController;
 __decorate([
-    (0, common_1.Get)(':category'),
+    (0, common_1.Get)('category/:category'),
     __param(0, (0, common_1.Param)('category')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "getByCategory", null);
 exports.ProductsController = ProductsController = __decorate([
-    (0, common_1.Controller)('products')
+    (0, common_1.Controller)('products'),
+    __metadata("design:paramtypes", [products_service_1.ProductsService])
 ], ProductsController);

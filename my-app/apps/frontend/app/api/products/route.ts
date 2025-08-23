@@ -1,22 +1,27 @@
 'use client'
 
 import { NextResponse } from "next/server";
-import { Product } from "../../types/product";
 
-// Datos de prueba temporalmente
-const mockProducts: Product[] = [
-  // ... tus productos de prueba aquí
-];
-
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const product = mockProducts.find(p => p.id === Number(params.id));
-  
-  if (!product) {
-    return NextResponse.json(
-      { error: "Producto no encontrado" }, 
-      { status: 404 }
-    );
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    
+    // Usar JSON Server directamente
+    let url = 'http://localhost:3001/products';
+    if (category) {
+      url += `?category=${category}`;
+    }
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      return NextResponse.json([], { status: 200 });
+    }
+    
+    const products = await response.json();
+    return NextResponse.json(products);
+  } catch  {
+    return NextResponse.json([], { status: 200 });
   }
-  
-  return NextResponse.json(product);
 }

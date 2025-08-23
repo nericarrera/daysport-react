@@ -1,25 +1,27 @@
-import { Product } from "../app/types/product";
+import { Product } from '../app/types/product';
 
-export const ProductService = {
-  async getProductsByCategory(category: string): Promise<Product[]> {
+export class ProductService {
+  static async getProductsByCategory(category: string): Promise<Product[]> {
     try {
-      const res = await fetch(`/api/products?category=${category}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("Error al obtener productos");
-      return res.json();
-    } catch (err) {
-      console.error("Error en ProductService.getProductsByCategory:", err);
+      // AGREGAR la URL completa
+      const response = await fetch(`http://localhost:3000/api/products?category=${category}`);
+      if (!response.ok) return [];
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
       return [];
     }
-  },
+  }
 
-  async getProductById(id: number): Promise<Product | null> {
+  static async getProductById(id: number): Promise<Product | null> {
     try {
-      const res = await fetch(`/api/products/${id}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("Producto no encontrado");
-      return res.json();
-    } catch (err) {
-      console.error("Error en ProductService.getProductById:", err);
+      // AGREGAR la URL completa  
+      const response = await fetch(`http://localhost:3000/api/products/${id}`);
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching product:', error);
       return null;
     }
-  },
-};
+  }
+}
