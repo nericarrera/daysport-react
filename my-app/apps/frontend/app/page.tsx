@@ -1,9 +1,9 @@
-// apps/frontend/app/page.tsx
+
 import ProductCarousel from './components/ProductCarousel';
 import VideoCarousel from './components/VideoCarousel';
 import CategorySelector from './components/CategorySelector';
 import { ProductService } from '../services/productService';
-import { Product } from '../services/types'; // ← Corregí la ruta de Types a types
+import { Product } from '../app/types/product'; // ← Corregí la ruta de Types a types
 
 export default async function Home() {
   try {
