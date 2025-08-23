@@ -1,23 +1,24 @@
 // apps/frontend/app/page.tsx
-import ProductCarousel from '../app/components/ProductCarousel';
-import VideoCarousel from '../app/components/VideoCarousel';
-import CategorySelector from '../app/components/CategorySelector';
+import ProductCarousel from './components/ProductCarousel';
+import VideoCarousel from './components/VideoCarousel';
+import CategorySelector from './components/CategorySelector';
 import { ProductService } from '../services/productService';
+import { Product } from '../app/Types';
 
 export default async function Home() {
   try {
     // Obtener productos destacados usando el servicio
     const [womenProducts, menProducts, kidsProducts, accessoriesProducts] = await Promise.all([
-      ProductService.getProductsByCategory('mujer').then(products => 
+      ProductService.getProductsByCategory('mujer').then((products: Product[]) => 
         products.filter(p => p.featured).slice(0, 8)
       ),
-      ProductService.getProductsByCategory('hombre').then(products => 
+      ProductService.getProductsByCategory('hombre').then((products: Product[]) => 
         products.filter(p => p.featured).slice(0, 8)
       ),
-      ProductService.getProductsByCategory('ninos').then(products => 
+      ProductService.getProductsByCategory('ninos').then((products: Product[]) => 
         products.filter(p => p.featured).slice(0, 8)
       ),
-      ProductService.getProductsByCategory('accesorios').then(products => 
+      ProductService.getProductsByCategory('accesorios').then((products: Product[]) => 
         products.filter(p => p.featured).slice(0, 8)
       ),
     ]);
