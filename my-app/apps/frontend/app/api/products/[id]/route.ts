@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { products } from "../../../data/products"; // Ajustá el path
+import { products } from "../../../types/product"; // Ajustá el path
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const product = products.find(p => p.id === Number(params.id));

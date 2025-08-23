@@ -1,14 +1,25 @@
-import { NextResponse } from "next/server";
-import { products } from "../../data/products"; // Ajustá el path según donde tengas tus productos mock
+import { Product } from "../../types/product";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const category = searchParams.get("category");
+export const ProductService = {
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    try {
+      const res = await fetch(`/api/products?category=${category}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Error al obtener productos");
+      return res.json();
+    } catch (err) {
+      console.error("Error en ProductService.getProductsByCategory:", err);
+      return [];
+    }
+  },
 
-  let filtered = products;
-  if (category) {
-    filtered = products.filter(p => p.category.toLowerCase() === category.toLowerCase());
-  }
-
-  return NextResponse.json(filtered);
-}
+  async getProductById(id: number): Promise<Product | null> {
+    try {
+      const res = await fetch(`/api/products/${id}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Producto no encontrado");
+      return res.json();
+    } catch (err) {
+      console.error("Error en ProductService.getProductById:", err);
+      return null;
+    }
+  },
+};

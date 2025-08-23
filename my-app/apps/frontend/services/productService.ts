@@ -1,4 +1,4 @@
-import { Product } from "../types/product";
+import { Product } from "../app/types/product";
 
 export const ProductService = {
   async getProductsByCategory(category: string): Promise<Product[]> {

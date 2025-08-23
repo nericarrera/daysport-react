@@ -1,5 +1,5 @@
 // apps/frontend/data/Products.ts
-import { Product } from '../../services/types'; // ← Ruta corregida
+import { Product } from '../types/product'; // ← Ruta corregida
 
 // Datos de ejemplo (opcional - puedes eliminarlos luego)
 export const mockProducts: Product[] = [
