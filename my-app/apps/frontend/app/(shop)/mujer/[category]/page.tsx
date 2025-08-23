@@ -1,6 +1,6 @@
 'use client';
 
-import { getProductsByCategory } from '../../../data/products'; // ← Solo esta importación
+import { getProductsByCategory } from '../../../data/mockProducts'; // ← Solo esta importación
 import ProductGrid from '../../../components/ProductGrid';
 
 // Mapeo de nombres bonitos para subcategorías
