@@ -1,27 +1,24 @@
-import { Product } from '../app/Types';
-
-export class ProductService {
-  // ¡Esta función debe existir y ser static!
-  static async getProductsByCategory(category: string): Promise<Product[]> {
+import { Product } from './types';
+export const ProductService = {
+  async getProductsByCategory(category: string): Promise<Product[]> {
     try {
-      const response = await fetch(`http://localhost:3001/products?category=${category}`);
-      if (!response.ok) return [];
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching products by category:', error);
+      const res = await fetch(`/api/products?category=${category}`);
+      if (!res.ok) throw new Error("Error al obtener productos");
+      return res.json();
+    } catch (err) {
+      console.error("Error en ProductService.getProductsByCategory:", err);
       return [];
     }
-  }
+  },
 
-  // Otras funciones del servicio...
-  static async getProductById(id: number): Promise<Product | null> {
+  async getProductById(id: number): Promise<Product | null> {
     try {
-      const response = await fetch(`http://localhost:3001/products/${id}`);
-      if (!response.ok) return null;
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching product:', error);
+      const res = await fetch(`/api/products/${id}`);
+      if (!res.ok) throw new Error("Producto no encontrado");
+      return res.json();
+    } catch (err) {
+      console.error("Error en ProductService.getProductById:", err);
       return null;
     }
-  }
-}
+  },
+};

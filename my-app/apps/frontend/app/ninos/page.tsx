@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 // Importamos el servicio de productos
 import { ProductService } from '../../services/productService';
-import { Product } from '../../app/Types';
+import { Product } from '../../services/types';
 
 // Datos de las categorías circulares PARA NIÑOS
 const subcategories = [

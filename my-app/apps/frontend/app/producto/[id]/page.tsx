@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { ProductService } from '../../../services/productService';
-import { Product } from '../../Types';
+import { Product } from '../../../services/types';
 
 export default function ProductDetailPage() {
   const params = useParams();

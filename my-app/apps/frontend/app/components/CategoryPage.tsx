@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import ProductGrid from './ProductGrid';
 import Filters from './Filters';
-import { Product } from '../Types'; // ← Importa el tipo correcto
+import { Product } from '../../services/types'; // ← Importa el tipo correcto
 
 interface CategoryPageProps {
   title: string;
