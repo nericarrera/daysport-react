@@ -1,5 +1,5 @@
-'use client'; // Esto es importante para los contextos en Next.js 13+
-
+// apps/frontend/components/CartContext.tsx
+'use client';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface CartItem {
@@ -19,7 +19,8 @@ interface CartContextType {
   cartCount: number;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+// Asegúrate de que esto esté exportado
+export const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -80,6 +81,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// ¡ESTA FUNCIÓN DEBE ESTAR EXPORTADA!
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {

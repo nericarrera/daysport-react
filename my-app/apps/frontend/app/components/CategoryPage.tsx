@@ -1,7 +1,9 @@
+// apps/frontend/components/CategoryPage.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import ProductGrid from './ProductGrid';
 import Filters from './Filters';
+import { Product } from '../Types'; // ← Importa el tipo correcto
 
 interface CategoryPageProps {
   title: string;
@@ -9,22 +11,12 @@ interface CategoryPageProps {
   category: string;
 }
 
-// Tipo compatible
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  images: string[];
-  category: string;
-  subcategory: string;
-}
-
 export default function CategoryPage({ 
   title, 
   description, 
   category,
 }: CategoryPageProps) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]); // ← Usa el tipo Product importado
   const [loading, setLoading] = useState(true);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
 
@@ -32,7 +24,7 @@ export default function CategoryPage({
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        let url = `/api/products?category=${category}`;
+        let url = `http://localhost:3001/products?category=${category}`;
         
         if (selectedSubcategory) {
           url += `&subcategory=${selectedSubcategory}`;

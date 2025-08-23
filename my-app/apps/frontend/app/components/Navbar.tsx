@@ -1,3 +1,4 @@
+// apps/frontend/components/Navbar.tsx (versión limpia)
 'use client';
 
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
@@ -6,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import MegaMenu from './MegaMenu';
 import { categories } from './Category';
+import CartIcon from './CartIcon';
 
 // Tipos para el contexto de usuario
 type User = {
@@ -29,26 +31,15 @@ const UserContext = createContext<UserContextType>({
 
 export const useUser = () => useContext(UserContext);
 
-type CartItem = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-};
-
 export default function Navbar() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [cartItemsCount, setCartItemsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   
-  const cartRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
@@ -116,13 +107,6 @@ export default function Navbar() {
   ];
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { id: 1, name: 'Remera Deportiva Mujer', price: 5990, image: '/img/products/remera-mujer.jpg', quantity: 1 },
-    { id: 2, name: 'Short Deportivo Hombre', price: 4990, image: '/img/products/short-hombre.jpg', quantity: 2 }
-  ]);
-
-  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-
   useEffect(() => {
     return () => {
       if (megaMenuTimeout.current) {
@@ -140,7 +124,6 @@ export default function Navbar() {
         setActiveCategory(null);
       }
       if (searchRef.current && !searchRef.current.contains(target)) setSearchOpen(false);
-      if (cartRef.current && !cartRef.current.contains(target)) setCartOpen(false);
       if (userMenuRef.current && !userMenuRef.current.contains(target)) setUserMenuOpen(false);
     };
 
@@ -299,79 +282,8 @@ export default function Navbar() {
                       )}
                     </div>
 
-                    {/* Carrito desktop */}
-                    <div className="relative" ref={cartRef}>
-                      <button 
-                        className="text-black hover:text-purple-500 transition-colors cursor-pointer relative" 
-                        onClick={() => setCartOpen(!cartOpen)}
-                        aria-label="Cart"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        {cartItemsCount > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {cartItemsCount}
-                          </span>
-                        )}
-                      </button>
-
-                      {/* Modal carrito desktop */}
-                      {cartOpen && (
-                        <div className={`absolute right-0 top-full mt-1 w-80 md:w-96 text-black bg-white shadow-xl rounded-md z-50 ${isMobileView ? 'fixed inset-0 h-full w-full m-0 rounded-none' : ''}`}>
-                          <div className="p-4">
-                            <h3 className="text-lg font-bold mb-4">Tu Carrito ({cartItems.length})</h3>
-                            <div className="max-h-60 overflow-y-auto mb-4">
-                              {cartItems.length > 0 ? (
-                                cartItems.map(item => (
-                                  <div key={item.id} className="flex items-center py-3 border-b">
-                                    <div className="relative w-16 h-16 mr-3">
-                                      <Image 
-                                        src={item.image} 
-                                        alt={item.name} 
-                                        fill 
-                                        className="object-cover rounded" 
-                                        sizes="64px"
-                                      />
-                                    </div>
-                                    <div className="flex-1">
-                                      <h4 className="font-medium">{item.name}</h4>
-                                      <p className="text-sm text-gray-600">{item.quantity} x ${item.price.toLocaleString()}</p>
-                                    </div>
-                                    <p className="font-semibold">${(item.price * item.quantity).toLocaleString()}</p>
-                                  </div>
-                                ))
-                              ) : (
-                                <p className="text-center py-4">Tu carrito está vacío</p>
-                              )}
-                            </div>
-
-                            <div className="border-t pt-3 mb-4">
-                              <div className="flex justify-between font-bold">
-                                <span>Total:</span>
-                                <span>${cartTotal.toLocaleString()}</span>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col space-y-2">
-                              <Link 
-                                href="/carrito" 
-                                className="bg-purple-800 text-white py-2 px-4 rounded text-center hover:bg-purple-500 transition-colors" 
-                                onClick={() => setCartOpen(false)}
-                              >
-                                Ver Carrito
-                              </Link>
-                              <button 
-                                className="bg-yellow-400 text-black py-2 px-4 rounded hover:bg-black hover:text-white transition-colors"
-                                onClick={() => { console.log('Proceder al pago'); setCartOpen(false); }}
-                              >
-                                Comprar Ahora
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    {/* Carrito desktop - REEMPLAZADO CON CartIcon */}
+                    <CartIcon />
 
                     {/* Menú usuario desktop */}
                     <div className="relative" ref={userMenuRef}>
@@ -460,23 +372,8 @@ export default function Navbar() {
                     </svg>
                   </button>
 
-                  {/* Cart icon mobile */}
-                  <div className="relative" ref={cartRef}>
-                    <button 
-                      className="text-black cursor-pointer relative" 
-                      onClick={() => setCartOpen(!cartOpen)}
-                      aria-label="Cart"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      {cartItemsCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {cartItemsCount}
-                        </span>
-                      )}
-                    </button>
-                  </div>
+                  {/* Cart icon mobile - REEMPLAZADO CON CartIcon */}
+                  <CartIcon />
 
                   {/* User menu mobile */}
                   <div className="relative" ref={userMenuRef}>

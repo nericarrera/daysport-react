@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '../Types';
+import AddToCartButton from './AddToCartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -154,4 +155,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
     </div>
   );
+
+  <AddToCartButton product={product} />
 }
