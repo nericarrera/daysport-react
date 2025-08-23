@@ -315,6 +315,9 @@
   .static {
     position: static;
   }
+  .static\! {
+    position: static !important;
+  }
   .sticky {
     position: sticky;
   }
