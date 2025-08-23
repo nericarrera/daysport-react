@@ -1,0 +1,100 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Camiseta Básica Mujer",
+      "price": 29.99,
+      "category": "mujer",
+      "subcategory": "camisetas",
+      "images": [
+        "https://picsum.photos/500/600?random=1",
+        "https://picsum.photos/500/600?random=2"
+      ],
+      "description": "Camiseta de algodón 100% de alta calidad, perfecta para uso diario",
+      "sizes": ["S", "M", "L", "XL"],
+      "colors": ["blanco", "negro", "gris"],
+      "stock": 15,
+      "featured": true
+    },
+    {
+      "id": 2,
+      "name": "Jeans Hombre Clásico",
+      "price": 59.99,
+      "category": "hombre",
+      "subcategory": "pantalones",
+      "images": [
+        "https://picsum.photos/500/600?random=3",
+        "https://picsum.photos/500/600?random=4"
+      ],
+      "description": "Jeans de corte regular, cómodos y duraderos para el día a día",
+      "sizes": ["32", "34", "36", "38"],
+      "colors": ["azul", "negro"],
+      "stock": 8,
+      "featured": true
+    },
+    {
+      "id": 3,
+      "name": "Vestido Niña Floreado",
+      "price": 39.99,
+      "category": "ninos",
+      "subcategory": "vestidos",
+      "images": [
+        "https://picsum.photos/500/600?random=5",
+        "https://picsum.photos/500/600?random=6"
+      ],
+      "description": "Vestido infantil con estampado floral, suave y cómodo",
+      "sizes": ["4", "6", "8", "10"],
+      "colors": ["rosa", "blanco", "amarillo"],
+      "stock": 12,
+      "featured": true
+    },
+    {
+      "id": 4,
+      "name": "Bolso de Cuero Elegante",
+      "price": 89.99,
+      "category": "accesorios",
+      "subcategory": "bolsos",
+      "images": [
+        "https://picsum.photos/500/600?random=7",
+        "https://picsum.photos/500/600?random=8"
+      ],
+      "description": "Bolso de cuero genuino con gran capacidad y diseño elegante",
+      "sizes": ["Único"],
+      "colors": ["marron", "negro"],
+      "stock": 5,
+      "featured": true
+    },
+    {
+      "id": 5,
+      "name": "Zapatillas Deportivas Hombre",
+      "price": 79.99,
+      "category": "hombre",
+      "subcategory": "calzado",
+      "images": [
+        "https://picsum.photos/500/600?random=9",
+        "https://picsum.photos/500/600?random=10"
+      ],
+      "description": "Zapatillas deportivas ideales para running y entrenamiento",
+      "sizes": ["40", "41", "42", "43", "44"],
+      "colors": ["negro", "blanco", "azul"],
+      "stock": 20,
+      "featured": true
+    },
+    {
+      "id": 6,
+      "name": "Falda Vaquera Mujer",
+      "price": 45.99,
+      "category": "mujer",
+      "subcategory": "faldas",
+      "images": [
+        "https://picsum.photos/500/600?random=11",
+        "https://picsum.photos/500/600?random=12"
+      ],
+      "description": "Falda vaquera de denim, estilo casual y moderno",
+      "sizes": ["S", "M", "L"],
+      "colors": ["azul", "negro"],
+      "stock": 7,
+      "featured": false
+    }
+  ]
+}
