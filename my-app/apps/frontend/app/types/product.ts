@@ -1,19 +1,33 @@
 export interface Product {
-  id: number;           
+  id: number;
   name: string;
+  description: string;
   price: number;
+  originalPrice?: number; // Precio original si hay descuento
   category: string;
-  subcategory: string | null;  
-  images: string[];     
-  description?: string;
-  sizes: string[];      
-  colors: string[];     
-  stock: number;
-  featured: boolean;
-  slug?: string;        
-  image?: string;       
+  subcategory?: string;
+  brand?: string;
+  images: string[]; // Array de URLs de imágenes
+  mainImage: string; // URL de la imagen principal
+  sizes?: string[]; // Talles disponibles
+  colors?: string[]; // Colores disponibles
+  inStock: boolean;
+  stockQuantity?: number;
+  featured?: boolean;
+  discountPercentage?: number;
+  rating?: number;
+  reviewCount?: number;
+  specifications?: Record<string, string>;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// Tipo para la respuesta paginada
+export interface PaginatedProducts {
+  products: Product[];
+  totalPages: number;
+  currentPage: number;
+  totalProducts: number;
 }
 
 export interface Category {
