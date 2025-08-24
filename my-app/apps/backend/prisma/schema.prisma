@@ -30,7 +30,7 @@ model Product {
   name        String
   description String?
   price       Float
-   originalPrice      Float?    @map("original_price")
+  originalPrice      Float?    @map("original_price")
   images      String[]
   stock       Int        @default(0)
   category    String
