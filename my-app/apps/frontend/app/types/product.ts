@@ -3,16 +3,16 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  originalPrice?: number; // Precio original si hay descuento
+  originalPrice?: number;
   category: string;
   subcategory?: string;
   brand?: string;
-  images: string[]; // Array de URLs de imágenes
-  mainImage: string; // URL de la imagen principal
-  sizes?: string[]; // Talles disponibles
-  colors?: string[]; // Colores disponibles
-  inStock: boolean;
-  stockQuantity?: number;
+  images: string[];
+  mainImage: string; // ✅ Esta propiedad es requerida
+  sizes?: string[];
+  colors?: string[];
+  inStock: boolean; // ✅ Cambiado de "stock" a "inStock"
+  stockQuantity?: number; // ✅ Nueva propiedad para cantidad
   featured?: boolean;
   discountPercentage?: number;
   rating?: number;
@@ -21,7 +21,6 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
 }
-
 // Tipo para la respuesta paginada
 export interface PaginatedProducts {
   products: Product[];
@@ -40,5 +39,5 @@ export interface Subcategory {
   name: string;
   href: string;
   image?: string;
-  slug?: string;       // ← Agregado para consistencia
+  slug?: string;       
 }

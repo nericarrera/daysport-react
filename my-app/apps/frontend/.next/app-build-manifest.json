@@ -31,25 +31,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/hombre/page.js"
     ],
-    "/ninos/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/ninos/page.js"
-    ],
-    "/accesorios/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/accesorios/page.js"
-    ],
-    "/registrarse/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/registrarse/page.js"
-    ],
-    "/api/register/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/register/route.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
