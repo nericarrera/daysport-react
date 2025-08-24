@@ -3,22 +3,22 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  originalPrice?: number;
+  originalPrice?: number;  // ← Para descuentos
   category: string;
   subcategory?: string;
-  brand?: string;
+  brand?: string;          // ← Marca del producto
   images: string[];
-  mainImage: string; // ✅ Esta propiedad es requerida
+  mainImage: string;
   sizes?: string[];
   colors?: string[];
-  inStock: boolean; // ✅ Cambiado de "stock" a "inStock"
-  stockQuantity?: number; // ✅ Nueva propiedad para cantidad
+  inStock: boolean;
+  stockQuantity?: number;  // ← Cantidad exacta
   featured?: boolean;
   discountPercentage?: number;
-  rating?: number;
-  reviewCount?: number;
+  rating?: number;         // ← Rating del producto
+  reviewCount?: number;    // ← Número de reviews
   specifications?: Record<string, string>;
-  createdAt?: string;
+  createdAt?: string;      // ← Fecha de creación para "NUEVO"
   updatedAt?: string;
 }
 // Tipo para la respuesta paginada

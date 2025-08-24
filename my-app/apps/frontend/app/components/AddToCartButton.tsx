@@ -1,35 +1,51 @@
 'use client';
-
-import { useCart } from './CartContext';
+import { Product } from '../types/product'; 
 
 interface AddToCartButtonProps {
-  product: {
-    id: number;       // ← Cambié de string a number para coincidir con tu DB
-    name: string;
-    price: number;
-    images: string[];
-  };
+  product: Product;
+  disabled?: boolean;
+  className?: string;
+  quantity?: number;
 }
 
-export default function AddToCartButton({ product }: AddToCartButtonProps) {
-  const { addToCart } = useCart();
-
+export default function AddToCartButton({ 
+  product, 
+  disabled = false, 
+  className = '',
+  quantity = 1 
+}: AddToCartButtonProps) {
+  
   const handleAddToCart = () => {
-    addToCart({
-      id: product.id.toString(), // ← Convertimos a string para coincidir con tu contexto
+    if (disabled) return;
+    
+    console.log('Agregando al carrito:', {
+      id: product.id,
       name: product.name,
       price: product.price,
-      image: product.images[0] || '/images/placeholder.jpg',
-      // quantity: 1 ← No necesario, el contexto lo agrega automáticamente
+      quantity: quantity,
+      image: product.mainImage || product.images[0]
     });
+    
+    // Aquí irá la lógica real del carrito
+    // Puedes usar context, redux, o localStorage
   };
 
   return (
     <button
       onClick={handleAddToCart}
-      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105"
+      disabled={disabled}
+      className={`flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      aria-label={`Agregar ${product.name} al carrito`}
     >
-      🛒 Agregar al Carrito
+      {disabled ? (
+        <>
+          <span>❌ Agotado</span>
+        </>
+      ) : (
+        <>
+          <span>🛒 Agregar al Carrito</span>
+        </>
+      )}
     </button>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Product } from '../../services';
-import AddToCartButton from './AddToCartButton';
 import { useState } from 'react';
+import { Product } from '../types/product'; // ← AJUSTA ESTA RUTA
+import AddToCartButton from './AddToCartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -56,7 +56,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
     : false;
 
   // Verificar stock
-  const isOutOfStock = product.stockQuantity === 0 || !product.inStock;
+  const isOutOfStock = (product.stockQuantity === 0 || !product.inStock);
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
@@ -217,11 +217,11 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
           {/* Stock disponible */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <span className={`text-sm font-medium ${
-              !isOutOfStock && product.stockQuantity > 10 ? 'text-green-600' : 
-              !isOutOfStock && product.stockQuantity > 0 ? 'text-orange-600' : 'text-red-600'
+              !isOutOfStock && product.stockQuantity && product.stockQuantity > 10 ? 'text-green-600' : 
+              !isOutOfStock && product.stockQuantity && product.stockQuantity > 0 ? 'text-orange-600' : 'text-red-600'
             }`}>
               {!isOutOfStock ? (
-                product.stockQuantity > 10 ? '✅ Disponible' : 
+                product.stockQuantity && product.stockQuantity > 10 ? '✅ Disponible' : 
                 `⚠️ Últimas ${product.stockQuantity} unidades`
               ) : '❌ Agotado'}
             </span>
