@@ -22,7 +22,7 @@ model User {
   updatedAt  DateTime    @updatedAt @map("updated_at")
 
   resetTokens ResetToken[]
-  carts       Cart[]     // Relación inversa hacia Cart
+  carts       Cart[]
 }
 
 model Product {
@@ -32,27 +32,29 @@ model Product {
   price       Float
   originalPrice      Float?    @map("original_price")
   images      String[]
-  mainImage   String     @map("main_image") // ← CAMPO AÑADIDO
+  mainImage   String     @map("main_image")
   stock       Int        @default(0)
-  stockQuantity Int?     @map("stock_quantity") // ← CAMPO AÑADIDO (alias)
+  stockQuantity Int?     @map("stock_quantity")
   category    String
   subcategory String?
-  brand       String?    // ← CAMPO AÑADIDO
+  brand       String?
   featured    Boolean    @default(false)
-  discountPercentage Int? @map("discount_percentage") // ← CAMPO AÑADIDO
-  rating      Float?     @default(0) // ← CAMPO AÑADIDO
-  reviewCount Int?       @map("review_count") @default(0) // ← CAMPO AÑADIDO
-  specifications Json?   // ← CAMPO AÑADIDO (JSON para especificaciones técnicas)
+  discountPercentage Int? @map("discount_percentage")
+  rating      Float?     @default(0)
+  reviewCount Int?       @map("review_count") @default(0)
+  specifications Json?
   sizes       String[]
   colors      String[]
+  inStock     Boolean    @map("in_stock") @default(true)
+  
+  // CAMPOS DE MEDIDAS (NUEVOS)
   sizeGuide    Json?   @map("size_guide")   // Guía de talles general
   measurements Json?   // Medidas específicas por talle
   fit          String? // Tipo de ajuste: "ajustado", "regular", "holgado"
-  inStock     Boolean    @map("in_stock") @default(true) // ← CAMPO AÑADIDO
+  
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
-  cartItems   CartItem[] // Relación inversa
-
+  cartItems   CartItem[]
 }
 
 model Cart {
