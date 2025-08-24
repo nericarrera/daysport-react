@@ -45,6 +45,10 @@ model Product {
   specifications Json?
   sizes       String[]
   colors      String[]
+  detailImages String[]  @map("detail_images")  // ← NUEVO CAMPO
+  colorImages  Json?     @map("color_images")   // ← NUEVO CAMPO
+  sizeGuide    Json?     @map("size_guide")     // ← NUEVO CAMPO
+  measurements Json?                            // ← NUEVO CAMPO
   inStock     Boolean    @map("in_stock") @default(true)
   
   // CAMPOS DE MEDIDAS (NUEVOS)
