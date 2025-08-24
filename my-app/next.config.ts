@@ -1,15 +1,8 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['picsum.photos'], // ← Agrega este dominio
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    domains: ['images.unsplash.com'], // dominios externos que quieras permitir
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
