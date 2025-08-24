@@ -10,7 +10,7 @@ export const productosAccesorios = [
     images: [
       "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"
     ],
-    mainImage: ["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"],
+    mainImage: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",
     colors: ["negro", "azul", "verde", "rojo"],
     inStock: true,
     stockQuantity: 10,

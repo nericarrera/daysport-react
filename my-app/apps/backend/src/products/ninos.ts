@@ -9,7 +9,7 @@ export const productosNinos = [
     images: [
       "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500"
     ],
-    mainImage: ["https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500"],
+    mainImage: "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500",
     sizes: ["4-6", "6-8", "8-10", "10-12"],
     colors: ["azul", "rojo", "verde"],
     inStock: true,

@@ -9,7 +9,7 @@ export const productosHombre = [
     images: [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500"
     ],
-    mainImage: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500"],
+    mainImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: ["negro", "blanco", "gris", "azul real"],
     inStock: true,

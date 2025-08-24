@@ -11,7 +11,7 @@ export const productosMujer = [
       "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500",
       "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500"
     ],
-    mainImage: ["https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500"], // ← OBLIGATORIO
+    mainImage: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500", // ← OBLIGATORIO
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["negro", "azul marino", "rosa", "verde menta"],
     inStock: true,
