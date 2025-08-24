@@ -5,12 +5,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  // Todos los productos con filtros
   async findAll(filters: {
     category?: string;
     subcategory?: string;
-    featured?: boolean;
-    inStock?: boolean;
+    featured?: boolean;  // ← Ahora recibe boolean directamente
+    inStock?: boolean;   // ← Ahora recibe boolean directamente
     page?: number;
     limit?: number;
   }) {

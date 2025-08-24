@@ -1,34 +1,45 @@
-import { Controller, Get, Query, Param } from '@nestjs/common'; // ← Agregar Param aquí
-import { PrismaService } from '../../prisma/prisma.service';
+// apps/backend/src/products/products.controller.ts
+import { Controller, Get, Query, Param, ParseBoolPipe, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { ProductsService } from '../products/products.services';
 
-@Controller() // ← Controlador en la raíz
+@Controller('products')
 export class ProductsController {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly productsService: ProductsService) {}
 
-  @Get('products') // ← Endpoint: /products
-  async getProducts(
+  @Get()
+  findAll(
     @Query('category') category?: string,
     @Query('subcategory') subcategory?: string,
-    @Query('featured') featured?: string
+    @Query('featured') featured?: string, // ← Cambiado a string
+    @Query('inStock') inStock?: string,    // ← Cambiado a string
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number
   ) {
-    const where: any = {};
-    
-    if (category) where.category = category;
-    if (subcategory) where.subcategory = subcategory;
-    if (featured === 'true') where.featured = true;
-
-    const products = await this.prisma.product.findMany({
-      where,
-      orderBy: { createdAt: 'desc' }
+    return this.productsService.findAll({
+      category,
+      subcategory,
+      featured: this.parseBoolean(featured), // ← Función de parsing
+      inStock: this.parseBoolean(inStock),    // ← Función de parsing
+      page,
+      limit
     });
-
-    return products;
   }
 
-  @Get('products/:id') // ← Endpoint: /products/1
-  async getProductById(@Param('id') id: string) {
-    return this.prisma.product.findUnique({
-      where: { id: parseInt(id) }
-    });
+  @Get('new')
+  findNewProducts(@Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number) {
+    return this.productsService.findNewProducts(limit);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findOne(id);
+  }
+
+  // Función helper para parsear booleanos desde strings
+  private parseBoolean(value?: string): boolean | undefined {
+    if (value === undefined) return undefined;
+    if (value.toLowerCase() === 'true') return true;
+    if (value.toLowerCase() === 'false') return false;
+    return undefined;
   }
 }
