@@ -22,14 +22,15 @@ async function main() {
   
   // Crear productos
  for (const productData of allProducts) {
-  // Si no tiene mainImage, usar la primera imagen
-  if (!productData.mainImage && productData.images && productData.images.length > 0) {
-    productData.mainImage = productData.images[0];
-  }
-  
+  // Asignar mainImage automáticamente si falta
+  const productWithMainImage = {
+    ...productData,
+    mainImage: productData.mainImage || productData.images[0] || '/placeholder.jpg'
+  };
+
   await prisma.product.create({
     data: {
-      ...productData,
+      ...productWithMainImage,
       createdAt: new Date(),
       updatedAt: new Date()
     }
