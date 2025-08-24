@@ -45,9 +45,9 @@ model Product {
   specifications Json?   // ← CAMPO AÑADIDO (JSON para especificaciones técnicas)
   sizes       String[]
   colors      String[]
-    measures Json? // ← Medidas específicas por talle
-  sizeGuide String? @map("size_guide") // ← Guía de talles general
-  fit          String?
+  sizeGuide    Json?   @map("size_guide")   // Guía de talles general
+  measurements Json?   // Medidas específicas por talle
+  fit          String? // Tipo de ajuste: "ajustado", "regular", "holgado"
   inStock     Boolean    @map("in_stock") @default(true) // ← CAMPO AÑADIDO
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
@@ -89,14 +89,4 @@ model SizeGuide {
   measures    Json     // Guía de talles general para la categoría
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model ProductMeasure {
-  id        Int     @id @default(autoincrement())
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-  size      String  // "S", "M", "L", etc.
-  measures  Json    // { "largo": 70, "ancho": 50, "manga": 60 }
-  
-  @@unique([productId, size])
 }
