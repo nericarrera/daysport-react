@@ -21,15 +21,20 @@ async function main() {
   ];
   
   // Crear productos
-  for (const productData of allProducts) {
-    await prisma.product.create({
-      data: {
-        ...productData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    });
+ for (const productData of allProducts) {
+  // Si no tiene mainImage, usar la primera imagen
+  if (!productData.mainImage && productData.images && productData.images.length > 0) {
+    productData.mainImage = productData.images[0];
   }
+  
+  await prisma.product.create({
+    data: {
+      ...productData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  });
+}
   
   console.log(`✅ Seed completed! Added ${allProducts.length} products.`);
 }
