@@ -16,10 +16,10 @@ model User {
   name       String?
   phone      String?
   address    String?
-  postalCode String?
-  birthDate  DateTime?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  postalCode String?     @map("postal_code")
+  birthDate  DateTime?   @map("birth_date")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
 
   resetTokens ResetToken[]
   carts       Cart[]     // Relación inversa hacia Cart
@@ -32,15 +32,23 @@ model Product {
   price       Float
   originalPrice      Float?    @map("original_price")
   images      String[]
+  mainImage   String     @map("main_image") // ← CAMPO AÑADIDO
   stock       Int        @default(0)
+  stockQuantity Int?     @map("stock_quantity") // ← CAMPO AÑADIDO (alias)
   category    String
   subcategory String?
+  brand       String?    // ← CAMPO AÑADIDO
   featured    Boolean    @default(false)
+  discountPercentage Int? @map("discount_percentage") // ← CAMPO AÑADIDO
+  rating      Float?     @default(0) // ← CAMPO AÑADIDO
+  reviewCount Int?       @map("review_count") @default(0) // ← CAMPO AÑADIDO
+  specifications Json?   // ← CAMPO AÑADIDO (JSON para especificaciones técnicas)
   sizes       String[]
   colors      String[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  cartItems   CartItem[] // ← RELACIÓN INVERSA AÑADIDA
+  inStock     Boolean    @map("in_stock") @default(true) // ← CAMPO AÑADIDO
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  cartItems   CartItem[] // Relación inversa
 }
 
 model Cart {
