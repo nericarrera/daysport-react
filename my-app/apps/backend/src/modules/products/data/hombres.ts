@@ -10,16 +10,16 @@ export const productosHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1", // Azul - frontal
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2"  // Azul - lateral
+      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpg", // Azul - frontal
+      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpg"  // Azul - lateral
     ],
-    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1",
+    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "marron": [
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1", // Azul - frontal
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2", // Azul - lateral  // Azul - niño usando
+        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpg", // Azul - frontal
+        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpg", // Azul - lateral  // Azul - niño usando
       ],
       "rojo": [
         "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800", // Rojo - frontal
