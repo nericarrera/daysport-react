@@ -1,24 +1,12 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ProductsService } from './products.service'; // ← services, no servicesS
+import { Controller, Get, Query } from '@nestjs/common';
+import { ProductsService } from './products.service';
 
-@Controller('products')
+@Controller('api/products') // ← ✅ "api/products" no solo "products"
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  // ✅ Usa el método que SÍ existe: getProducts()
-  @Get()
+  @Get() // ← Esto responde a GET /api/products
   async getProducts(@Query('category') category: string) {
     return this.productsService.getProducts(category);
-  }
-
-  // ✅ O si prefieres parámetro en la ruta:
-  @Get('category/:category')
-  async getByCategory(@Param('category') category: string) {
-    return this.productsService.getProducts(category);
-  }
-
-  @Get(':id')
-  async getProductById(@Param('id') id: string) {
-    return this.productsService.getProductById(Number(id));
   }
 }
