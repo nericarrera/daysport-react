@@ -1,22 +1,21 @@
 import { Product } from '../app/types/product';
 
-// IMPORTANTE: Ahora usamos rutas relativas (/api/...) porque el proxy se encarga
-const API_BASE_URL = ''; // ← Vacío porque usamos proxy
-
 export class ProductService {
   static async getProductsByCategory(category: string): Promise<Product[]> {
     try {
       console.log('🔄 Fetching products for:', category);
       
-      const response = await fetch(`/api/products?category=${category}`, {
+      // Usa URL absoluta para evitar conflictos
+      const response = await fetch(`http://localhost:3001/api/products?category=${category}`, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
+        // cache: 'no-store' // Para desarrollo
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.warn('⚠️ Backend not ready, using empty data');
+        return [];
       }
 
       const data = await response.json();
@@ -25,19 +24,8 @@ export class ProductService {
       return data.products || data || [];
       
     } catch (error) {
-      console.error('❌ Error fetching products:', error);
+      console.warn('⚠️ Using empty data due to error:', error);
       return [];
-    }
-  }
-
-  static async getProductById(id: number): Promise<Product | null> {
-    try {
-      const response = await fetch(`/api/products/${id}`);
-      if (!response.ok) return null;
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      return null;
     }
   }
 }

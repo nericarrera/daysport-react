@@ -2,16 +2,23 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*', // Todas las rutas que empiecen con /api
-        destination: 'http://localhost:3001/api/:path*', // Redirige al backend
+        source: '/api/:path*',
+        destination: 'http://localhost:3001/api/:path*',
       },
+      {
+        source: '/products/:path*',
+        destination: 'http://localhost:3001/api/products/:path*',
+      }
     ];
   },
   images: {
-    domains: ['localhost'],
-    // Para imágenes locales
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3001',
+      },
+    ],
   },
 };
 
