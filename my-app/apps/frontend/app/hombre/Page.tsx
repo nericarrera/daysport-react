@@ -51,22 +51,45 @@ export default function HombrePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Cargar productos desde la API
+function getProductsArray(data: unknown): Product[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  
+  if (data && typeof data === 'object') {
+    const response = data as Record<string, unknown>;
+    
+    if (Array.isArray(response.products)) {
+      return response.products as Product[];
+    }
+    if (Array.isArray(response.data)) {
+      return response.data as Product[];
+    }
+    if (Array.isArray(response.items)) {
+      return response.items as Product[];
+    }
+  }
+  
+  return [];
+}
+
   useEffect(() => {
     async function loadProducts() {
       try {
         console.log('🔄 Cargando productos de hombre...');
         
-        // Usar el servicio
         const productsData = await ProductService.getProductsByCategory('hombre');
         console.log('🎯 Productos desde el servicio:', productsData);
         
-        setAllProducts(productsData);
-        setFilteredProducts(productsData);
+        // ✅ VERSIÓN CORREGIDA - Manejo seguro de tipos
+        const productsArray = getProductsArray(productsData);
+        
+        setAllProducts(productsArray);
+        setFilteredProducts(productsArray);
         
       } catch (err) {
         console.error('💥 Error completo:', err);
-        setError('Error al cargar los productos. Verifica que el backend esté corriendo en http://localhost:3001');
+        setError('Error al cargar los productos');
       } finally {
         setLoading(false);
       }
@@ -87,6 +110,13 @@ export default function HombrePage() {
     }
   }, [selectedSubcategory, allProducts]);
 
+  // DEBUG: Ver productos en consola
+  useEffect(() => {
+    console.log('📊 Todos los productos:', allProducts);
+    console.log('🔍 Productos filtrados:', filteredProducts);
+    console.log('🎯 Subcategoría seleccionada:', selectedSubcategory);
+  }, [allProducts, filteredProducts, selectedSubcategory]);
+
   const compatibleProducts = filteredProducts;
 
   if (loading) {
@@ -100,7 +130,7 @@ export default function HombrePage() {
 
   if (error) {
     return (
-      <div className="max-w-full mx-auto px-43 py-14 bg-white">
+      <div className="max-w-full mx-auto px-4 py-14 bg-white">
         <div className="text-center py-20">
           <div className="text-red-500 text-lg mb-4">{error}</div>
           <p className="text-gray-600">
@@ -113,7 +143,7 @@ export default function HombrePage() {
   }
 
   return (
-    <div className="max-w-full mx-auto px-43 py-14 bg-white">
+    <div className="max-w-full mx-auto px-4 py-14 bg-white">
       {/* Breadcrumbs y Botón de Regreso */}
       <div className="flex items-center gap-4 mb-6">
         <Link 
@@ -146,27 +176,50 @@ export default function HombrePage() {
       <div className="mb-12 overflow-x-auto">
         <div className="flex space-x-8 pb-4">
           {subcategories.map((subcategory) => (
-            <Link 
-              key={subcategory.slug} 
-              href={`/hombre/${subcategory.slug}`}
-              className="flex flex-col items-center group min-w-[80px]"
+            <button
+              key={subcategory.slug}
+              onClick={() => setSelectedSubcategory(
+                selectedSubcategory === subcategory.slug ? '' : subcategory.slug
+              )}
+              className={`flex flex-col items-center group min-w-[80px] transition-all ${
+                selectedSubcategory === subcategory.slug 
+                  ? 'scale-110 text-gray-900' 
+                  : 'text-gray-600'
+              }`}
             >
-              <div className="rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 border-gray-200 group-hover:border-gray-900 transition-all duration-300">
+              <div className={`rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 transition-all duration-300 ${
+                selectedSubcategory === subcategory.slug 
+                  ? 'border-gray-900 shadow-lg' 
+                  : 'border-gray-200 group-hover:border-gray-400'
+              }`}>
                 <Image
-                  src={subcategory.image}
+                  src={subcategory.image || '/placeholder-category.jpg'}
                   alt={subcategory.name}
                   width={96}
                   height={96}
                   className="object-cover w-full h-full"
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder-category.jpg';
+                  }}
                 />
               </div>
-              <span className="mt-2 text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+              <span className="mt-2 text-sm font-medium transition-colors">
                 {subcategory.name}
               </span>
-            </Link>
+            </button>
           ))}
         </div>
       </div>
+
+      {/* Información de debug (solo desarrollo) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 p-4 rounded-lg mb-6">
+          <h3 className="font-bold text-yellow-800">DEBUG Info:</h3>
+          <p>Productos totales: {allProducts.length}</p>
+          <p>Productos filtrados: {filteredProducts.length}</p>
+          <p>Subcategoría activa: {selectedSubcategory || 'Ninguna'}</p>
+        </div>
+      )}
 
       {/* Contenido */}
       <div className="flex flex-col md:flex-row gap-8">
@@ -217,11 +270,34 @@ export default function HombrePage() {
         {/* Productos */}
         <div className="md:w-3/4">
           {compatibleProducts.length > 0 ? (
-            <ProductGrid products={compatibleProducts} />
+            <>
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold">
+                  {selectedSubcategory 
+                    ? `Productos en ${selectedSubcategory}` 
+                    : 'Todos los productos de hombre'
+                  }
+                </h2>
+              </div>
+              <ProductGrid products={compatibleProducts} />
+            </>
           ) : (
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg">No se encontraron productos</p>
-              <p className="text-gray-400">Prueba con otro filtro o categoría</p>
+              <p className="text-gray-400">
+                {selectedSubcategory 
+                  ? `Prueba con otra subcategoría o limpia los filtros`
+                  : 'No hay productos en la categoría hombre aún'
+                }
+              </p>
+              {selectedSubcategory && (
+                <button 
+                  onClick={() => setSelectedSubcategory('')}
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Ver todos los productos
+                </button>
+              )}
             </div>
           )}
         </div>
