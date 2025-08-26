@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { productosHombre } from '../src/modules/products/data/hombre'; // ← Importa tus datos
+import { productosHombre } from '../src/modules/products/data/hombres'; // ← Importa tus datos
 
 const prisma = new PrismaClient();
 
