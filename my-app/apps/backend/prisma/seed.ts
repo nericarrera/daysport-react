@@ -1,9 +1,9 @@
 // prisma/seed.ts - VERSIÓN CORREGIDA Y COMPLETA
 import { PrismaClient } from '@prisma/client';
-import { productosMujer } from '../src/products/data/mujeres';
-import { productosHombre } from '../src/products/data/hombres';
-import { productosNinos } from '../src/products/data/ninos';
-import { productosAccesorios } from '../src/products/data/accesorios';
+import { productosMujer } from '../src/modules/products/data/mujeres';
+import { productosHombre } from '../src/modules/products/data/hombres';
+import { productosNinos } from '../src/modules/products/data/ninos';
+import { productosAccesorios } from '../src/modules/products/data/accesorios';
 
 const prisma = new PrismaClient();
 
