@@ -1,31 +1,38 @@
 import { Product } from '../app/types/product';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// IMPORTANTE: Ahora usamos rutas relativas (/api/...) porque el proxy se encarga
+const API_BASE_URL = ''; // ← Vacío porque usamos proxy
 
 export class ProductService {
   static async getProductsByCategory(category: string): Promise<Product[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/products?category=${category}`);
+      console.log('🔄 Fetching products for:', category);
+      
+      const response = await fetch(`/api/products?category=${category}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
       
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('✅ Products received:', data);
       
-      // Si tu backend devuelve { products: [], total, etc } o directamente el array
       return data.products || data || [];
       
     } catch (error) {
       console.error('❌ Error fetching products:', error);
-      return []; // Retorna array vacío en lugar de mock
+      return [];
     }
   }
 
-  // Otros métodos que necesites...
   static async getProductById(id: number): Promise<Product | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
+      const response = await fetch(`/api/products/${id}`);
       if (!response.ok) return null;
       return await response.json();
     } catch (error) {

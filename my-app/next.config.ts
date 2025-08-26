@@ -1,7 +1,17 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*', // Todas las rutas que empiecen con /api
+        destination: 'http://localhost:3001/api/:path*', // Redirige al backend
+      },
+    ];
+  },
   images: {
-    domains: ['images.unsplash.com'], // dominios externos que quieras permitir
+    domains: ['localhost'],
+    // Para imágenes locales
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 
