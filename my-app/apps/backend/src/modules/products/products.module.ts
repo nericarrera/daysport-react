@@ -8,4 +8,6 @@ import { PrismaModule } from '../../../prisma/prisma.module';
   controllers: [ProductsController], // ← Asegúrate de que esté aquí
   providers: [ProductsService],
 })
+
+
 export class ProductsModule {}
