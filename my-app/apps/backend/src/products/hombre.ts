@@ -1,29 +1,25 @@
 export const productosHombre = [
   {
-    name: "Conjunto Deportivo Infantil Sport Pro",
-    price: 35.99,
-    originalPrice: 45.99,
-    category: "ninos",
-    subcategory: "conjuntos",
-    brand: "Puma",
-    description: "Conjunto deportivo para niños con tecnología dry-fit. Ideal para actividades físicas, juegos y deportes. Material transpirable y cómodo.",
+    name: "Pantalon Corte Chino, Recto",
+    price: 36.00,
+    originalPrice: 40.00,
+    category: "hombre",
+    subcategory: "pantalones",
+    brand: "Original",
+    description: "Pantalon clasico de hombre, corte chino, recto, con bolsillos laterales y traseros. Ideal para uso casual y oficina.",
     
     // Imágenes principales (vista previa)
     images: [
-      "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500", // Azul - frontal
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500"  // Azul - lateral
+      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1", // Azul - frontal
+      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2"  // Azul - lateral
     ],
-    mainImage: "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500",
+    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
-      "azul": [
-        "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=800", // Azul - frontal
-        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800", // Azul - lateral
-        "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=800", // Azul - espalda
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800", // Azul - detalle logo
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800", // Azul - detalle material
-        "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800"  // Azul - niño usando
+      "marron": [
+        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1", // Azul - frontal
+        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2", // Azul - lateral  // Azul - niño usando
       ],
       "rojo": [
         "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800", // Rojo - frontal
