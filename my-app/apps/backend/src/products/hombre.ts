@@ -59,12 +59,12 @@ export const productosHombre = [
     fit: "regular"
   },
 
-  // SEGUNDO PRODUCTO NIÑO - Polo Deportivo
+  // SEGUNDO PRODUCTO 
   {
     name: "Polo Deportivo Infantil Active Fit",
     price: 25.99,
     originalPrice: 32.99,
-    category: "ninos",
+    category: "hombre",
     subcategory: "remeras",
     brand: "Nike",
     description: "Polo deportivo para niños con corte moderno y tejido transpirable. Perfecto para escuela y deportes.",
