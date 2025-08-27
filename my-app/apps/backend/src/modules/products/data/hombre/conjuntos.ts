@@ -1,4 +1,4 @@
-export const productosHombre = [
+export const conjuntosHombre = [
   {
     name: "Conjuto Combinado Campera Deportiva y Pantalon",
     price: 55.00,

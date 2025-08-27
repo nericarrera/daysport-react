@@ -1,4 +1,4 @@
-export const productosHombre = [
+export const buzosHombre = [
   {
     name: "Buzos de Algodón con Capucha",
     price: 35.00,

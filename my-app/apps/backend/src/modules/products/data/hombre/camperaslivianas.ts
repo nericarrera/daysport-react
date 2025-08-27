@@ -1,10 +1,10 @@
-export const productosHombre = [
+export const camperaslivianasHombre = [
   {
     name: "Campera Liviana Deportiva Hombre",
     price: 35.00,
     originalPrice: 40.00,
     category: "hombre",
-    subcategory: "camperas-livianas",
+    subcategory: "camperaslivianas",
     brand: "Original",
     description: "Campera liviana deportiva para hombre, ideal para actividades al aire libre y uso casual. Resistente al viento y al agua.",
     
@@ -54,7 +54,7 @@ export const productosHombre = [
     price: 35.99,
     originalPrice: 45.00,
     category: "hombre",
-    subcategory: "camperas-livianas",
+    subcategory: "camperaslivianas",
     brand: "Original",
     description: "Campera liviana deportiva clasica para hombre, ideal para actividades al aire libre y uso casual. Resistente al viento y al agua.",
     

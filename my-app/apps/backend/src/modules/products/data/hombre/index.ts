@@ -1,9 +1,9 @@
-import { remerasHombre } from './remeras';          // ← SIN .ts
-import { pantalonesHombre } from './pantalones';    // ← SIN .ts  
-import { shortsHombre } from './shorts';            // ← SIN .ts
-import { buzosHombre } from './buzos';              // ← SIN .ts
-import { camperasHombre } from './camperas';        // ← SIN .ts
-import { camperasLivianasHombre } from './camperaslivianas'; // ← SIN .ts
+import { remerasHombre } from './remeras';          
+import { pantalonesHombre } from './pantalones';      
+import { shortsHombre } from './shorts';            
+import { buzosHombre } from './buzos';            
+import { camperasHombre } from './camperas';       
+import { camperasLivianasHombre } from './camperaslivianas'; 
 
 export const productosHombre = [
   ...remerasHombre,

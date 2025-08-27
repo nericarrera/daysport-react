@@ -1,4 +1,4 @@
-export const productosHombre = [
+export const sweatersHombre = [
   {
     name: "Pantalon Corte Chino, Recto",
     price: 36.00,
