@@ -15,6 +15,8 @@ export const productosHombre = [
     ],
     mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
 
+    detailImages: [],
+
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "marron": [

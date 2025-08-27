@@ -45,7 +45,7 @@ model Product {
   specifications Json?
   sizes       String[]
   colors      String[]
-  detailImages String[]  @map("detail_images")  // ← NUEVO CAMPO
+  detailImages String[]  @map("detail_images") @default([])
   colorImages  Json?     @map("color_images")   // ← NUEVO CAMPO
   inStock     Boolean    @map("in_stock") @default(true)
   
