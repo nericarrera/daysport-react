@@ -10,7 +10,7 @@ export const productosHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+      "/images/hombre/buzos/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
       "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
     ],
     mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
