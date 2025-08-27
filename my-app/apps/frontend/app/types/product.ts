@@ -11,7 +11,7 @@ export interface Product {
   mainImage: string;
   sizes?: string[];
   colors?: string[];
-  inStock: boolean;
+  inStock: number;
   stockQuantity?: number;  // ← Cantidad exacta
   featured?: boolean;
   discountPercentage?: number;

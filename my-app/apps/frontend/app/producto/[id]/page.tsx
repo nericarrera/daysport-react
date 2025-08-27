@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -17,7 +16,9 @@ export default function ProductDetailPage() {
   useEffect(() => {
     async function loadProduct() {
       try {
-        const productData = await ProductService.getProductById(Number(params.id));
+        // Corregido: params.id es string, no number
+        const productId = params.id as string;
+        const productData = await ProductService.getProductById(productId);
         setProduct(productData);
       } catch (error) {
         console.error('Error loading product:', error);
@@ -61,35 +62,43 @@ export default function ProductDetailPage() {
     return colorMap[color.toLowerCase()] || '#f0f0f0';
   };
 
+  // Valores por defecto para propiedades opcionales
+  const images = product.images || [];
+  const sizes = product.sizes || [];
+  const colors = product.colors || [];
+  const inStock = product.inStock || 0;
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div className="relative h-96 mb-4">
             <Image
-              src={product.images[selectedImage] || '/images/placeholder.jpg'}
+              src={images[selectedImage] || '/images/placeholder.jpg'}
               alt={product.name}
               fill
               className="object-cover rounded-lg"
               priority
             />
           </div>
-          <div className="flex gap-2">
-            {product.images.map((image: string, index: number) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(index)}
-                className="relative h-20 w-20"
-              >
-                <Image
-                  src={image}
-                  alt={`Vista ${index + 1} de ${product.name}`}
-                  fill
-                  className="object-cover rounded-md"
-                />
-              </button>
-            ))}
-          </div>
+          {images.length > 1 && (
+            <div className="flex gap-2">
+              {images.map((image: string, index: number) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className="relative h-20 w-20"
+                >
+                  <Image
+                    src={image}
+                    alt={`Vista ${index + 1} de ${product.name}`}
+                    fill
+                    className="object-cover rounded-md"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -97,11 +106,11 @@ export default function ProductDetailPage() {
           <p className="text-2xl text-green-600 font-bold mb-4">${product.price}</p>
           <p className="text-gray-600 mb-6">{product.description}</p>
 
-          {product.sizes.length > 0 && (
+          {sizes.length > 0 && (
             <div className="mb-4">
               <label className="block font-medium mb-2">Talla:</label>
               <div className="flex gap-2">
-                {product.sizes.map((size: string) => (
+                {sizes.map((size: string) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -118,11 +127,11 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {product.colors.length > 0 && (
+          {colors.length > 0 && (
             <div className="mb-6">
               <label className="block font-medium mb-2">Color:</label>
               <div className="flex gap-2">
-                {product.colors.map((color: string) => (
+                {colors.map((color: string) => (
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
@@ -147,10 +156,10 @@ export default function ProductDetailPage() {
 
           <div className="mt-6 text-sm text-gray-600">
             <p className={`mb-2 ${
-              product.stock > 10 ? 'text-green-600' : 
-              product.stock > 0 ? 'text-orange-600' : 'text-red-600'
+              inStock > 10 ? 'text-green-600' : 
+              inStock > 0 ? 'text-orange-600' : 'text-red-600'
             }`}>
-              Stock disponible: {product.stock} unidades
+              Stock disponible: {inStock} unidades
             </p>
             <p className="mb-1">✓ Envíos a todo el país</p>
             <p className="mb-1">✓ Devoluciones gratuitas</p>
