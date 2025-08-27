@@ -1,12 +1,12 @@
 export const productosHombre = [
   {
-    name: "Pantalon Corte Chino, Recto",
-    price: 36.00,
+    name: "Buzos de Algodón con Capucha",
+    price: 35.00,
     originalPrice: 40.00,
     category: "hombre",
-    subcategory: "pantalones",
+    subcategory: "buzos",
     brand: "Original",
-    description: "Pantalon clasico de hombre, corte chino, recto, con bolsillos laterales y traseros. Ideal para uso casual y oficina.",
+    description: "Buzo clasico de hombre, con capucha. Ideal para uso casual.",
     
     // Imágenes principales (vista previa)
     images: [

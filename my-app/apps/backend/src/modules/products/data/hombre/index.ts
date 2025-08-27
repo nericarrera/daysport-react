@@ -15,4 +15,4 @@ export const productosHombre = [
 ];
 
 // Exportar individualmente también
-export { remerasHombre, pantalonesHombre, shortsHombre, buzosHombre, camperasHombre };
+export { remerasHombre, pantalonesHombre, shortsHombre, buzosHombre, camperasHombre, camperasLivianasHombre };
