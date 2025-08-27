@@ -1,4 +1,4 @@
-export const productosMujer = [
+export const buzosMujer = [
   {
     name: "Conjunto Deportivo Infantil Sport Pro",
     price: 35.99,

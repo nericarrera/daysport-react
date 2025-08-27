@@ -1,4 +1,4 @@
-export const productosMujer = [
+export const pantalonesMujer = [
   {
     name: "Conjunto Deportivo Infantil Sport Pro",
     price: 35.99,
