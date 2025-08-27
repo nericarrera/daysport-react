@@ -3,7 +3,7 @@ import { pantalonesHombre } from './pantalones';
 import { shortsHombre } from './shorts';            
 import { buzosHombre } from './buzos';            
 import { camperasHombre } from './camperas';       
-import { camperasLivianasHombre } from './camperas-livianas';
+import { camperaslivianasHombre } from './camperas-livianas';
 import { conjuntosHombre } from './conjuntos';
 import { sweatersHombre } from './sweaters';
 
@@ -14,7 +14,7 @@ export const productosHombre = [
   ...shortsHombre,
   ...buzosHombre,
   ...camperasHombre,
-  ...camperasLivianasHombre
+  ...camperaslivianasHombre
 ];
 
 export { 
@@ -23,5 +23,5 @@ export {
   shortsHombre, 
   buzosHombre, 
   camperasHombre, 
-  camperasLivianasHombre 
+  camperaslivianasHombre 
 };
