@@ -22,20 +22,10 @@ export const productosHombre = [
         "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
       ],
       "rojo": [
-        "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800", // Rojo - frontal
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f19?w=800", // Rojo - lateral
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f20?w=800", // Rojo - espalda
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f21?w=800", // Rojo - detalle logo
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f22?w=800", // Rojo - detalle material
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f23?w=800"  // Rojo - niño usando
+        
       ],
       "verde": [
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800", // Verde - frontal
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3106?w=800", // Verde - lateral
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3107?w=800", // Verde - espalda
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3108?w=800", // Verde - detalle logo
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3109?w=800", // Verde - detalle material
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3110?w=800"  // Verde - niño usando
+       
       ]
     },
 
