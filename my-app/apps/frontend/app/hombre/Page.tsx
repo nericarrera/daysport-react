@@ -1,9 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
 import FilterButton from '../components/FilterButton';
-import { ChevronLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, HomeIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 
 // Importamos el servicio de productos que conecta con la API
@@ -44,13 +44,7 @@ const subcategories = [
   }
 ];
 
-export default function HombrePage() {
-  const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+// Función helper para obtener productos de diferentes formatos de respuesta
 function getProductsArray(data: unknown): Product[] {
   if (Array.isArray(data)) {
     return data;
@@ -73,30 +67,50 @@ function getProductsArray(data: unknown): Product[] {
   return [];
 }
 
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        console.log('🔄 Cargando productos de hombre...');
-        
-        const productsData = await ProductService.getProductsByCategory('hombre');
-        console.log('🎯 Productos desde el servicio:', productsData);
-        
-        // ✅ VERSIÓN CORREGIDA - Manejo seguro de tipos
-        const productsArray = getProductsArray(productsData);
-        
-        setAllProducts(productsArray);
-        setFilteredProducts(productsArray);
-        
-      } catch (err) {
-        console.error('💥 Error completo:', err);
-        setError('Error al cargar los productos');
-      } finally {
-        setLoading(false);
-      }
+export default function HombrePage() {
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Función para cargar productos con manejo de errores mejorado
+  const loadProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      console.log('🔄 Cargando productos de hombre...');
+      
+      const productsData = await ProductService.getProductsByCategory('hombre');
+      console.log('🎯 Productos desde el servicio:', productsData);
+      
+      // ✅ VERSIÓN CORREGIDA - Manejo seguro de tipos
+      const productsArray = getProductsArray(productsData);
+      
+      setAllProducts(productsArray);
+      setFilteredProducts(productsArray);
+      
+    } catch (err) {
+      console.error('💥 Error completo:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error al cargar los productos';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    
-    loadProducts();
   }, []);
+
+  // Cargar productos al montar el componente
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  // Función para recargar productos
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadProducts();
+  };
 
   // Filtrar productos cuando cambia la subcategoría seleccionada
   useEffect(() => {
@@ -104,54 +118,76 @@ function getProductsArray(data: unknown): Product[] {
       setFilteredProducts(allProducts);
     } else {
       const filtered = allProducts.filter(product => 
-        product.subcategory === selectedSubcategory
+        product.subcategory?.toLowerCase() === selectedSubcategory.toLowerCase()
       );
       setFilteredProducts(filtered);
     }
   }, [selectedSubcategory, allProducts]);
 
-  // DEBUG: Ver productos en consola
+  // DEBUG: Ver productos en consola (solo en desarrollo)
   useEffect(() => {
-    console.log('📊 Todos los productos:', allProducts);
-    console.log('🔍 Productos filtrados:', filteredProducts);
-    console.log('🎯 Subcategoría seleccionada:', selectedSubcategory);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Todos los productos:', allProducts);
+      console.log('🔍 Productos filtrados:', filteredProducts);
+      console.log('🎯 Subcategoría seleccionada:', selectedSubcategory);
+    }
   }, [allProducts, filteredProducts, selectedSubcategory]);
 
   const compatibleProducts = filteredProducts;
 
-  if (loading) {
+  // Estado de carga mejorado
+  if (loading && !refreshing) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-        <p className="ml-4 text-gray-600">Cargando productos...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+        <p className="mt-4 text-gray-600 text-lg">Cargando productos...</p>
+        <p className="text-sm text-gray-400 mt-2">Conectando con el servidor</p>
       </div>
     );
   }
 
-  if (error) {
+  // Manejo de errores mejorado
+  if (error && allProducts.length === 0) {
     return (
-      <div className="max-w-full mx-auto px-4 py-14 bg-white">
-        <div className="text-center py-20">
-          <div className="text-red-500 text-lg mb-4">{error}</div>
-          <p className="text-gray-600">
-            Asegúrate de que el backend esté corriendo en otra terminal con: 
-            <code className="bg-gray-100 p-1 rounded ml-2">npm run start:dev</code>
-          </p>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Error al cargar productos</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          
+          <div className="bg-gray-100 p-4 rounded-lg text-left mb-6">
+            <p className="text-sm font-medium mb-2">Solución:</p>
+            <code className="text-xs bg-white p-2 rounded block">
+              npm run start:dev
+            </code>
+            <p className="text-xs text-gray-500 mt-1">Ejecuta este comando en la carpeta del backend</p>
+          </div>
+          
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center mx-auto"
+          >
+            {refreshing ? (
+              <ArrowPathIcon className="h-5 w-5 animate-spin mr-2" />
+            ) : null}
+            Reintentar
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-full mx-auto px-4 py-14 bg-white">
+    <div className="max-w-full mx-auto px-4 py-14 bg-white min-h-screen">
       {/* Breadcrumbs y Botón de Regreso */}
       <div className="flex items-center gap-4 mb-6">
         <Link 
           href="/" 
-          className="flex items-center text-gray-600 hover:text-purple-700 transition-colors"
+          className="flex items-center text-gray-600 hover:text-purple-700 transition-colors group"
           aria-label="Volver al inicio"
         >
-          <ChevronLeftIcon className="h-6 w-6 mr-1" />
+          <ChevronLeftIcon className="h-6 w-6 mr-1 group-hover:-translate-x-1 transition-transform" />
           <HomeIcon className="h-6 w-6" />
         </Link>
         
@@ -163,13 +199,45 @@ function getProductsArray(data: unknown): Product[] {
           >
             Hombre
           </Link>
+          {selectedSubcategory && (
+            <>
+              <span className="mx-2">/</span>
+              <span className="text-gray-800 font-medium capitalize">
+                {selectedSubcategory}
+              </span>
+            </>
+          )}
         </div>
+
+        {/* Botón de recarga */}
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="ml-auto flex items-center text-gray-500 hover:text-blue-600 transition-colors disabled:opacity-50"
+          title="Recargar productos"
+        >
+          <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
+          <span className="ml-1 text-sm">Actualizar</span>
+        </button>
       </div>
 
       {/* Encabezado */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-1">ROPA DEPORTIVA PARA HOMBRE +</h1>
         <p className="text-gray-600">DESCUBRE NUESTRA COLECCIÓN DISEÑADA PARA HOMBRES ACTIVOS</p>
+        
+        {/* Contador de productos en el header */}
+        <div className="mt-4 flex items-center gap-4">
+          <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+            {compatibleProducts.length} {compatibleProducts.length === 1 ? 'producto' : 'productos'}
+          </span>
+          {refreshing && (
+            <span className="text-sm text-gray-500 flex items-center">
+              <ArrowPathIcon className="h-4 w-4 animate-spin mr-1" />
+              Actualizando...
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Sección de Categorías Circulares */}
@@ -184,26 +252,27 @@ function getProductsArray(data: unknown): Product[] {
               className={`flex flex-col items-center group min-w-[80px] transition-all ${
                 selectedSubcategory === subcategory.slug 
                   ? 'scale-110 text-gray-900' 
-                  : 'text-gray-600'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
+              aria-pressed={selectedSubcategory === subcategory.slug}
             >
               <div className={`rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 transition-all duration-300 ${
                 selectedSubcategory === subcategory.slug 
-                  ? 'border-gray-900 shadow-lg' 
-                  : 'border-gray-200 group-hover:border-gray-400'
+                  ? 'border-gray-900 shadow-lg ring-2 ring-blue-100' 
+                  : 'border-gray-200 group-hover:border-gray-400 group-hover:shadow-md'
               }`}>
                 <Image
                   src={subcategory.image || '/placeholder-category.jpg'}
                   alt={subcategory.name}
                   width={96}
                   height={96}
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder-category.jpg';
                   }}
                 />
               </div>
-              <span className="mt-2 text-sm font-medium transition-colors">
+              <span className="mt-2 text-sm font-medium transition-colors text-center">
                 {subcategory.name}
               </span>
             </button>
@@ -213,11 +282,21 @@ function getProductsArray(data: unknown): Product[] {
 
       {/* Información de debug (solo desarrollo) */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="bg-yellow-50 p-4 rounded-lg mb-6">
-          <h3 className="font-bold text-yellow-800">DEBUG Info:</h3>
-          <p>Productos totales: {allProducts.length}</p>
-          <p>Productos filtrados: {filteredProducts.length}</p>
-          <p>Subcategoría activa: {selectedSubcategory || 'Ninguna'}</p>
+        <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
+          <h3 className="font-bold text-yellow-800 flex items-center">
+            <span className="mr-2">🐛</span>
+            DEBUG Info:
+          </h3>
+          <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+            <span>Productos totales:</span>
+            <span className="font-mono">{allProducts.length}</span>
+            
+            <span>Productos filtrados:</span>
+            <span className="font-mono">{filteredProducts.length}</span>
+            
+            <span>Subcategoría activa:</span>
+            <span className="font-mono capitalize">{selectedSubcategory || 'Ninguna'}</span>
+          </div>
         </div>
       )}
 
@@ -226,8 +305,11 @@ function getProductsArray(data: unknown): Product[] {
         {/* Filtros */}
         <div className="md:w-1/4">
           <div className="sticky top-4 space-y-4">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="font-bold text-lg mb-4">Filtros</h3>
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <h3 className="font-bold text-lg mb-4 flex items-center">
+                <span className="mr-2">⚙️</span>
+                Filtros
+              </h3>
               
               {/* Botón de filtro con funcionalidad completa */}
               <FilterButton 
@@ -237,7 +319,7 @@ function getProductsArray(data: unknown): Product[] {
               
               {/* Mostrar filtro activo */}
               {selectedSubcategory && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
                   <p className="text-sm font-medium text-blue-800">
                     Filtro activo: 
                     <span className="ml-2 capitalize font-bold">
@@ -246,7 +328,7 @@ function getProductsArray(data: unknown): Product[] {
                   </p>
                   <button 
                     onClick={() => setSelectedSubcategory('')}
-                    className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+                    className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline flex items-center"
                   >
                     Limpiar filtro
                   </button>
@@ -255,13 +337,13 @@ function getProductsArray(data: unknown): Product[] {
             </div>
 
             {/* Contador de productos */}
-            <div className="bg-white p-4 rounded-lg shadow-md text-center">
-              <p className="text-lg font-semibold text-gray-800">
+            <div className="bg-white p-4 rounded-lg shadow-md text-center border border-gray-100">
+              <p className="text-2xl font-bold text-gray-800">
                 {compatibleProducts.length}
               </p>
-              <p className="text-sm text-gray-600">
-                {compatibleProducts.length === 1 ? 'producto' : 'productos'} encontrado
-                {selectedSubcategory && ` en ${selectedSubcategory}`}
+              <p className="text-sm text-gray-600 mt-1">
+                {compatibleProducts.length === 1 ? 'producto' : 'productos'} 
+                {selectedSubcategory ? ` en ${selectedSubcategory}` : ' disponibles'}
               </p>
             </div>
           </div>
@@ -271,31 +353,46 @@ function getProductsArray(data: unknown): Product[] {
         <div className="md:w-3/4">
           {compatibleProducts.length > 0 ? (
             <>
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">
                   {selectedSubcategory 
                     ? `Productos en ${selectedSubcategory}` 
                     : 'Todos los productos de hombre'
                   }
+                  <span className="text-gray-500 ml-2 text-base font-normal">
+                    ({compatibleProducts.length})
+                  </span>
                 </h2>
               </div>
               <ProductGrid products={compatibleProducts} />
             </>
           ) : (
-            <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No se encontraron productos</p>
-              <p className="text-gray-400">
+            <div className="text-center py-20 bg-gray-50 rounded-lg">
+              <div className="text-gray-400 text-6xl mb-4">🛒</div>
+              <p className="text-gray-500 text-lg font-medium mb-2">
+                No se encontraron productos
+              </p>
+              <p className="text-gray-400 mb-6">
                 {selectedSubcategory 
                   ? `Prueba con otra subcategoría o limpia los filtros`
                   : 'No hay productos en la categoría hombre aún'
                 }
               </p>
-              {selectedSubcategory && (
+              {selectedSubcategory ? (
                 <button 
                   onClick={() => setSelectedSubcategory('')}
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   Ver todos los productos
+                </button>
+              ) : (
+                <button 
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center mx-auto"
+                >
+                  <ArrowPathIcon className={`h-5 w-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  Reintentar
                 </button>
               )}
             </div>
