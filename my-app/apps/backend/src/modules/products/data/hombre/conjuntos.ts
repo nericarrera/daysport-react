@@ -11,22 +11,16 @@ export const productosHombre = [
     // Imágenes principales (vista previa)
     images: [
       "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
+      "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg"  // Azul - lateral
     ],
-    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+    mainImage: "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
-      "marron": [
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
-      ],
-      "rojo": [
-        
-      ],
       "verde": [
-       
-      ]
+        "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
+        "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - lateral  // Azul - niño usando
+      ],
     },
 
     // Especificaciones técnicas
@@ -38,8 +32,8 @@ export const productosHombre = [
       "Características": "Costuras reforzadas, Elasticidad mejorada"
     },
 
-    sizes: ["4-6", "6-8", "8-10", "10-12"],
-    colors: ["azul", "rojo", "verde"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["verde"],
     inStock: true,
     stockQuantity: 15,
     featured: true,
@@ -51,44 +45,30 @@ export const productosHombre = [
 
   // SEGUNDO PRODUCTO 
   {
-    name: "Polo Deportivo Infantil Active Fit",
-    price: 25.99,
-    originalPrice: 32.99,
+    name: "Conjunto Deportivo Verano Remera y Short",
+    price: 45.00,
+    originalPrice: 50.99,
     category: "hombre",
-    subcategory: "remeras",
-    brand: "Nike",
-    description: "Polo deportivo para niños con corte moderno y tejido transpirable. Perfecto para escuela y deportes.",
+    subcategory: "conjuntos",
+    brand: "Original",
+    description: "Conjunto deportivo de verano para hombre que incluye remera de manga corta y short. Perfecto para entrenamientos y actividades al aire libre.",
     
     images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500", // Negro - frontal
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"  // Negro - detalle
+      "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg", // Negro - frontal
+      "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg"  // Negro - detalle
     ],
-    mainImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
+    mainImage: "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
 
     colorImages: {
       "negro": [
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800",
-        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800",
-        "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=800",
-        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800",
-        "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800",
-        "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=800"
+        "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-negro-1.jpeg",
       ],
       "blanco": [
-        "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800",
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f19?w=800",
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f20?w=800",
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f21?w=800",
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f22?w=800",
-        "https://images.unsplash.com/photo-1576566580491-39ae920c5f23?w=800"
+        "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
       ],
       "gris": [
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800",
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3106?w=800",
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3107?w=800",
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3108?w=800",
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3109?w=800",
-        "https://images.unsplash.com/photo-1434389677669-e08b4cac3110?w=800"
+        "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-gris-1.jpeg",
+       
       ]
     },
 
@@ -100,7 +80,7 @@ export const productosHombre = [
       "Estampado": "Serigrafía de alta calidad"
     },
 
-    sizes: ["6-8", "8-10", "10-12", "12-14"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
     colors: ["negro", "blanco", "gris"],
     inStock: true,
     stockQuantity: 20,
