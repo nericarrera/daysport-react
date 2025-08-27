@@ -4,7 +4,7 @@ export const camperaslivianasHombre = [
     price: 35.00,
     originalPrice: 40.00,
     category: "hombre",
-    subcategory: "camperaslivianas",
+    subcategory: "camperas-livianas",
     brand: "Original",
     description: "Campera liviana deportiva para hombre, ideal para actividades al aire libre y uso casual. Resistente al viento y al agua.",
     
@@ -54,7 +54,7 @@ export const camperaslivianasHombre = [
     price: 35.99,
     originalPrice: 45.00,
     category: "hombre",
-    subcategory: "camperaslivianas",
+    subcategory: "camperas-livianas",
     brand: "Original",
     description: "Campera liviana deportiva clasica para hombre, ideal para actividades al aire libre y uso casual. Resistente al viento y al agua.",
     

@@ -3,7 +3,10 @@ import { pantalonesHombre } from './pantalones';
 import { shortsHombre } from './shorts';            
 import { buzosHombre } from './buzos';            
 import { camperasHombre } from './camperas';       
-import { camperasLivianasHombre } from './camperaslivianas'; 
+import { camperasLivianasHombre } from './camperas-livianas';
+import { conjuntosHombre } from './conjuntos';
+import { sweatersHombre } from './sweaters';
+
 
 export const productosHombre = [
   ...remerasHombre,
