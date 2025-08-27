@@ -1,16 +1,16 @@
 export const productosHombre = [
   {
-    name: "Pantalon Corte Chino, Recto",
-    price: 36.00,
+    name: "Conjuto Combinado Campera Deportiva y Pantalon",
+    price: 55.00,
     originalPrice: 40.00,
     category: "hombre",
-    subcategory: "pantalones",
+    subcategory: "conjuntos",
     brand: "Original",
-    description: "Pantalon clasico de hombre, corte chino, recto, con bolsillos laterales y traseros. Ideal para uso casual y oficina.",
+    description: "Conjunto deportivo para hombre que incluye campera liviana y pantalon deportivo. Ideal para actividades al aire libre y uso casual.",
     
     // Imágenes principales (vista previa)
     images: [
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+      "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
       "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
     ],
     mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
