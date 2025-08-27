@@ -40,7 +40,7 @@ export const productosHombre = [
       "Características": "Costuras reforzadas, Elasticidad mejorada"
     },
 
-    sizes: ["4-6", "6-8", "8-10", "10-12"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
     colors: ["azul", "rojo", "verde"],
     inStock: true,
     stockQuantity: 15,
@@ -53,6 +53,6 @@ export const productosHombre = [
 
   // SEGUNDO PRODUCTO 
 
-  
+
   // Puedes agregar 8-10 productos más siguiendo la misma estructura...
 ];
