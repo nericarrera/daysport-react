@@ -12,19 +12,19 @@ async function main() {
   for (const productData of productosHombre) {
     await prisma.product.create({
       data: {
-        // CAMPOS OBLIGATORIOS DEL SCHEMA:
+        // CAMPOS OBLIGATORIOS:
         name: productData.name,
         price: productData.price,
         category: productData.category,
-        subcategory: productData.subcategory || '', // ← OBLIGATORIO en schema
-        description: productData.description || '', // ← OBLIGATORIO en schema
-        images: productData.images || [],           // ← OBLIGATORIO (String[])
-        mainImage: productData.mainImage || '',     // ← OBLIGATORIO
-        sizes: productData.sizes || [],             // ← OBLIGATORIO (String[])
-        colors: productData.colors || [],           // ← OBLIGATORIO (String[])
-        inStock: productData.inStock ?? true,       // ← OBLIGATORIO
+        subcategory: productData.subcategory || '',
+        description: productData.description || '',
+        images: productData.images || [],
+        mainImage: productData.mainImage || '',
+        sizes: productData.sizes || [],
+        colors: productData.colors || [],
+        inStock: productData.inStock ?? true,
         
-        // CAMPOS OPCIONALES CON VALORES POR DEFECTO:
+        // CAMPOS OPCIONALES QUE SÍ EXISTEN EN TUS PRODUCTOS:
         originalPrice: productData.originalPrice || null,
         stockQuantity: productData.stockQuantity || 0,
         brand: productData.brand || '',
@@ -32,17 +32,14 @@ async function main() {
         discountPercentage: productData.discountPercentage || 0,
         rating: productData.rating || 0,
         reviewCount: productData.reviewCount || 0,
-        
-        // CAMPOS NUEVOS DEL SCHEMA:
         specifications: productData.specifications || {},
         colorImages: productData.colorImages || {},
-        detailImages: productData.detailImages || [], // ← OBLIGATORIO (String[])
-        sizeGuide: productData.sizeGuide || null,
-        measurements: productData.measurements || null,
         fit: productData.fit || '',
         
-        // Campos automáticos de Prisma (no necesitan valor):
-        // createdAt: auto, updatedAt: auto, id: auto
+        // ⚠️ CAMPOS NUEVOS QUE NO EXISTEN EN TUS PRODUCTOS - COMENTAR TEMPORALMENTE:
+        // detailImages: productData.detailImages || [], // ← COMENTAR
+        // sizeGuide: productData.sizeGuide || null,     // ← COMENTAR  
+        // measurements: productData.measurements || null, // ← COMENTAR
       }
     });
   }
