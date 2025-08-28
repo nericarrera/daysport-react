@@ -97,14 +97,14 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         aria-label={`Ver detalles de ${product.name}`}
       >
         {/* Imagen del producto - CORREGIDO */}
-        <div className="relative h-48 w-full overflow-hidden">
-  <img
-    src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
-    alt={product.name}
-    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-    onError={() => setImageError(true)}
-  />
-</div>
+      <Image
+  src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
+  alt={product.name}
+  fill
+  className="object-cover group-hover:scale-105 transition-transform duration-300"
+  unoptimized={true} // ← Mantén esto
+  onError={() => setImageError(true)}
+/>
 
         <div className="p-4">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[3rem]">
