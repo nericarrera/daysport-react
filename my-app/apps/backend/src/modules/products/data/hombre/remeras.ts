@@ -10,16 +10,16 @@ export const remerasHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
+      "/asset/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+      "/asset/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
     ],
-    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+    mainImage: "/asset/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "marron": [
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
+        "/asset/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+        "/asset/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
       ],
       "rojo": [
         
