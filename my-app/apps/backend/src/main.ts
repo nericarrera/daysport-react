@@ -10,22 +10,33 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   try {
+    // Creamos la app usando NestExpressApplication
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: ['log', 'error', 'warn', 'debug'],
     });
 
+    // Configuración del env
     const configService = app.get(ConfigService);
     const nodeEnv = configService.get('NODE_ENV') || 'development';
     const isProduction = nodeEnv === 'production';
 
+    // ------------------------
+    // CORS dinámico
+    // ------------------------
     const frontendUrls = configService.get<string>('FRONTEND_URL')?.split(',') || [];
-    app.enableCors({
+    const corsOptions = {
       origin: frontendUrls,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
       allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
-    });
+    };
+    app.enableCors(corsOptions);
+    logger.debug(`Modo: ${nodeEnv}`);
+    logger.debug(`CORS habilitado para: ${frontendUrls.join(', ')}`);
 
+    // ------------------------
+    // Validación global de DTOs
+    // ------------------------
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -37,14 +48,22 @@ async function bootstrap() {
     );
 
     // ------------------------
-    // Servir carpeta de imágenes
+    // Servir carpeta de imágenes (assets)
     // ------------------------
-    const assetsPath = join(__dirname, '..', 'assets'); // Ajuste seguro desde src/
-    logger.debug(`📂 Servir assets desde: ${assetsPath}`);
-    logger.debug('📂 Existe la carpeta?', existsSync(assetsPath));
+    // Ajuste seguro: desde src/ hacia la carpeta assets en la raíz del backend
+    const assetsPath = join(__dirname, '..', 'assets');
+    if (!existsSync(assetsPath)) {
+      logger.error(`❌ La carpeta de assets no existe: ${assetsPath}`);
+    } else {
+      logger.log(`📂 Servir assets desde: ${assetsPath}`);
+      app.useStaticAssets(assetsPath, {
+        prefix: '/assets/', // Se accede como http://localhost:3001/assets/...
+      });
+    }
 
-    app.useStaticAssets(assetsPath, { prefix: '/assets/' });
-
+    // ------------------------
+    // Puerto y host
+    // ------------------------
     const port = configService.get<number>('PORT') || 3001;
     const host = configService.get('HOST') || '0.0.0.0';
 
