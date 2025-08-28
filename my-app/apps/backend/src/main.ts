@@ -51,7 +51,7 @@ async function bootstrap() {
     // ------------------------
     // Servir carpeta de imágenes (assets/images)
     // ------------------------
-    const assetsPath = join(process.cwd(), 'assets', 'images');
+    const assetsPath = join(process.cwd(), 'assets');
     app.useStaticAssets(assetsPath, {
       prefix: '/images/', // URL: http://localhost:3001/images/tu-imagen.jpg
     });
