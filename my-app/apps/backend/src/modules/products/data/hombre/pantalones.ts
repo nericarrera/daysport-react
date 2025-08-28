@@ -1,8 +1,10 @@
+const BACKEND_URL = 'http://localhost:3001';
+
 export const pantalonesHombre = [
   {
     name: "Pantalon Corte Chino, Recto",
-    price: 36.00,
-    originalPrice: 40.00,
+    price: 36.0,
+    originalPrice: 40.0,
     category: "hombre",
     subcategory: "pantalones",
     brand: "Original",
@@ -10,26 +12,21 @@ export const pantalonesHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
+      `${BACKEND_URL}/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg`,
+      `${BACKEND_URL}/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg`
     ],
-    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+    mainImage: `${BACKEND_URL}/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg`,
 
-    // Imágenes detalladas por color (6-8 fotos por color)
+    // Imágenes detalladas por color
     colorImages: {
       "marron": [
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
+        `${BACKEND_URL}/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg`,
+        `${BACKEND_URL}/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg`
       ],
-      "rojo": [
-        
-      ],
-      "verde": [
-       
-      ]
+      "rojo": [],
+      "verde": []
     },
 
-    // Especificaciones técnicas
     specifications: {
       "Material": "100% Poliéster",
       "Tecnología": "Dry-Fit, Anti-humedad",
@@ -49,7 +46,6 @@ export const pantalonesHombre = [
     fit: "regular"
   },
 
-  // SEGUNDO PRODUCTO 
   {
     name: "Polo Deportivo Infantil Active Fit",
     price: 25.99,
@@ -60,8 +56,8 @@ export const pantalonesHombre = [
     description: "Polo deportivo para niños con corte moderno y tejido transpirable. Perfecto para escuela y deportes.",
     
     images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500", // Negro - frontal
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"  // Negro - detalle
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"
     ],
     mainImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
 
@@ -110,6 +106,4 @@ export const pantalonesHombre = [
     reviewCount: 45,
     fit: "ajustado"
   }
-
-  // Puedes agregar 8-10 productos más siguiendo la misma estructura...
 ];
