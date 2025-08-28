@@ -93,7 +93,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         {/* Imagen del producto */}
         <div className="relative h-48 w-full overflow-hidden">
           <Image
-  src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || '/images/placeholder.jpg')}
+  src={imageError ? '/images/placeholder.jpg' : (product.mainImage || '/images/placeholder.jpg')}
   alt={product.name}
   fill
   className="object-cover group-hover:scale-105 transition-transform duration-300"
