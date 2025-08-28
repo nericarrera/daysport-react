@@ -2,21 +2,25 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
+    "lib": ["ES2022"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "baseUrl": "./",
     "types": ["node", "jest"],
     "paths": {
       "@app/*": ["src/*"],
-      "@auth/*": ["src/modules/user/*"]
-    },
-    
+      "@auth/*": ["src/modules/auth/*"],
+      "@user/*": ["src/modules/user/*"],
+      "@products/*": ["src/modules/products/*"],
+      "@prisma/*": ["../../prisma/*"]
+    }
   },
-  "include": ["src/**/*", "prisma.config.ts", "scripts"],
-  "exclude": ["../../node_modules", "test", "dist"]
+  "include": ["src/**/*", "prisma.config.ts", "scripts/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
 }

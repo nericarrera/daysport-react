@@ -9,7 +9,7 @@ export class ProductsService {
   async getProducts(category?: string, subcategory?: string) {
     try {
       console.log('📦 Fetching products with filters:', { category, subcategory });
-      
+
       const where: any = {};
       if (category) where.category = category;
       if (subcategory) where.subcategory = subcategory;
@@ -19,16 +19,14 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      // Agregar URL completa de la imagen
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      const productsWithImages = products.map(p => ({
+      const productsWithImages = products.map((p) => ({
         ...p,
         mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
       }));
 
       console.log('✅ Products found:', productsWithImages.length);
       return { products: productsWithImages, total: productsWithImages.length };
-      
     } catch (error) {
       console.error('❌ Error in getProducts:', error);
       throw new Error('Error fetching products');
@@ -59,7 +57,7 @@ export class ProductsService {
       });
 
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      const productsWithImages = products.map(p => ({
+      const productsWithImages = products.map((p) => ({
         ...p,
         mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
       }));
