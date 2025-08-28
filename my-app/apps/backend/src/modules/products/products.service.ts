@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Prisma, Product } from '.prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -11,8 +11,9 @@ export class ProductsService {
       console.log('📦 Fetching products with filters:', { category, subcategory });
 
       const where: Prisma.ProductWhereInput = {};
-      if (category) where.category = category;
-      if (subcategory) where.subcategory = subcategory;
+
+      if (category) where.category = { equals: category };
+      if (subcategory) where.subcategory = { equals: subcategory };
 
       const products: Product[] = await this.prisma.product.findMany({
         where,
@@ -35,7 +36,9 @@ export class ProductsService {
 
   async getProductById(id: number) {
     try {
-      const product: Product | null = await this.prisma.product.findUnique({ where: { id } });
+      const product: Product | null = await this.prisma.product.findUnique({
+        where: { id },
+      });
       if (!product) throw new Error('Product not found');
 
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
