@@ -1,8 +1,8 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { CartProvider } from '../components/CartContext';
-import Header from '../components/Header'; // Ajusta la ruta
-import Footer from '../components/Footer'; // Ajusta la ruta
+import { CartProvider } from './components/CartContext';
+import Navbar from './components/Navbar'; // Ajusta la ruta
+import Footer from './components/Footer'; // Ajusta la ruta
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <CartProvider>
-          <Header />
+          <Navbar />
           <main className="flex-grow">
             {children}
           </main>
