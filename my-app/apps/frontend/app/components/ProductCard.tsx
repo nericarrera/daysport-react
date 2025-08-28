@@ -23,7 +23,6 @@ const COLOR_MAP: Record<string, string> = {
 
 export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
 
   const getColorHex = useCallback((color: string): string => {
     return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
@@ -65,11 +64,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
   const handleImageError = useCallback(() => {
     setImageError(true);
-    setImageLoading(false);
-  }, []);
-
-  const handleImageLoad = useCallback(() => {
-    setImageLoading(false);
   }, []);
 
   return (
@@ -83,24 +77,20 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
       </div>
 
       <Link href={`/producto/${product.id}`} className="block relative flex-grow" aria-label={`Ver detalles de ${product.name}`}>
-        {/* Imagen del producto - VERSIÓN CORREGIDA */}
+        {/* IMAGEN - VERSIÓN SIMPLIFICADA Y FUNCIONANDO */}
         <div className="relative h-48 w-full overflow-hidden">
-          {imageLoading && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
-          )}
           <Image
             src={imageSrc}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
             unoptimized={true}
             onError={handleImageError}
-            onLoad={handleImageLoad}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           
           {!isOutOfStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300 z-20" />
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
           )}
         </div>
 
