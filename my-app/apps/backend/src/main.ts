@@ -14,7 +14,9 @@ async function bootstrap() {
       logger: ['log', 'error', 'warn', 'debug'],
     });
 
+    // ------------------------
     // Configuración de .env
+    // ------------------------
     const configService = app.get(ConfigService);
     const nodeEnv = configService.get('NODE_ENV') || 'development';
     const isProduction = nodeEnv === 'production';
@@ -23,13 +25,12 @@ async function bootstrap() {
     // CORS dinámico
     // ------------------------
     const frontendUrls = configService.get<string>('FRONTEND_URL')?.split(',') || [];
-    const corsOptions = {
+    app.enableCors({
       origin: frontendUrls,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
       allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
-    };
-    app.enableCors(corsOptions);
+    });
 
     logger.debug(`Modo: ${nodeEnv}`);
     logger.debug(`CORS habilitado para: ${frontendUrls.join(', ')}`);
@@ -48,11 +49,11 @@ async function bootstrap() {
     );
 
     // ------------------------
-    // Servir carpeta de imágenes (assets)
+    // Servir carpeta de imágenes (assets/images)
     // ------------------------
-    const assetsPath = join(process.cwd(), 'assets'); 
+    const assetsPath = join(process.cwd(), 'assets', 'images');
     app.useStaticAssets(assetsPath, {
-      prefix: '/assets/', // se accede como http://localhost:3001/assets/imagen.jpg
+      prefix: '/images/', // URL: http://localhost:3001/images/tu-imagen.jpg
     });
 
     logger.debug(`📂 Assets servidos desde: ${assetsPath}`);
@@ -64,7 +65,7 @@ async function bootstrap() {
     const host = configService.get('HOST') || '0.0.0.0';
 
     await app.listen(port, host);
-    logger.log(`🚀 Servidor escuchando en ${await app.getUrl()}`);
+    logger.log(`🚀 Servidor corriendo en ${await app.getUrl()}`);
   } catch (error) {
     logger.error('❌ Error al iniciar la aplicación:', error);
     process.exit(1);

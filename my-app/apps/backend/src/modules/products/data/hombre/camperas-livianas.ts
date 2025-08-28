@@ -10,21 +10,21 @@ export const camperaslivianasHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/assets/images/hombre/camperaslivianas/campera-liviana-combinada-abc-1.jpeg", // Azul - frontal
-      "/assets/images/hombre/camperaslivianas/campera-liviana-combinada-azulvioleta-1.jpeg"  // Azul - lateral
+      "/images/hombre/camperaslivianas/campera-liviana-combinada-abc-1.jpeg", // Azul - frontal
+      "/images/hombre/camperaslivianas/campera-liviana-combinada-azulvioleta-1.jpeg"  // Azul - lateral
     ],
-    mainImage: "/assets/images/hombre/camperaslivianas/campera-liviana-combinada-abc-1.jpeg",
+    mainImage: "/images/hombre/camperaslivianas/campera-liviana-combinada-abc-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "azul": [
-        "/assets/images/hombre/camperaslivianas/campera-liviana-combinada-azulvioleta-1.jpeg", // Azul - frontal
+        "/images/hombre/camperaslivianas/campera-liviana-combinada-azulvioleta-1.jpeg", // Azul - frontal
       ],
       "gris": [
-        "/assets/images/hombre/camperaslivianas/campera-liviana-combinada-gtbg-1.jpeg",
+        "/images/hombre/camperaslivianas/campera-liviana-combinada-gtbg-1.jpeg",
       ],
       "negro": [
-       "/assets/images/hombre/camperaslivianas/campera-liviana-combinada-nbg-1.jpeg",
+       "/images/hombre/camperaslivianas/campera-liviana-combinada-nbg-1.jpeg",
       ]
     },
 
@@ -59,18 +59,18 @@ export const camperaslivianasHombre = [
     description: "Campera liviana deportiva clasica para hombre, ideal para actividades al aire libre y uso casual. Resistente al viento y al agua.",
     
     images: [
-      "/assets/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg", // Negro - frontal
-      "/assets/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg"  // Negro - detalle
+      "/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg", // Negro - frontal
+      "/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg"  // Negro - detalle
     ],
-    mainImage: "/assets/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg",
+    mainImage: "/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg",
 
     colorImages: {
       "gris": [
-        "/assets/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg",
+        "/images/hombre/camperaslivianas/campera-liviana-lisa-cnegro-1.jpeg",
        
       ],
       "negro": [
-        "/assets/images/hombre/camperaslivianas/campera-liviana-lisa-negro-1.jpeg",
+        "/images/hombre/camperaslivianas/campera-liviana-lisa-negro-1.jpeg",
         
       ],
     },

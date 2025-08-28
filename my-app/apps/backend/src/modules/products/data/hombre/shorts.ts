@@ -10,16 +10,16 @@ export const shortsHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-      "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
+      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+      "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
     ],
-    mainImage: "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+    mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "marron": [
-        "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-        "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
+        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
       ],
       "rojo": [
         
