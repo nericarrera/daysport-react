@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Añadido useEffect
 import { Product } from '../types/product';
 import AddToCartButton from './AddToCartButton';
 
@@ -13,6 +13,32 @@ interface ProductCardProps {
 export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   
+  // DEBUG EXTREMO - Agregado
+  useEffect(() => {
+    const imgUrl = product.mainImageUrl || product.mainImage;
+    console.log('🔍 IMAGE DEBUG:', {
+      url: imgUrl,
+      exists: !!imgUrl,
+      isExternal: imgUrl?.includes('http'),
+      isLocalhost: imgUrl?.includes('localhost')
+    });
+
+    // Test real de la imagen
+    if (imgUrl) {
+      fetch(imgUrl)
+        .then(response => {
+          console.log('🌐 Image fetch status:', response.status);
+          return response.blob();
+        })
+        .then(blob => {
+          console.log('✅ Image loaded successfully, size:', blob.size);
+        })
+        .catch(error => {
+          console.log('❌ Image fetch failed:', error);
+        });
+    }
+  }, [product]);
+
   const getColorHex = (color: string): string => {
     const colorMap: Record<string, string> = {
       'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
@@ -73,13 +99,13 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         {/* Imagen del producto - CORREGIDO */}
         <div className="relative h-48 w-full overflow-hidden">
           <Image
-  src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
-  alt={product.name}
-  fill
-  className="object-cover group-hover:scale-105 transition-transform duration-300"
-  unoptimized={true} // ← ¡ESTA LÍNEA ES MÁGICA!
-  onError={() => setImageError(true)}
-/>
+            src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            unoptimized={true} // ← ¡ESTA LÍNEA ES MÁGICA!
+            onError={() => setImageError(true)}
+          />
           
           {!isOutOfStock && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
