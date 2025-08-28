@@ -50,7 +50,7 @@ async function bootstrap() {
     // Servir carpeta de imágenes (assets)
     // ------------------------
     // Ruta absoluta segura: desde la raíz del proyecto backend
-    const assetsPath = join(process.cwd(), 'apps', 'backend', 'assets');
+    const assetsPath = join(__dirname, '..', '..', 'assets');
     if (!existsSync(assetsPath)) {
       logger.error(`❌ La carpeta de assets no existe: ${assetsPath}`);
     } else {
