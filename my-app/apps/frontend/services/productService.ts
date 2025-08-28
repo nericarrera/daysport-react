@@ -1,16 +1,16 @@
 import { Product } from '../app/types/product';
 
-// Usamos fetch universal: funciona tanto en servidor como en cliente
-const _fetch = typeof window !== 'undefined' ? window.fetch : fetch;
+// Usamos fetch universal para cliente y servidor
+const _fetch = globalThis.fetch;
 
 // Configuración de la API
 const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001',
-  TIMEOUT: 15000, // Timeout
-  RETRY_ATTEMPTS: 3, // Reintentos
+  TIMEOUT: 15000, // Timeout en ms
+  RETRY_ATTEMPTS: 3, // Número de reintentos
 } as const;
 
-// Tipos de error personalizados
+// Errores personalizados
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -36,7 +36,7 @@ export class TimeoutError extends Error {
   }
 }
 
-// Tipo para la respuesta de la API
+// Tipo de respuesta
 interface ProductsResponse {
   products?: Product[];
   message?: string;
@@ -63,7 +63,6 @@ export class ProductService {
           ...options.headers,
         },
       });
-
       clearTimeout(timeoutId);
       return response;
     } catch (error) {
@@ -86,7 +85,6 @@ export class ProductService {
         `HTTP error! status: ${response.status}`
       );
     }
-
     try {
       return await response.json();
     } catch {
@@ -94,7 +92,7 @@ export class ProductService {
     }
   }
 
-  // Reintentos
+  // Reintentos con backoff
   private static async retry<T>(
     fn: () => Promise<T>,
     retries: number = API_CONFIG.RETRY_ATTEMPTS
@@ -121,7 +119,7 @@ export class ProductService {
     );
   }
 
-  // Extraer productos de respuesta
+  // Extraer productos de la respuesta
   private static extractProductsFromResponse(
     data: ProductsResponse | Product[]
   ): Product[] {
@@ -156,7 +154,6 @@ export class ProductService {
   // Obtener producto por ID
   static async getProductById(id: string): Promise<Product | null> {
     const url = `${API_CONFIG.BASE_URL}/api/products/${id}`;
-
     try {
       const response = await this.fetchWithTimeout(url);
       const product = await this.handleResponse<Product>(response);
