@@ -13,7 +13,7 @@ export const pantalonesHombre = [
       "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
       "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
     ],
-    mainImage: "/asset/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+    mainImage: "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
