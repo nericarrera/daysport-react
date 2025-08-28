@@ -2,17 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   try {
-    // Creamos la app con logging completo
-    const app = await NestFactory.create(AppModule, {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: ['log', 'error', 'warn', 'debug'],
     });
 
-    // Obtenemos configuración desde .env
     const configService = app.get(ConfigService);
     const nodeEnv = configService.get('NODE_ENV') || 'development';
     const isProduction = nodeEnv === 'production';
@@ -37,13 +37,20 @@ async function bootstrap() {
     // ------------------------
     app.useGlobalPipes(
       new ValidationPipe({
-        whitelist: true,                 // elimina propiedades no declaradas en DTO
-        forbidNonWhitelisted: true,      // lanza error si llegan propiedades extras
-        transform: true,                 // transforma payload a clases DTO
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
         transformOptions: { enableImplicitConversion: true },
-        disableErrorMessages: isProduction, // en producción no mostramos detalles
+        disableErrorMessages: isProduction,
       }),
     );
+
+    // ------------------------
+    // Servir imágenes estáticas desde backend/assets/images
+    // ------------------------
+    app.useStaticAssets(join(__dirname, '..', 'assets/images'), {
+      prefix: '/assets/images',
+    });
 
     // ------------------------
     // Configuración de puerto y host
