@@ -8,24 +8,24 @@ const nextConfig = {
     ];
   },
   images: {
-    // PERMITE imágenes HTTP locales
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    
-    // Configuración más permisiva
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',
-        pathname: '/**', // Permite TODAS las rutas
+        pathname: '/assets/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
       }
     ],
-    
-    // Desactiva completamente la optimización
-    unoptimized: true,
+    // Solo desactiva optimización en desarrollo
+    unoptimized: process.env.NODE_ENV === 'development',
   },
+  
+  // Para producción, considera usar HTTPS o un CDN
 };
 
 module.exports = nextConfig;
