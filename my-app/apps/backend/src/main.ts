@@ -53,7 +53,7 @@ async function bootstrap() {
     // ------------------------
     const assetsPath = join(process.cwd(), 'assets');
     app.useStaticAssets(assetsPath, {
-      prefix: '/images/', // URL: http://localhost:3001/images/tu-imagen.jpg
+      prefix: '/assets/', // URL: http://localhost:3001/images/tu-imagen.jpg
     });
 
     logger.debug(`📂 Assets servidos desde: ${assetsPath}`);
