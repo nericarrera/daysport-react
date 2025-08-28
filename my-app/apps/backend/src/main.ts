@@ -2,23 +2,25 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   try {
+    // Creamos la app usando NestExpressApplication
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: ['log', 'error', 'warn', 'debug'],
     });
 
+    // Configuración de .env
     const configService = app.get(ConfigService);
     const nodeEnv = configService.get('NODE_ENV') || 'development';
     const isProduction = nodeEnv === 'production';
 
     // ------------------------
-    // Configuración CORS dinámica
+    // CORS dinámico
     // ------------------------
     const frontendUrls = configService.get<string>('FRONTEND_URL')?.split(',') || [];
     const corsOptions = {
@@ -46,14 +48,15 @@ async function bootstrap() {
     );
 
     // ------------------------
-    // Servir imágenes estáticas desde backend/assets/images
+    // Servir carpeta de imágenes
     // ------------------------
-    app.useStaticAssets(join(__dirname, '..', 'assets/images'), {
-      prefix: '/assets/images',
+    const assetsPath = join(__dirname, '../../assets'); // apunta a my-app/assets
+    app.useStaticAssets(assetsPath, {
+      prefix: '/assets', // se accede como http://localhost:3001/assets/images/...
     });
 
     // ------------------------
-    // Configuración de puerto y host
+    // Puerto y host
     // ------------------------
     const port = configService.get<number>('PORT') || 3001;
     const host = configService.get('HOST') || '0.0.0.0';
