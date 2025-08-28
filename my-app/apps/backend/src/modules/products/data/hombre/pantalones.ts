@@ -1,5 +1,3 @@
-const BACKEND_URL = 'http://localhost:3001';
-
 export const pantalonesHombre = [
   {
     name: "Pantalon Corte Chino, Recto",
@@ -10,18 +8,18 @@ export const pantalonesHombre = [
     brand: "Original",
     description: "Pantalon clasico de hombre, corte chino, recto, con bolsillos laterales y traseros. Ideal para uso casual y oficina.",
     
-    // Imágenes principales (vista previa)
+    // ✅ USAR RUTAS RELATIVAS - CORREGIDO
     images: [
-     `${BACKEND_URL}/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg`,
-  `${BACKEND_URL}/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg`
+      "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+      "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"
     ],
-    mainImage: `${BACKEND_URL}/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg`,
+    mainImage: "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
 
-    // Imágenes detalladas por color
+    // ✅ RUTAS RELATIVAS - CORREGIDO
     colorImages: {
       "marron": [
-        `${BACKEND_URL}/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg`,
-        `${BACKEND_URL}/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg`
+        "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+        "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"
       ],
       "rojo": [],
       "verde": []
