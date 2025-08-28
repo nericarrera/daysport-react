@@ -26,6 +26,18 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
+  // Debug solo en desarrollo
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const imgUrl = product.mainImageUrl || product.mainImage;
+      console.log('🔍 IMAGE DEBUG:', {
+        url: imgUrl,
+        exists: !!imgUrl,
+        isExternal: imgUrl?.includes('http'),
+        isLocalhost: imgUrl?.includes('localhost')
+      });
+    }
+  }, [product]);
 
   const getColorHex = useCallback((color: string): string => {
     return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';

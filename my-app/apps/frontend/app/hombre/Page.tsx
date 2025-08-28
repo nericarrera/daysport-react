@@ -315,41 +315,6 @@ export default function HombrePage() {
         </div>
       </div>
 
-      {/* Información de debug (solo desarrollo) - AMPLIADO */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
-          <h3 className="font-bold text-yellow-800 flex items-center">
-            <span className="mr-2">🐛</span>
-            DEBUG INFO DETALLADA:
-          </h3>
-          <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
-            <span>Productos totales:</span>
-            <span className="font-mono">{allProducts.length}</span>
-            
-            <span>Productos filtrados:</span>
-            <span className="font-mono">{filteredProducts.length}</span>
-            
-            <span>Subcategoría activa:</span>
-            <span className="font-mono capitalize">{selectedSubcategory || 'Ninguna'}</span>
-            
-            {allProducts.length > 0 && (
-              <>
-                <span>Primer producto ID:</span>
-                <span className="font-mono">{allProducts[0].id}</span>
-                
-                <span>Primer producto nombre:</span>
-                <span className="font-mono truncate">{allProducts[0].name}</span>
-                
-                <span>Tiene mainImageUrl:</span>
-                <span className="font-mono">{allProducts[0].mainImageUrl ? '✅ Sí' : '❌ No'}</span>
-                
-                <span>Tiene mainImage:</span>
-                <span className="font-mono">{allProducts[0].mainImage ? '✅ Sí' : '❌ No'}</span>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Contenido */}
       <div className="flex flex-col md:flex-row gap-8">
