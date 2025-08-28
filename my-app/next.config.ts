@@ -12,7 +12,7 @@ const nextConfig = {
     ];
   },
   images: {
-    // Dominios permitidos (forma alternativa)
+    // Dominios permitidos
     domains: ['localhost', 'images.unsplash.com'],
     
     // Patrones remotos más específicos
@@ -21,7 +21,7 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',
-        pathname: '/assets/images/**', // Más específico
+        pathname: '/assets/images/**',
       },
       {
         protocol: 'https',
@@ -40,7 +40,8 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  // Agrega logging para debug
+  
+  // Agrega logging para debug (OPCIONAL - puede generar muchos logs)
   logging: {
     fetches: {
       fullUrl: true,
