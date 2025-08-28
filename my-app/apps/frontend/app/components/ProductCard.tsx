@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react'; // Añadido useEffect
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Product } from '../types/product';
 import AddToCartButton from './AddToCartButton';
 
@@ -10,63 +10,88 @@ interface ProductCardProps {
   showNewBadge?: boolean;
 }
 
+// Mapa de colores fuera del componente para mejor rendimiento
+const COLOR_MAP: Record<string, string> = {
+  'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
+  'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
+  'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
+  'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
+  'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
+  'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
+  'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
+  'ocre': '#cc7722', 'vino': '#722f37'
+};
+
 export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
-  
-  // DEBUG EXTREMO - Agregado
-  useEffect(() => {
-    const imgUrl = product.mainImageUrl || product.mainImage;
-    console.log('🔍 IMAGE DEBUG:', {
-      url: imgUrl,
-      exists: !!imgUrl,
-      isExternal: imgUrl?.includes('http'),
-      isLocalhost: imgUrl?.includes('localhost')
-    });
+  const [imageLoading, setImageLoading] = useState(true);
 
-    // Test real de la imagen
-    if (imgUrl) {
-      fetch(imgUrl)
-        .then(response => {
-          console.log('🌐 Image fetch status:', response.status);
-          return response.blob();
-        })
-        .then(blob => {
-          console.log('✅ Image loaded successfully, size:', blob.size);
-        })
-        .catch(error => {
-          console.log('❌ Image fetch failed:', error);
-        });
+  // Debug solo en desarrollo
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const imgUrl = product.mainImageUrl || product.mainImage;
+      console.log('🔍 IMAGE DEBUG:', {
+        url: imgUrl,
+        exists: !!imgUrl,
+        isExternal: imgUrl?.includes('http'),
+        isLocalhost: imgUrl?.includes('localhost')
+      });
     }
   }, [product]);
 
-  const getColorHex = (color: string): string => {
-    const colorMap: Record<string, string> = {
-      'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
-      'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
-      'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
-      'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
-      'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
-      'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
-      'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
-      'ocre': '#cc7722', 'vino': '#722f37'
-    };
+  const getColorHex = useCallback((color: string): string => {
+    return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
+  }, []);
+
+  // Memoizar cálculos costosos
+  const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
+    const hasDiscount = product.originalPrice && product.originalPrice > product.price;
+    const discountPercentage = hasDiscount 
+      ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
+      : 0;
+
+    const isNew = showNewBadge && product.createdAt 
+      ? (new Date().getTime() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
+      : false;
+
+    const isOutOfStock = (product.stockQuantity === 0 || !product.inStock);
+
+    return { hasDiscount, discountPercentage, isNew, isOutOfStock };
+  }, [product, showNewBadge]);
+
+  // Determinar el estado de stock
+  const stockStatus = useMemo(() => {
+    if (isOutOfStock) return { text: '❌ Agotado', color: 'text-red-600' };
     
-    return colorMap[color.toLowerCase()] || '#f0f0f0';
-  };
+    if (product.stockQuantity && product.stockQuantity > 10) {
+      return { text: '✅ Disponible', color: 'text-green-600' };
+    }
+    
+    return { 
+      text: `⚠️ Últimas ${product.stockQuantity} unidades`, 
+      color: 'text-orange-600' 
+    };
+  }, [isOutOfStock, product.stockQuantity]);
 
-  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
-  const discountPercentage = hasDiscount 
-    ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
-    : 0;
+  // URL de la imagen con fallback
+  const imageSrc = useMemo(() => {
+    return imageError 
+      ? '/images/placeholder.jpg' 
+      : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg');
+  }, [imageError, product.mainImageUrl, product.mainImage]);
 
-  const isNew = showNewBadge && product.createdAt 
-    ? (new Date().getTime() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
-    : false;
+  // Manejo de errores de imagen
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+    setImageLoading(false);
+  }, []);
 
-  const isOutOfStock = (product.stockQuantity === 0 || !product.inStock);
+  const handleImageLoad = useCallback(() => {
+    setImageLoading(false);
+  }, []);
 
   return (
-    <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
+    <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
       {/* Badges superpuestos */}
       <div className="absolute top-2 left-2 z-10 flex flex-col space-y-1">
         {isNew && (
@@ -93,23 +118,32 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
       <Link 
         href={`/producto/${product.id}`} 
-        className="block relative"
+        className="block relative flex-grow"
         aria-label={`Ver detalles de ${product.name}`}
       >
-        {/* Imagen del producto - CORREGIDO */}
-  <div className="relative h-48 w-full overflow-hidden">
-  <Image
-    src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
-    alt={product.name}
-    fill
-    className="object-cover group-hover:scale-105 transition-transform duration-300"
-    unoptimized={true}
-    onError={() => setImageError(true)}
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
-</div>
+        {/* Imagen del producto con skeleton loading */}
+        <div className="relative h-48 w-full overflow-hidden">
+          {imageLoading && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse z-10"></div>
+          )}
+          <Image
+            src={imageSrc}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            unoptimized={true}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          
+          {!isOutOfStock && (
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
+          )}
+        </div>
 
-        <div className="p-4">
+        {/* Contenido de la tarjeta */}
+        <div className="p-4 flex-grow">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[3rem]">
             {product.name}
           </h3>
@@ -130,6 +164,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             )}
           </div>
 
+          {/* Precio */}
           <div className="mb-3">
             {hasDiscount ? (
               <div className="flex items-center space-x-2">
@@ -147,6 +182,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             )}
           </div>
 
+          {/* Rating */}
           {product.rating && (
             <div className="flex items-center mb-3">
               <div className="flex text-yellow-400">
@@ -164,6 +200,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </div>
           )}
 
+          {/* Colores */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
@@ -172,9 +209,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                   <span
                     key={index}
                     className="w-5 h-5 rounded-full border-2 border-gray-200 shadow-sm"
-                    style={{ 
-                      backgroundColor: getColorHex(color)
-                    }}
+                    style={{ backgroundColor: getColorHex(color) }}
                     title={color.charAt(0).toUpperCase() + color.slice(1)}
                   />
                 ))}
@@ -187,6 +222,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </div>
           )}
 
+          {/* Tallas */}
           {product.sizes && product.sizes.length > 0 && product.sizes[0] !== 'Único' && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Tallas:</p>
@@ -208,15 +244,10 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </div>
           )}
 
+          {/* Estado de stock y envío */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <span className={`text-sm font-medium ${
-              !isOutOfStock && product.stockQuantity && product.stockQuantity > 10 ? 'text-green-600' : 
-              !isOutOfStock && product.stockQuantity && product.stockQuantity > 0 ? 'text-orange-600' : 'text-red-600'
-            }`}>
-              {!isOutOfStock ? (
-                product.stockQuantity && product.stockQuantity > 10 ? '✅ Disponible' : 
-                `⚠️ Últimas ${product.stockQuantity} unidades`
-              ) : '❌ Agotado'}
+            <span className={`text-sm font-medium ${stockStatus.color}`}>
+              {stockStatus.text}
             </span>
             
             {product.price > 50 && !isOutOfStock && (
@@ -228,7 +259,8 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         </div>
       </Link>
 
-      <div className="px-4 pb-4">
+      {/* Botones de acción */}
+      <div className="px-4 pb-4 mt-auto">
         <AddToCartButton 
           product={product} 
           disabled={isOutOfStock}
