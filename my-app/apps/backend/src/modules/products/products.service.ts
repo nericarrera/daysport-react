@@ -1,17 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 
+// Interfaz para el producto de Prisma
+interface PrismaProduct {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  subcategory?: string;
+  mainImage: string;
+  images?: string[];
+  colorImages?: Record<string, string[]>;
+  featured?: boolean;
+  inStock: boolean;
+  sizes?: string[];
+  colors?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  private buildImageUrl(filename: string): string {
+  private buildImageUrl(imagePath: string): string {
     const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-    return `${host}/assets/images/products/${filename}`;
+    
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/assets/')) return `${host}${imagePath}`;
+    if (imagePath.startsWith('/images/')) return `${host}/assets${imagePath}`;
+    if (imagePath.startsWith('images/')) return `${host}/assets/${imagePath}`;
+    
+    return `${host}/assets/images/${imagePath}`;
   }
 
   private buildColorImages(colorImages: Record<string, string[]>): Record<string, string[]> {
-    const host = process.env.HOST_BACKEND || 'http://localhost:3001';
     return Object.fromEntries(
       Object.entries(colorImages).map(([color, images]) => [
         color,
@@ -31,10 +55,19 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      const productsWithImages = products.map((p: any) => ({
+      // DEBUG: Ver qué hay en la base de datos
+      console.log('📦 Productos de BD:', products.map((p: PrismaProduct) => ({
+        id: p.id,
+        name: p.name,
+        mainImage: p.mainImage,
+        images: p.images
+      })));
+
+      const productsWithImages = products.map((p: PrismaProduct) => ({
         ...p,
         mainImageUrl: this.buildImageUrl(p.mainImage),
-        colorImages: p.colorImages ? this.buildColorImages(p.colorImages as Record<string, string[]>) : {},
+        images: p.images ? p.images.map((img: string) => this.buildImageUrl(img)) : [],
+        colorImages: p.colorImages ? this.buildColorImages(p.colorImages) : {},
       }));
 
       return { products: productsWithImages, total: productsWithImages.length };
@@ -46,13 +79,17 @@ export class ProductsService {
 
   async getProductById(id: number) {
     try {
-      const product = await this.prisma.product.findUnique({ where: { id } });
+      const product = await this.prisma.product.findUnique({ 
+        where: { id } 
+      }) as PrismaProduct | null;
+      
       if (!product) throw new NotFoundException('Product not found');
 
       return { 
         ...product, 
         mainImageUrl: this.buildImageUrl(product.mainImage),
-        colorImages: product.colorImages ? this.buildColorImages(product.colorImages as Record<string, string[]>) : {},
+        images: product.images ? product.images.map(img => this.buildImageUrl(img)) : [],
+        colorImages: product.colorImages ? this.buildColorImages(product.colorImages) : {},
       };
     } catch (error) {
       console.error('❌ Error fetching product:', error);
@@ -66,12 +103,13 @@ export class ProductsService {
         where: { featured: true },
         take: 10,
         orderBy: { createdAt: 'desc' },
-      });
+      }) as PrismaProduct[];
 
-      const productsWithImages = products.map((p: any) => ({
+      const productsWithImages = products.map((p: PrismaProduct) => ({
         ...p,
         mainImageUrl: this.buildImageUrl(p.mainImage),
-        colorImages: p.colorImages ? this.buildColorImages(p.colorImages as Record<string, string[]>) : {},
+        images: p.images ? p.images.map((img: string) => this.buildImageUrl(img)) : [],
+        colorImages: p.colorImages ? this.buildColorImages(p.colorImages) : {},
       }));
 
       return { products: productsWithImages, total: productsWithImages.length };
