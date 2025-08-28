@@ -122,12 +122,15 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         aria-label={`Ver detalles de ${product.name}`}
       >
         {/* Imagen del producto con skeleton loading */}
-       <div className="relative h-48 w-full overflow-hidden">
+   <div className="relative h-48 w-full overflow-hidden">
+  {imageLoading && (
+    <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div> // ← z-0 en lugar de z-10
+  )}
   <Image
     src={imageSrc}
     alt={product.name}
     fill
-    className="object-cover group-hover:scale-105 transition-transform duration-300"
+    className="object-cover group-hover:scale-105 transition-transform duration-300 z-10" // ← Agrega z-10 aquí
     unoptimized={true}
     onError={handleImageError}
     onLoad={handleImageLoad}
