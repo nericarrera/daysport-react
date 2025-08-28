@@ -10,6 +10,16 @@ export class ProductsService {
     return `${host}/assets/images/products/${filename}`;
   }
 
+  private buildColorImages(colorImages: Record<string, string[]>): Record<string, string[]> {
+    const host = process.env.HOST_BACKEND || 'http://localhost:3001';
+    return Object.fromEntries(
+      Object.entries(colorImages).map(([color, images]) => [
+        color,
+        images.map(img => `${host}/assets/images/products/${img}`)
+      ])
+    );
+  }
+
   async getProducts(category?: string, subcategory?: string) {
     try {
       const where: any = {};
@@ -24,6 +34,7 @@ export class ProductsService {
       const productsWithImages = products.map((p: typeof products[number]) => ({
         ...p,
         mainImageUrl: this.buildImageUrl(p.mainImage),
+        colorImages: p.colorImages ? this.buildColorImages(p.colorImages) : {},
       }));
 
       return { products: productsWithImages, total: productsWithImages.length };
@@ -40,7 +51,8 @@ export class ProductsService {
 
       return { 
         ...product, 
-        mainImageUrl: this.buildImageUrl(product.mainImage) 
+        mainImageUrl: this.buildImageUrl(product.mainImage),
+        colorImages: product.colorImages ? this.buildColorImages(product.colorImages) : {},
       };
     } catch (error) {
       console.error('❌ Error fetching product:', error);
@@ -59,6 +71,7 @@ export class ProductsService {
       const productsWithImages = products.map((p: typeof products[number]) => ({
         ...p,
         mainImageUrl: this.buildImageUrl(p.mainImage),
+        colorImages: p.colorImages ? this.buildColorImages(p.colorImages) : {},
       }));
 
       return { products: productsWithImages, total: productsWithImages.length };
