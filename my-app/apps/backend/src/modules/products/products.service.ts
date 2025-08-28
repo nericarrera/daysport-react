@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Product } from '.prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  // Obtener productos por categoría / subcategoría
   async getProducts(category?: string, subcategory?: string) {
     try {
       console.log('📦 Fetching products with filters:', { category, subcategory });
 
-      const where: Partial<Product> = {};
+      const where: Prisma.ProductWhereInput = {};
       if (category) where.category = category;
       if (subcategory) where.subcategory = subcategory;
 
@@ -20,9 +19,8 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      // Construir URL completa de la imagen
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      const productsWithImages = products.map((p: Product) => ({
+      const productsWithImages = products.map((p) => ({
         ...p,
         mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
       }));
@@ -35,7 +33,6 @@ export class ProductsService {
     }
   }
 
-  // Obtener producto por ID
   async getProductById(id: number) {
     try {
       const product: Product | null = await this.prisma.product.findUnique({ where: { id } });
@@ -49,7 +46,6 @@ export class ProductsService {
     }
   }
 
-  // Obtener productos destacados
   async getFeaturedProducts() {
     try {
       const products: Product[] = await this.prisma.product.findMany({
@@ -59,7 +55,7 @@ export class ProductsService {
       });
 
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      const productsWithImages = products.map((p: Product) => ({
+      const productsWithImages = products.map((p) => ({
         ...p,
         mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
       }));
