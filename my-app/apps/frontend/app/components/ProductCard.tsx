@@ -72,16 +72,19 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
       >
         {/* Imagen del producto - CORREGIDO */}
         <div className="relative h-48 w-full overflow-hidden">
-  <img
-    src={product.mainImageUrl || product.mainImage || '/images/placeholder.jpg'}
-    alt={product.name}
-    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-    onError={() => setImageError(true)}
-  />
-  {!isOutOfStock && (
-    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
-  )}
-</div>
+          <Image
+  src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
+  alt={product.name}
+  fill
+  className="object-cover group-hover:scale-105 transition-transform duration-300"
+  unoptimized={true} // ← ¡ESTA LÍNEA ES MÁGICA!
+  onError={() => setImageError(true)}
+/>
+          
+          {!isOutOfStock && (
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
+          )}
+        </div>
 
         <div className="p-4">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[3rem]">
