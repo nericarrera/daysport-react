@@ -1,10 +1,12 @@
 import { Product } from '../app/types/product';
 
+const _fetch = window.fetch;
+
 // Configuración de la API
 const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001',
-  TIMEOUT: 10000, // 10 segundos
-  RETRY_ATTEMPTS: 2,
+  TIMEOUT: 15000, // Aumenta timeout
+  RETRY_ATTEMPTS: 3,
 } as const;
 
 // Tipos de error personalizados

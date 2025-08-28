@@ -12,10 +12,30 @@ async function bootstrap() {
     });
 
     const configService = app.get(ConfigService);
+    const nodeEnv = configService.get('NODE_ENV') || 'development';
 
-    // ✅ Configuración CORS unificada
+    // ✅ Configuración CORS pro
     const corsOptions = {
-      origin: configService.get('FRONTEND_URL')?.split(',') || ['http://localhost:3000'],
+      origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
+        if (!origin) {
+          // Permitir llamadas internas (ej: Postman, curl)
+          return callback(null, true);
+        }
+
+        if (nodeEnv !== 'production') {
+          // En desarrollo → aceptar cualquier origen
+          return callback(null, true);
+        }
+
+        // En producción → solo orígenes permitidos desde .env
+        const allowedOrigins = configService.get<string>('FRONTEND_URL')?.split(',') || [];
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        } else {
+          logger.warn(`❌ Bloqueado por CORS: ${origin}`);
+          return callback(new Error('Not allowed by CORS'));
+        }
+      },
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
       allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
@@ -30,7 +50,7 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
         transformOptions: { enableImplicitConversion: true },
-        disableErrorMessages: configService.get('NODE_ENV') === 'production',
+        disableErrorMessages: nodeEnv === 'production',
       }),
     );
 
@@ -41,8 +61,8 @@ async function bootstrap() {
     await app.listen(port, host);
 
     logger.log(`🚀 Servidor escuchando en ${await app.getUrl()}`);
-    logger.debug(`Modo: ${configService.get('NODE_ENV') || 'development'}`);
-    logger.debug(`Configuración CORS: ${JSON.stringify(corsOptions)}`);
+    logger.debug(`Modo: ${nodeEnv}`);
+    logger.debug(`Configuración CORS activa`);
   } catch (error) {
     logger.error('❌ Error al iniciar la aplicación:', error);
     process.exit(1);
