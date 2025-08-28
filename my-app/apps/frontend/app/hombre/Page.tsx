@@ -124,12 +124,47 @@ export default function HombrePage() {
     }
   }, [selectedSubcategory, allProducts]);
 
-  // DEBUG: Ver productos en consola (solo en desarrollo)
+  // DEBUG: Ver productos en consola (solo en desarrollo) - AMPLIADO
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       console.log('📊 Todos los productos:', allProducts);
       console.log('🔍 Productos filtrados:', filteredProducts);
       console.log('🎯 Subcategoría seleccionada:', selectedSubcategory);
+      
+      // ✅ DEBUG ESPECÍFICO PARA IMÁGENES
+      if (allProducts.length > 0) {
+        console.log('🖼️ === DEBUG DETALLADO DE IMÁGENES ===');
+        
+        allProducts.forEach((product, index) => {
+          console.log(`📦 Producto ${index + 1}:`, {
+            id: product.id,
+            name: product.name,
+            mainImage: product.mainImage,
+            mainImageUrl: product.mainImageUrl,
+            images: product.images,
+            hasMainImage: !!product.mainImage,
+            hasMainImageUrl: !!product.mainImageUrl,
+            hasImages: !!product.images?.length,
+            category: product.category,
+            subcategory: product.subcategory
+          });
+        });
+
+        // Probar la primera imagen
+        const firstProduct = allProducts[0];
+        if (firstProduct?.mainImageUrl) {
+          console.log('🌐 URL para probar en navegador:', firstProduct.mainImageUrl);
+          console.log('🔗 ¿Es URL absoluta?', firstProduct.mainImageUrl.startsWith('http'));
+        }
+
+        // Verificar tipos de datos
+        console.log('🔎 Tipos de datos - Primer producto:');
+        console.log('   mainImage:', typeof firstProduct?.mainImage, firstProduct?.mainImage);
+        console.log('   mainImageUrl:', typeof firstProduct?.mainImageUrl, firstProduct?.mainImageUrl);
+        console.log('   images:', Array.isArray(firstProduct?.images) ? 'Array' : typeof firstProduct?.images);
+      } else {
+        console.log('❌ No hay productos para debuggear');
+      }
     }
   }, [allProducts, filteredProducts, selectedSubcategory]);
 
@@ -280,12 +315,12 @@ export default function HombrePage() {
         </div>
       </div>
 
-      {/* Información de debug (solo desarrollo) */}
+      {/* Información de debug (solo desarrollo) - AMPLIADO */}
       {process.env.NODE_ENV === 'development' && (
         <div className="bg-yellow-50 p-4 rounded-lg mb-6 border border-yellow-200">
           <h3 className="font-bold text-yellow-800 flex items-center">
             <span className="mr-2">🐛</span>
-            DEBUG Info:
+            DEBUG INFO DETALLADA:
           </h3>
           <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
             <span>Productos totales:</span>
@@ -296,6 +331,22 @@ export default function HombrePage() {
             
             <span>Subcategoría activa:</span>
             <span className="font-mono capitalize">{selectedSubcategory || 'Ninguna'}</span>
+            
+            {allProducts.length > 0 && (
+              <>
+                <span>Primer producto ID:</span>
+                <span className="font-mono">{allProducts[0].id}</span>
+                
+                <span>Primer producto nombre:</span>
+                <span className="font-mono truncate">{allProducts[0].name}</span>
+                
+                <span>Tiene mainImageUrl:</span>
+                <span className="font-mono">{allProducts[0].mainImageUrl ? '✅ Sí' : '❌ No'}</span>
+                
+                <span>Tiene mainImage:</span>
+                <span className="font-mono">{allProducts[0].mainImage ? '✅ Sí' : '❌ No'}</span>
+              </>
+            )}
           </div>
         </div>
       )}
