@@ -7,62 +7,52 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   try {
+    // Creamos la app con logging completo
     const app = await NestFactory.create(AppModule, {
       logger: ['log', 'error', 'warn', 'debug'],
     });
 
+    // Obtenemos configuración desde .env
     const configService = app.get(ConfigService);
     const nodeEnv = configService.get('NODE_ENV') || 'development';
+    const isProduction = nodeEnv === 'production';
 
-    // ✅ Configuración CORS pro
+    // ------------------------
+    // Configuración CORS dinámica
+    // ------------------------
+    const frontendUrls = configService.get<string>('FRONTEND_URL')?.split(',') || [];
     const corsOptions = {
-      origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
-        if (!origin) {
-          // Permitir llamadas internas (ej: Postman, curl)
-          return callback(null, true);
-        }
-
-        if (nodeEnv !== 'production') {
-          // En desarrollo → aceptar cualquier origen
-          return callback(null, true);
-        }
-
-        // En producción → solo orígenes permitidos desde .env
-        const allowedOrigins = configService.get<string>('FRONTEND_URL')?.split(',') || [];
-        if (allowedOrigins.includes(origin)) {
-          return callback(null, true);
-        } else {
-          logger.warn(`❌ Bloqueado por CORS: ${origin}`);
-          return callback(new Error('Not allowed by CORS'));
-        }
-      },
+      origin: frontendUrls,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
       allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
     };
-
     app.enableCors(corsOptions);
 
-    // ✅ Validación global
+    logger.debug(`Modo: ${nodeEnv}`);
+    logger.debug(`CORS habilitado para: ${frontendUrls.join(', ')}`);
+
+    // ------------------------
+    // Validación global de DTOs
+    // ------------------------
     app.useGlobalPipes(
       new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
+        whitelist: true,                 // elimina propiedades no declaradas en DTO
+        forbidNonWhitelisted: true,      // lanza error si llegan propiedades extras
+        transform: true,                 // transforma payload a clases DTO
         transformOptions: { enableImplicitConversion: true },
-        disableErrorMessages: nodeEnv === 'production',
+        disableErrorMessages: isProduction, // en producción no mostramos detalles
       }),
     );
 
-    // ✅ Configuración de puerto y host
+    // ------------------------
+    // Configuración de puerto y host
+    // ------------------------
     const port = configService.get<number>('PORT') || 3001;
     const host = configService.get('HOST') || '0.0.0.0';
 
     await app.listen(port, host);
-
     logger.log(`🚀 Servidor escuchando en ${await app.getUrl()}`);
-    logger.debug(`Modo: ${nodeEnv}`);
-    logger.debug(`Configuración CORS activa`);
   } catch (error) {
     logger.error('❌ Error al iniciar la aplicación:', error);
     process.exit(1);
