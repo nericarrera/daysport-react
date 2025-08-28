@@ -10,7 +10,6 @@ interface ProductCardProps {
   showNewBadge?: boolean;
 }
 
-// Mapa de colores fuera del componente para mejor rendimiento
 const COLOR_MAP: Record<string, string> = {
   'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
   'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
@@ -26,24 +25,10 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
-  // Debug solo en desarrollo
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const imgUrl = product.mainImageUrl || product.mainImage;
-      console.log('🔍 IMAGE DEBUG:', {
-        url: imgUrl,
-        exists: !!imgUrl,
-        isExternal: imgUrl?.includes('http'),
-        isLocalhost: imgUrl?.includes('localhost')
-      });
-    }
-  }, [product]);
-
   const getColorHex = useCallback((color: string): string => {
     return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
   }, []);
 
-  // Memoizar cálculos costosos
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercentage = hasDiscount 
@@ -59,7 +44,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
     return { hasDiscount, discountPercentage, isNew, isOutOfStock };
   }, [product, showNewBadge]);
 
-  // Determinar el estado de stock
   const stockStatus = useMemo(() => {
     if (isOutOfStock) return { text: '❌ Agotado', color: 'text-red-600' };
     
@@ -73,14 +57,12 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
     };
   }, [isOutOfStock, product.stockQuantity]);
 
-  // URL de la imagen con fallback
   const imageSrc = useMemo(() => {
     return imageError 
       ? '/images/placeholder.jpg' 
       : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg');
   }, [imageError, product.mainImageUrl, product.mainImage]);
 
-  // Manejo de errores de imagen
   const handleImageError = useCallback(() => {
     setImageError(true);
     setImageLoading(false);
@@ -93,65 +75,42 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
       {/* Badges superpuestos */}
-      <div className="absolute top-2 left-2 z-10 flex flex-col space-y-1">
-        {isNew && (
-          <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            🆕 NUEVO
-          </span>
-        )}
-        {hasDiscount && (
-          <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            🔥 -{discountPercentage}%
-          </span>
-        )}
-        {product.featured && !hasDiscount && !isNew && (
-          <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            ⭐ DESTACADO
-          </span>
-        )}
-        {isOutOfStock && (
-          <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            🔒 AGOTADO
-          </span>
-        )}
+      <div className="absolute top-2 left-2 z-20 flex flex-col space-y-1">
+        {isNew && <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">🆕 NUEVO</span>}
+        {hasDiscount && <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">🔥 -{discountPercentage}%</span>}
+        {product.featured && !hasDiscount && !isNew && <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">⭐ DESTACADO</span>}
+        {isOutOfStock && <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">🔒 AGOTADO</span>}
       </div>
 
-      <Link 
-        href={`/producto/${product.id}`} 
-        className="block relative flex-grow"
-        aria-label={`Ver detalles de ${product.name}`}
-      >
-        {/* Imagen del producto con skeleton loading */}
-  <div className="relative h-48 w-full overflow-hidden">
-  {imageLoading && (
-    <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div> // ← z-0 en lugar de z-10
-  )}
-  <Image
-    src={imageSrc}
-    alt={product.name}
-    fill
-    className="object-cover group-hover:scale-105 transition-transform duration-300 z-10" // ← Agrega z-10 aquí
-    unoptimized={true}
-    onError={handleImageError}
-    onLoad={handleImageLoad}
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
+      <Link href={`/producto/${product.id}`} className="block relative flex-grow" aria-label={`Ver detalles de ${product.name}`}>
+        {/* Imagen del producto - VERSIÓN CORREGIDA */}
+        <div className="relative h-48 w-full overflow-hidden">
+          {imageLoading && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
+          )}
+          <Image
+            src={imageSrc}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
+            unoptimized={true}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
           
           {!isOutOfStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300 z-20" />
           )}
         </div>
 
-        {/* Contenido de la tarjeta */}
         <div className="p-4 flex-grow">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[3rem]">
             {product.name}
           </h3>
           
           {product.brand && (
-            <p className="text-sm text-gray-500 mb-1 font-medium">
-              {product.brand}
-            </p>
+            <p className="text-sm text-gray-500 mb-1 font-medium">{product.brand}</p>
           )}
 
           <div className="flex items-center text-sm text-gray-500 mb-3">
@@ -164,43 +123,28 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             )}
           </div>
 
-          {/* Precio */}
           <div className="mb-3">
             {hasDiscount ? (
               <div className="flex items-center space-x-2">
-                <span className="text-2xl font-bold text-green-600">
-                  ${product.price.toFixed(2)}
-                </span>
-                <span className="text-lg text-gray-500 line-through">
-                  ${product.originalPrice!.toFixed(2)}
-                </span>
+                <span className="text-2xl font-bold text-green-600">${product.price.toFixed(2)}</span>
+                <span className="text-lg text-gray-500 line-through">${product.originalPrice!.toFixed(2)}</span>
               </div>
             ) : (
-              <span className="text-2xl font-bold text-gray-900">
-                ${product.price.toFixed(2)}
-              </span>
+              <span className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
             )}
           </div>
 
-          {/* Rating */}
           {product.rating && (
             <div className="flex items-center mb-3">
               <div className="flex text-yellow-400">
                 {'★'.repeat(Math.round(product.rating))}
                 {'☆'.repeat(5 - Math.round(product.rating))}
               </div>
-              <span className="text-sm text-gray-600 ml-2">
-                ({product.rating.toFixed(1)})
-              </span>
-              {product.reviewCount && (
-                <span className="text-sm text-gray-500 ml-2">
-                  ({product.reviewCount} reviews)
-                </span>
-              )}
+              <span className="text-sm text-gray-600 ml-2">({product.rating.toFixed(1)})</span>
+              {product.reviewCount && <span className="text-sm text-gray-500 ml-2">({product.reviewCount} reviews)</span>}
             </div>
           )}
 
-          {/* Colores */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
@@ -214,52 +158,37 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                   />
                 ))}
                 {product.colors.length > 5 && (
-                  <span className="text-xs text-gray-500 self-center">
-                    +{product.colors.length - 5}
-                  </span>
+                  <span className="text-xs text-gray-500 self-center">+{product.colors.length - 5}</span>
                 )}
               </div>
             </div>
           )}
 
-          {/* Tallas */}
           {product.sizes && product.sizes.length > 0 && product.sizes[0] !== 'Único' && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Tallas:</p>
               <div className="flex flex-wrap gap-1">
                 {product.sizes.slice(0, 6).map((size: string, index: number) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-gray-100 text-xs rounded-md text-gray-700 border border-gray-200"
-                  >
+                  <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-md text-gray-700 border border-gray-200">
                     {size}
                   </span>
                 ))}
                 {product.sizes.length > 6 && (
-                  <span className="text-xs text-gray-500 self-center">
-                    +{product.sizes.length - 6}
-                  </span>
+                  <span className="text-xs text-gray-500 self-center">+{product.sizes.length - 6}</span>
                 )}
               </div>
             </div>
           )}
 
-          {/* Estado de stock y envío */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <span className={`text-sm font-medium ${stockStatus.color}`}>
-              {stockStatus.text}
-            </span>
-            
+            <span className={`text-sm font-medium ${stockStatus.color}`}>{stockStatus.text}</span>
             {product.price > 50 && !isOutOfStock && (
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                🚚 Envío gratis
-              </span>
+              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">🚚 Envío gratis</span>
             )}
           </div>
         </div>
       </Link>
 
-      {/* Botones de acción */}
       <div className="px-4 pb-4 mt-auto">
         <AddToCartButton 
           product={product} 
@@ -273,12 +202,8 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         
         {!isOutOfStock && (
           <div className="flex gap-2 mt-2">
-            <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
-              ❤️ Favorito
-            </button>
-            <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
-              🔄 Comparar
-            </button>
+            <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">❤️ Favorito</button>
+            <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">🔄 Comparar</button>
           </div>
         )}
       </div>
