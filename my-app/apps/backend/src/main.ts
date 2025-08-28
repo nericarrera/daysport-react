@@ -4,7 +4,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -24,13 +24,12 @@ async function bootstrap() {
     // CORS dinámico
     // ------------------------
     const frontendUrls = configService.get<string>('FRONTEND_URL')?.split(',') || [];
-    const corsOptions = {
+    app.enableCors({
       origin: frontendUrls,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
       allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
-    };
-    app.enableCors(corsOptions);
+    });
     logger.debug(`Modo: ${nodeEnv}`);
     logger.debug(`CORS habilitado para: ${frontendUrls.join(', ')}`);
 
@@ -50,15 +49,14 @@ async function bootstrap() {
     // ------------------------
     // Servir carpeta de imágenes (assets)
     // ------------------------
-    // Ajuste seguro: desde src/ hacia la carpeta assets en la raíz del backend
-    const assetsPath = join(__dirname, '..', 'assets');
+    // Ruta absoluta segura: desde la raíz del proyecto backend
+    const assetsPath = join(process.cwd(), 'apps', 'backend', 'assets');
     if (!existsSync(assetsPath)) {
       logger.error(`❌ La carpeta de assets no existe: ${assetsPath}`);
     } else {
       logger.log(`📂 Servir assets desde: ${assetsPath}`);
-      app.useStaticAssets(assetsPath, {
-        prefix: '/assets/', // Se accede como http://localhost:3001/assets/...
-      });
+      logger.log('📂 Contenido de pantalones:', readdirSync(join(assetsPath, 'images/hombre/pantalones')));
+      app.useStaticAssets(assetsPath, { prefix: '/assets/' });
     }
 
     // ------------------------
