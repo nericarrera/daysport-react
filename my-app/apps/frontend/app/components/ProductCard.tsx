@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Product } from '../types/product'; // ← AJUSTA ESTA RUTA
+import { Product } from '../types/product';
 import AddToCartButton from './AddToCartButton';
 
 interface ProductCardProps {
@@ -13,49 +13,30 @@ interface ProductCardProps {
 export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   
-  // Función para obtener el color hexadecimal
   const getColorHex = (color: string): string => {
     const colorMap: Record<string, string> = {
-      'negro': '#000000',
-      'blanco': '#ffffff',
-      'rojo': '#ff0000',
-      'azul': '#0000ff',
-      'verde': '#00ff00',
-      'gris': '#808080',
-      'amarillo': '#ffff00',
-      'rosa': '#ffc0cb',
-      'morado': '#800080',
-      'naranja': '#ffa500',
-      'marron': '#a52a2a',
-      'beige': '#f5f5dc',
-      'azul marino': '#000080',
-      'verde oscuro': '#006400',
-      'cyan': '#00ffff',
-      'magenta': '#ff00ff',
-      'plateado': '#c0c0c0',
-      'dorado': '#ffd700',
-      'turquesa': '#40e0d0',
-      'lavanda': '#e6e6fa',
-      'coral': '#ff7f50',
-      'ocre': '#cc7722',
-      'vino': '#722f37'
+      'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
+      'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
+      'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
+      'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
+      'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
+      'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
+      'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
+      'ocre': '#cc7722', 'vino': '#722f37'
     };
     
     return colorMap[color.toLowerCase()] || '#f0f0f0';
   };
 
-  // Calcular descuento si existe
   const hasDiscount = product.originalPrice && product.originalPrice > product.price;
   const discountPercentage = hasDiscount 
     ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0;
 
-  // Determinar si es nuevo (últimos 30 días)
   const isNew = showNewBadge && product.createdAt 
     ? (new Date().getTime() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
     : false;
 
-  // Verificar stock
   const isOutOfStock = (product.stockQuantity === 0 || !product.inStock);
 
   return (
@@ -84,44 +65,39 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         )}
       </div>
 
-      {/* Link que envuelve toda la tarjeta */}
       <Link 
         href={`/producto/${product.id}`} 
         className="block relative"
         aria-label={`Ver detalles de ${product.name}`}
       >
-        {/* Imagen del producto */}
+        {/* Imagen del producto - CORREGIDO */}
         <div className="relative h-48 w-full overflow-hidden">
           <Image
-  src={imageError ? '/images/placeholder.jpg' : (product.mainImage || '/images/placeholder.jpg')}
-  alt={product.name}
-  fill
-  className="object-cover group-hover:scale-105 transition-transform duration-300"
-  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-  onError={() => setImageError(true)}
-  priority={product.featured}
-/>
+            src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg')}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            onError={() => setImageError(true)}
+            priority={product.featured}
+          />
           
-          {/* Overlay hover */}
           {!isOutOfStock && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
           )}
         </div>
 
-        {/* Información del producto */}
         <div className="p-4">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[3rem]">
             {product.name}
           </h3>
           
-          {/* Marca */}
           {product.brand && (
             <p className="text-sm text-gray-500 mb-1 font-medium">
               {product.brand}
             </p>
           )}
 
-          {/* Categoría y subcategoría */}
           <div className="flex items-center text-sm text-gray-500 mb-3">
             <span className="capitalize">{product.category}</span>
             {product.subcategory && (
@@ -132,7 +108,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             )}
           </div>
 
-          {/* Precio */}
           <div className="mb-3">
             {hasDiscount ? (
               <div className="flex items-center space-x-2">
@@ -150,7 +125,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             )}
           </div>
 
-          {/* Rating */}
           {product.rating && (
             <div className="flex items-center mb-3">
               <div className="flex text-yellow-400">
@@ -168,7 +142,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </div>
           )}
 
-          {/* Colores disponibles (mini preview) */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
@@ -192,7 +165,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </div>
           )}
 
-          {/* Tallas disponibles */}
           {product.sizes && product.sizes.length > 0 && product.sizes[0] !== 'Único' && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Tallas:</p>
@@ -214,7 +186,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </div>
           )}
 
-          {/* Stock disponible */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <span className={`text-sm font-medium ${
               !isOutOfStock && product.stockQuantity && product.stockQuantity > 10 ? 'text-green-600' : 
@@ -226,7 +197,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
               ) : '❌ Agotado'}
             </span>
             
-            {/* Envío gratis badge */}
             {product.price > 50 && !isOutOfStock && (
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                 🚚 Envío gratis
@@ -236,7 +206,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         </div>
       </Link>
 
-      {/* Botón de acción rápida */}
       <div className="px-4 pb-4">
         <AddToCartButton 
           product={product} 
@@ -248,7 +217,6 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
           }`}
         />
         
-        {/* Quick actions */}
         {!isOutOfStock && (
           <div className="flex gap-2 mt-2">
             <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
