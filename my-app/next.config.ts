@@ -8,17 +8,23 @@ const nextConfig = {
     ];
   },
   images: {
-    // ✅ CONFIGURACIÓN MÁS PERMISIVA
-    domains: ['localhost'],
+    // PERMITE imágenes HTTP locales
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    
+    // Configuración más permisiva
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',
-        pathname: '/**', // ← PERMITE TODAS LAS RUTAS
+        pathname: '/**', // Permite TODAS las rutas
       }
     ],
-    unoptimized: true, // ← DESACTIVA OPCIÓN DE OPTIMIZACIÓN
+    
+    // Desactiva completamente la optimización
+    unoptimized: true,
   },
 };
 
