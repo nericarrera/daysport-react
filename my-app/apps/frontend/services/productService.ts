@@ -1,12 +1,13 @@
 import { Product } from '../app/types/product';
 
-const _fetch = window.fetch;
+// Usamos fetch universal: funciona tanto en servidor como en cliente
+const _fetch = typeof window !== 'undefined' ? window.fetch : fetch;
 
 // Configuración de la API
 const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001',
-  TIMEOUT: 15000, // Aumenta timeout
-  RETRY_ATTEMPTS: 3,
+  TIMEOUT: 15000, // Timeout
+  RETRY_ATTEMPTS: 3, // Reintentos
 } as const;
 
 // Tipos de error personalizados
@@ -38,12 +39,12 @@ export class TimeoutError extends Error {
 // Tipo para la respuesta de la API
 interface ProductsResponse {
   products?: Product[];
-  // Puedes agregar otros campos que pueda devolver tu API
   message?: string;
   status?: string;
 }
 
 export class ProductService {
+  // Fetch con timeout
   private static async fetchWithTimeout(
     url: string,
     options: RequestInit = {},
@@ -54,7 +55,7 @@ export class ProductService {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(url, {
+      const response = await _fetch(url, {
         ...options,
         signal,
         headers: {
@@ -70,10 +71,13 @@ export class ProductService {
       if (error instanceof Error && error.name === 'AbortError') {
         throw new TimeoutError();
       }
-      throw new NetworkError(error instanceof Error ? error.message : 'Unknown network error');
+      throw new NetworkError(
+        error instanceof Error ? error.message : 'Unknown network error'
+      );
     }
   }
 
+  // Manejo de respuesta
   private static async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       throw new ApiError(
@@ -90,6 +94,7 @@ export class ProductService {
     }
   }
 
+  // Reintentos
   private static async retry<T>(
     fn: () => Promise<T>,
     retries: number = API_CONFIG.RETRY_ATTEMPTS
@@ -98,9 +103,10 @@ export class ProductService {
       return await fn();
     } catch (error) {
       if (retries > 0 && this.isRetryableError(error)) {
-        console.log(`Retrying... ${retries} attempts left`);
-        // Esperar un poco antes de reintentar (backoff exponencial simple)
-        await new Promise(resolve => setTimeout(resolve, 1000 * (API_CONFIG.RETRY_ATTEMPTS - retries + 1)));
+        console.warn(`Retrying... ${retries} attempts left`);
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (API_CONFIG.RETRY_ATTEMPTS - retries + 1))
+        );
         return this.retry(fn, retries - 1);
       }
       throw error;
@@ -115,25 +121,21 @@ export class ProductService {
     );
   }
 
-  // Helper para extraer productos de la respuesta
-  private static extractProductsFromResponse(data: ProductsResponse | Product[]): Product[] {
-    // Si la respuesta es directamente un array de productos
-    if (Array.isArray(data)) {
-      return data;
-    }
-    
-    // Si la respuesta es un objeto con propiedad products
-    if (data.products && Array.isArray(data.products)) {
-      return data.products;
-    }
-    
-    // Si no hay productos, devolver array vacío
+  // Extraer productos de respuesta
+  private static extractProductsFromResponse(
+    data: ProductsResponse | Product[]
+  ): Product[] {
+    if (Array.isArray(data)) return data;
+    if (data.products && Array.isArray(data.products)) return data.products;
     return [];
   }
 
+  // Obtener productos por categoría
   static async getProductsByCategory(category: string): Promise<Product[]> {
-    const url = `${API_CONFIG.BASE_URL}/api/products?category=${encodeURIComponent(category)}`;
-    
+    const url = `${API_CONFIG.BASE_URL}/api/products?category=${encodeURIComponent(
+      category
+    )}`;
+
     console.log('🔄 Fetching products for:', category, 'from:', url);
 
     try {
@@ -144,26 +146,20 @@ export class ProductService {
 
       const products = this.extractProductsFromResponse(data);
       console.log('✅ Products received:', products.length, 'items');
-      
       return products;
     } catch (error) {
       console.error('❌ Error fetching products:', error);
-      
-      // Podrías implementar aquí un fallback a datos locales o caché
-      // return this.getFallbackData(category);
-      
-      throw error; // Propaga el error para que el llamador pueda manejarlo
+      throw error;
     }
   }
 
-  // Método adicional para obtener un producto por ID
+  // Obtener producto por ID
   static async getProductById(id: string): Promise<Product | null> {
     const url = `${API_CONFIG.BASE_URL}/api/products/${id}`;
-    
+
     try {
       const response = await this.fetchWithTimeout(url);
       const product = await this.handleResponse<Product>(response);
-      
       return product;
     } catch (error) {
       console.error('❌ Error fetching product:', error);
@@ -171,7 +167,7 @@ export class ProductService {
     }
   }
 
-  // Método adicional para obtener productos con múltiples filtros
+  // Obtener productos con filtros
   static async getProductsWithFilters(filters: {
     category?: string;
     subcategory?: string;
@@ -180,7 +176,6 @@ export class ProductService {
     sortBy?: string;
   }): Promise<Product[]> {
     const params = new URLSearchParams();
-    
     if (filters.category) params.append('category', filters.category);
     if (filters.subcategory) params.append('subcategory', filters.subcategory);
     if (filters.priceRange) {
@@ -189,13 +184,12 @@ export class ProductService {
     }
     if (filters.limit) params.append('limit', filters.limit.toString());
     if (filters.sortBy) params.append('sortBy', filters.sortBy);
-    
+
     const url = `${API_CONFIG.BASE_URL}/api/products?${params.toString()}`;
-    
+
     try {
       const response = await this.fetchWithTimeout(url);
       const data = await this.handleResponse<ProductsResponse | Product[]>(response);
-      
       return this.extractProductsFromResponse(data);
     } catch (error) {
       console.error('❌ Error fetching products with filters:', error);
