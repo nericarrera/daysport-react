@@ -10,16 +10,16 @@ export const conjuntosHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
-      "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg"  // Azul - lateral
+      "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
+      "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg"  // Azul - lateral
     ],
-    mainImage: "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg",
+    mainImage: "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "verde": [
-        "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
-        "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - lateral  // Azul - niño usando
+        "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - frontal
+        "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg", // Azul - lateral  // Azul - niño usando
       ],
     },
 
@@ -54,20 +54,20 @@ export const conjuntosHombre = [
     description: "Conjunto deportivo de verano para hombre que incluye remera de manga corta y short. Perfecto para entrenamientos y actividades al aire libre.",
     
     images: [
-      "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg", // Negro - frontal
-      "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg"  // Negro - detalle
+      "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg", // Negro - frontal
+      "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg"  // Negro - detalle
     ],
-    mainImage: "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
+    mainImage: "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
 
     colorImages: {
       "negro": [
-        "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-negro-1.jpeg",
+        "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-negro-1.jpeg",
       ],
       "blanco": [
-        "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
+        "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
       ],
       "gris": [
-        "/asset/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-gris-1.jpeg",
+        "/assets/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-gris-1.jpeg",
        
       ]
     },

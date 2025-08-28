@@ -10,23 +10,23 @@ export const buzosHombre = [
     
     // Imágenes principales (vista previa)
     images: [
-      "/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg", // Azul - frontal
-      "/images/hombre/buzos/buzos-algodon-frizado-concapucha-2.jpeg"  // Azul - lateral
+      "/assets/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg", // Azul - frontal
+      "/assets/images/hombre/buzos/buzos-algodon-frizado-concapucha-2.jpeg"  // Azul - lateral
     ],
-    mainImage: "/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg",
+    mainImage: "/assets/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
       "marron": [
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
-        "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
+        "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg", // Azul - frontal
+        "/assets/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg", // Azul - lateral  // Azul - niño usando
       ],
       "rojo": [
-        "/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg",
+        "/assets/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg",
         
       ],
       "verde": [
-        "/images/hombre/buzos/buzos-algodon-frizado-concapucha-3.jpeg",
+        "/assets/images/hombre/buzos/buzos-algodon-frizado-concapucha-3.jpeg",
        
       ]
     },
