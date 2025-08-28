@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { Product } from '.prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -10,17 +11,18 @@ export class ProductsService {
     try {
       console.log('📦 Fetching products with filters:', { category, subcategory });
 
-      const where: any = {};
+      const where: Partial<Product> = {};
       if (category) where.category = category;
       if (subcategory) where.subcategory = subcategory;
 
-      const products = await this.prisma.product.findMany({
+      const products: Product[] = await this.prisma.product.findMany({
         where,
         orderBy: { createdAt: 'desc' },
       });
 
+      // Construir URL completa de la imagen
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      const productsWithImages = products.map((p) => ({
+      const productsWithImages = products.map((p: Product) => ({
         ...p,
         mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
       }));
@@ -36,7 +38,7 @@ export class ProductsService {
   // Obtener producto por ID
   async getProductById(id: number) {
     try {
-      const product = await this.prisma.product.findUnique({ where: { id } });
+      const product: Product | null = await this.prisma.product.findUnique({ where: { id } });
       if (!product) throw new Error('Product not found');
 
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
@@ -50,14 +52,14 @@ export class ProductsService {
   // Obtener productos destacados
   async getFeaturedProducts() {
     try {
-      const products = await this.prisma.product.findMany({
+      const products: Product[] = await this.prisma.product.findMany({
         where: { featured: true },
         take: 10,
         orderBy: { createdAt: 'desc' },
       });
 
       const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      const productsWithImages = products.map((p) => ({
+      const productsWithImages = products.map((p: Product) => ({
         ...p,
         mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
       }));

@@ -10,9 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "baseUrl": "./",
-    "types": ["node", "jest"],
+    "types": ["node"],
     "paths": {
       "@app/*": ["src/*"],
       "@auth/*": ["src/modules/auth/*"],
