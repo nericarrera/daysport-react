@@ -9,6 +9,7 @@ export interface Product {
   brand?: string;          // ← Marca del producto
   images: string[];
   mainImage: string;
+    mainImageUrl?: string;
   sizes?: string[];
   colors?: string[];
   inStock: number;

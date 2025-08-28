@@ -93,14 +93,14 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         {/* Imagen del producto */}
         <div className="relative h-48 w-full overflow-hidden">
           <Image
-            src={imageError ? '/images/placeholder.jpg' : (product.mainImage || product.images[0] || '/images/placeholder.jpg')}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            onError={() => setImageError(true)}
-            priority={product.featured}
-          />
+  src={imageError ? '/images/placeholder.jpg' : (product.mainImageUrl || '/images/placeholder.jpg')}
+  alt={product.name}
+  fill
+  className="object-cover group-hover:scale-105 transition-transform duration-300"
+  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+  onError={() => setImageError(true)}
+  priority={product.featured}
+/>
           
           {/* Overlay hover */}
           {!isOutOfStock && (
