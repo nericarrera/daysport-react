@@ -4,48 +4,21 @@ const nextConfig = {
       {
         source: '/api/:path*',
         destination: 'http://localhost:3001/api/:path*',
-      },
-      {
-        source: '/products/:path*', 
-        destination: 'http://localhost:3001/api/products/:path*',
       }
     ];
   },
   images: {
-    // Dominios permitidos
-    domains: ['localhost', 'images.unsplash.com'],
-    
-    // Patrones remotos más específicos
+    // ✅ CONFIGURACIÓN MÁS PERMISIVA
+    domains: ['localhost'],
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',
-        pathname: '/assets/images/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '/**',
+        pathname: '/**', // ← PERMITE TODAS LAS RUTAS
       }
     ],
-    
-    // Desactiva optimización en desarrollo para mejor debug
-    unoptimized: process.env.NODE_ENV === 'development',
-    
-    // Formatos permitidos
-    formats: ['image/webp', 'image/avif'],
-    
-    // Tamaños de imagen
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-  },
-  
-  // Agrega logging para debug (OPCIONAL - puede generar muchos logs)
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
+    unoptimized: true, // ← DESACTIVA OPCIÓN DE OPTIMIZACIÓN
   },
 };
 
