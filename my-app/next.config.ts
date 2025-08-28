@@ -12,23 +12,39 @@ const nextConfig = {
     ];
   },
   images: {
+    // Dominios permitidos (forma alternativa)
+    domains: ['localhost', 'images.unsplash.com'],
+    
+    // Patrones remotos más específicos
     remotePatterns: [
-      // Para imágenes locales del backend
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '3001',
+        pathname: '/assets/images/**', // Más específico
       },
-      // Para imágenes de Unsplash (¡ESTA FALTA!)
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '.unsplash.com', // Para todos los subdominios
-      },
+        pathname: '/**',
+      }
     ],
+    
+    // Desactiva optimización en desarrollo para mejor debug
+    unoptimized: process.env.NODE_ENV === 'development',
+    
+    // Formatos permitidos
+    formats: ['image/webp', 'image/avif'],
+    
+    // Tamaños de imagen
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  // Agrega logging para debug
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 
