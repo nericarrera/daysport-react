@@ -26,7 +26,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**.unsplash.com', // Para todos los subdominios
+        hostname: '.unsplash.com', // Para todos los subdominios
       },
     ],
   },
