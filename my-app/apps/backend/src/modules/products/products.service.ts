@@ -1,23 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { JsonValue } from '@prisma/client/runtime/library';
 
-// Interfaz para el producto de Prisma
+// Interfaz exacta para el producto de Prisma
 interface PrismaProduct {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
+  originalPrice?: number | null;
   category: string;
-  subcategory?: string;
+  subcategory?: string | null;
   mainImage: string;
-  images?: string[];
-  colorImages?: Record<string, string[]>;
+  images?: string[] | null;
+  colorImages?: JsonValue;
   featured?: boolean;
   inStock: boolean;
-  sizes?: string[];
-  colors?: string[];
+  stock?: number;
+  sizes?: string[] | null;
+  colors?: string[] | null;
   createdAt: Date;
   updatedAt: Date;
+  sizeGuide?: JsonValue;
+  material?: string | null;
+  fit?: string | null;
 }
 
 @Injectable()
@@ -27,6 +33,7 @@ export class ProductsService {
   private buildImageUrl(imagePath: string): string {
     const host = process.env.HOST_BACKEND || 'http://localhost:3001';
     
+    if (!imagePath) return `${host}/assets/images/placeholder.jpg`;
     if (imagePath.startsWith('http')) return imagePath;
     if (imagePath.startsWith('/assets/')) return `${host}${imagePath}`;
     if (imagePath.startsWith('/images/')) return `${host}/assets${imagePath}`;
@@ -35,9 +42,32 @@ export class ProductsService {
     return `${host}/assets/images/${imagePath}`;
   }
 
-  private buildColorImages(colorImages: Record<string, string[]>): Record<string, string[]> {
+  // Función segura para manejar colorImages como JsonValue - CORREGIDA
+  private parseColorImages(colorImages: JsonValue | null | undefined): Record<string, string[]> {
+    if (!colorImages || typeof colorImages !== 'object' || colorImages === null) {
+      return {};
+    }
+    
+    try {
+      const parsed = colorImages as Record<string, unknown>;
+      const result: Record<string, string[]> = {};
+      
+      for (const [color, value] of Object.entries(parsed)) {
+        if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+          result[color] = value as string[];
+        }
+      }
+      
+      return result;
+    } catch {
+      return {};
+    }
+  }
+
+  private buildColorImages(colorImages: JsonValue | null | undefined): Record<string, string[]> {
+    const parsed = this.parseColorImages(colorImages);
     return Object.fromEntries(
-      Object.entries(colorImages).map(([color, images]) => [
+      Object.entries(parsed).map(([color, images]) => [
         color,
         images.map(img => this.buildImageUrl(img))
       ])
@@ -55,20 +85,20 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      // DEBUG: Ver qué hay en la base de datos
-      console.log('📦 Productos de BD:', products.map((p: PrismaProduct) => ({
-        id: p.id,
-        name: p.name,
-        mainImage: p.mainImage,
-        images: p.images
-      })));
+      // DEBUG: Ver la estructura real
+      if (products.length > 0) {
+        console.log('📦 Estructura real del primer producto:', JSON.stringify(products[0], null, 2));
+      }
 
-      const productsWithImages = products.map((p: PrismaProduct) => ({
-        ...p,
-        mainImageUrl: this.buildImageUrl(p.mainImage),
-        images: p.images ? p.images.map((img: string) => this.buildImageUrl(img)) : [],
-        colorImages: p.colorImages ? this.buildColorImages(p.colorImages) : {},
-      }));
+      const productsWithImages = products.map((p: any) => {
+        const product = p as PrismaProduct;
+        return {
+          ...product,
+          mainImageUrl: this.buildImageUrl(product.mainImage),
+          images: (product.images || []).map((img: string) => this.buildImageUrl(img)),
+          colorImages: this.buildColorImages(product.colorImages),
+        };
+      });
 
       return { products: productsWithImages, total: productsWithImages.length };
     } catch (error) {
@@ -81,15 +111,17 @@ export class ProductsService {
     try {
       const product = await this.prisma.product.findUnique({ 
         where: { id } 
-      }) as PrismaProduct | null;
+      });
       
       if (!product) throw new NotFoundException('Product not found');
 
+      const productTyped = product as PrismaProduct;
+
       return { 
-        ...product, 
-        mainImageUrl: this.buildImageUrl(product.mainImage),
-        images: product.images ? product.images.map(img => this.buildImageUrl(img)) : [],
-        colorImages: product.colorImages ? this.buildColorImages(product.colorImages) : {},
+        ...productTyped, 
+        mainImageUrl: this.buildImageUrl(productTyped.mainImage),
+        images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
+        colorImages: this.buildColorImages(productTyped.colorImages),
       };
     } catch (error) {
       console.error('❌ Error fetching product:', error);
@@ -103,14 +135,17 @@ export class ProductsService {
         where: { featured: true },
         take: 10,
         orderBy: { createdAt: 'desc' },
-      }) as PrismaProduct[];
+      });
 
-      const productsWithImages = products.map((p: PrismaProduct) => ({
-        ...p,
-        mainImageUrl: this.buildImageUrl(p.mainImage),
-        images: p.images ? p.images.map((img: string) => this.buildImageUrl(img)) : [],
-        colorImages: p.colorImages ? this.buildColorImages(p.colorImages) : {},
-      }));
+      const productsWithImages = products.map((p: any) => {
+        const product = p as PrismaProduct;
+        return {
+          ...product,
+          mainImageUrl: this.buildImageUrl(product.mainImage),
+          images: (product.images || []).map((img: string) => this.buildImageUrl(img)),
+          colorImages: this.buildColorImages(product.colorImages),
+        };
+      });
 
       return { products: productsWithImages, total: productsWithImages.length };
     } catch (error) {
