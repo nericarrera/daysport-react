@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
+
+  private buildImageUrl(filename: string): string {
+    const host = process.env.HOST_BACKEND || 'http://localhost:3001';
+    return `${host}/assets/images/products/${filename}`;
+  }
 
   async getProducts(category?: string, subcategory?: string) {
     try {
@@ -17,15 +21,14 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      const host = process.env.HOST_BACKEND || 'http://localhost:3001';
       const productsWithImages = products.map((p: typeof products[number]) => ({
         ...p,
-        mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
+        mainImageUrl: this.buildImageUrl(p.mainImage),
       }));
 
       return { products: productsWithImages, total: productsWithImages.length };
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('❌ Error fetching products:', error);
       throw new Error('Error fetching products');
     }
   }
@@ -33,13 +36,15 @@ export class ProductsService {
   async getProductById(id: number) {
     try {
       const product = await this.prisma.product.findUnique({ where: { id } });
-      if (!product) throw new Error('Product not found');
+      if (!product) throw new NotFoundException('Product not found');
 
-      const host = process.env.HOST_BACKEND || 'http://localhost:3001';
-      return { ...product, mainImageUrl: `${host}/assets/images/products/${product.mainImage}` };
+      return { 
+        ...product, 
+        mainImageUrl: this.buildImageUrl(product.mainImage) 
+      };
     } catch (error) {
-      console.error('Error fetching product:', error);
-      throw new Error('Error fetching product');
+      console.error('❌ Error fetching product:', error);
+      throw error;
     }
   }
 
@@ -51,15 +56,14 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      const host = process.env.HOST_BACKEND || 'http://localhost:3001';
       const productsWithImages = products.map((p: typeof products[number]) => ({
         ...p,
-        mainImageUrl: `${host}/assets/images/products/${p.mainImage}`,
+        mainImageUrl: this.buildImageUrl(p.mainImage),
       }));
 
       return { products: productsWithImages, total: productsWithImages.length };
     } catch (error) {
-      console.error('Error fetching featured products:', error);
+      console.error('❌ Error fetching featured products:', error);
       throw new Error('Error fetching featured products');
     }
   }
