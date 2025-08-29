@@ -45,7 +45,7 @@ export default function CategorySelector() {
       id: 'deportes', 
       name: 'Deportes', 
       image: '/menu-categoria-img/categoria-deportes.jpg',
-      href: '/deportes' // ← O CREAR ESTA PÁGINA
+      href: '/hombre?subcategory=deportes' // ← O CREAR ESTA PÁGINA
     },
     { 
       id: 'ofertas', 
