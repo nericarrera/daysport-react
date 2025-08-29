@@ -67,13 +67,37 @@ function getProductsArray(data: unknown): Product[] {
   return [];
 }
 
-export default function HombrePage() {
-  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+// SOLO UNA FUNCIÓN HombrePage - ESTA ES LA CORRECTA
+export default function HombrePage({ 
+  searchParams 
+}: { 
+  searchParams: { subcategory?: string } 
+}) {
+  const [selectedSubcategory, setSelectedSubcategory] = useState(
+    searchParams.subcategory || ''
+  );
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+
+  // AGREGAR este useEffect para los parámetros de URL
+  useEffect(() => {
+    if (searchParams.subcategory) {
+      setSelectedSubcategory(searchParams.subcategory);
+      // Scroll automático a los productos después de un breve delay
+      setTimeout(() => {
+        const productsSection = document.getElementById('productos');
+        if (productsSection) {
+          productsSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 300);
+    }
+  }, [searchParams.subcategory]);
 
   // Función para cargar productos con manejo de errores mejorado
   const loadProducts = useCallback(async () => {
@@ -365,8 +389,8 @@ export default function HombrePage() {
           </div>
         </div>
         
-        {/* Productos */}
-        <div className="md:w-3/4">
+        {/* Productos - AGREGAR ID PARA EL SCROLL */}
+        <div className="md:w-3/4" id="productos">
           {compatibleProducts.length > 0 ? (
             <>
               <div className="mb-6">
