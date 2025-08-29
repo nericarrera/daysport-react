@@ -222,7 +222,7 @@ export default function Navbar() {
               {/* Logo */}
               <Link href="/" className={isMobileView ? "mx-auto" : "flex-shrink-0"} aria-label="Home">
                 <Image 
-                  src="/daysport-transparente-02.png" 
+                  src="/logo-daysport-00.png" 
                   alt="Daysport Logo" 
                   width={120} 
                   height={40} 
