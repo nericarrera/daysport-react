@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 interface Category {
   name: string;
@@ -21,25 +21,20 @@ interface MegaMenuProps {
 
 export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProps) {
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // 🔒 BLOQUEAR SCROLL DEL BODY CUANDO EL MENÚ ESTÁ ABIERTO
+  // 🔄 CONTROL DE VISIBILIDAD CON ANIMACIÓN
   useEffect(() => {
     if (isOpen) {
+      setIsVisible(true);
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     } else {
-      document.body.style.overflow = 'unset';
-      document.body.style.position = 'static';
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-      document.body.style.position = 'static';
-    };
   }, [isOpen]);
 
-  if (!isOpen || !categoryData) return null;
+  if (!isVisible || !categoryData) return null;
 
   const handleMouseEnter = () => {
     if (closeTimeout.current) {
@@ -51,12 +46,14 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
   const handleMouseLeave = () => {
     closeTimeout.current = setTimeout(() => {
       onClose();
-    }, 200);
+    }, 500); // ← AUMENTADO A 500ms
   };
 
   return (
     <div
-      className="fixed left-0 right-0 bg-white shadow-xl z-50 border-t border-gray-200 top-full"
+      className={`fixed left-0 right-0 bg-white shadow-xl z-50 border-t border-gray-200 top-full transition-all duration-300 ${
+        isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+      }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ 
@@ -66,7 +63,8 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
     >
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="grid grid-cols-4 gap-8">
-          {/* Columna de subcategorías - MÁS ESTILO */}
+          
+          {/* Columna de subcategorías */}
           <div className="col-span-1">
             <h3 className="text-lg font-bold mb-6 text-gray-900 text-center border-b pb-3">
               {categoryData.name}
@@ -86,7 +84,7 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
             </ul>
           </div>
 
-          {/* Destacados con imágenes - TAMAÑO CONTROLADO */}
+          {/* Destacados con imágenes */}
           <div className="col-span-3 grid grid-cols-3 gap-6">
             {categoryData.subcategories
               .filter((sc) => sc.image)
@@ -97,8 +95,8 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
                       <Image
                         src={subcat.image || "/default-image.jpg"}
                         alt={subcat.name}
-                        width={160} // ← TAMAÑO CONTROLADO
-                        height={160} // ← TAMAÑO CONTROLADO
+                        width={160}
+                        height={160}
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         style={{
                           width: '100%',
@@ -117,7 +115,7 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
           </div>
         </div>
 
-        {/* BOTÓN DE CERRAR PARA MÓVIL */}
+        {/* BOTÓN DE CERRAR */}
         <div className="lg:hidden mt-6 text-center">
           <button
             onClick={onClose}
