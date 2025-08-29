@@ -130,7 +130,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
     src={imageSrc}
     alt={product.name}
     fill
-    className="object-cover group-hover:scale-105 transition-transform duration-300 z-10" // ← Agrega z-10 aquí
+    className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
     unoptimized={true}
     onError={handleImageError}
     onLoad={handleImageLoad}
@@ -144,7 +144,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
         {/* Contenido de la tarjeta */}
         <div className="p-4 flex-grow">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[3rem]">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-violet-700 transition-colors min-h-[3rem]">
             {product.name}
           </h3>
           
@@ -168,7 +168,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
           <div className="mb-3">
             {hasDiscount ? (
               <div className="flex items-center space-x-2">
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-xl font-bold text-green-600">
                   ${product.price.toFixed(2)}
                 </span>
                 <span className="text-lg text-gray-500 line-through">
