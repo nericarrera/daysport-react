@@ -30,10 +30,10 @@ export default function CategorySelector() {
       href: '/ninos' // ← RUTA DIRECTA
     },
     { 
-      id: 'zapatillas', 
-      name: 'Zapatillas', 
+      id: 'calzado', 
+      name: 'Calzado', 
       image: '/menu-categoria-img/categoria-zapatillas3.jpg',
-      href: '/zapatillas' // ← O CREAR ESTA PÁGINA
+      href: '/accesorios?subcategory=calzado' // ← O CREAR ESTA PÁGINA
     },
     { 
       id: 'accesorios', 
