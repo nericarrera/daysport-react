@@ -9,15 +9,56 @@ export default function CategorySelector() {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
+  // CATEGORÍAS ACTUALIZADAS CON LAS RUTAS CORRECTAS
   const categories = [
-    { id: 'mujer', name: 'Mujer', image: '/menu-categoria-img/categoria-mujer1.jpg' },
-    { id: 'hombre', name: 'Hombre', image: '/menu-categoria-img/categoria-hombre1.jpg' },
-    { id: 'ninos', name: 'Niños', image: '/menu-categoria-img/categoria-niños1.jpg' },
-    { id: 'zapatillas', name: 'Zapatillas', image: '/menu-categoria-img/categoria-zapatillas3.jpg' },
-    { id: 'accesorios', name: 'Accesorios', image: '/menu-categoria-img/categoria-accesorios1.jpg' },
-    { id: 'deportes', name: 'Deportes', image: '/menu-categoria-img/categoria-deportes.jpg' },
-    { id: 'ofertas', name: 'Ofertas', image: '/menu-categoria-img/categoria-ofertas1.jpg' },
-    { id: 'colecciones', name: 'Colecciones', image: '/menu-categoria-img/categoria-coleccion.jpg' }
+    { 
+      id: 'mujer', 
+      name: 'Mujer', 
+      image: '/menu-categoria-img/categoria-mujer1.jpg',
+      href: '/mujer' // ← RUTA DIRECTA
+    },
+    { 
+      id: 'hombre', 
+      name: 'Hombre', 
+      image: '/menu-categoria-img/categoria-hombre1.jpg',
+      href: '/hombre' // ← RUTA DIRECTA
+    },
+    { 
+      id: 'ninos', 
+      name: 'Niños', 
+      image: '/menu-categoria-img/categoria-niños1.jpg',
+      href: '/ninos' // ← RUTA DIRECTA
+    },
+    { 
+      id: 'zapatillas', 
+      name: 'Zapatillas', 
+      image: '/menu-categoria-img/categoria-zapatillas3.jpg',
+      href: '/zapatillas' // ← O CREAR ESTA PÁGINA
+    },
+    { 
+      id: 'accesorios', 
+      name: 'Accesorios', 
+      image: '/menu-categoria-img/categoria-accesorios1.jpg',
+      href: '/accesorios' // ← RUTA DIRECTA
+    },
+    { 
+      id: 'deportes', 
+      name: 'Deportes', 
+      image: '/menu-categoria-img/categoria-deportes.jpg',
+      href: '/deportes' // ← O CREAR ESTA PÁGINA
+    },
+    { 
+      id: 'ofertas', 
+      name: 'Ofertas', 
+      image: '/menu-categoria-img/categoria-ofertas1.jpg',
+      href: '/ofertas' // ← O CREAR ESTA PÁGINA
+    },
+    { 
+      id: 'colecciones', 
+      name: 'Colecciones', 
+      image: '/menu-categoria-img/categoria-coleccion.jpg',
+      href: '/colecciones' // ← O CREAR ESTA PÁGINA
+    }
   ];
 
   // Verificar visibilidad de flechas
@@ -35,6 +76,11 @@ export default function CategorySelector() {
       const scrollAmount = direction === 'right' ? 300 : -300;
       containerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
+  };
+
+  // Navegación a categoría
+  const handleCategoryClick = (category: typeof categories[0]) => {
+    router.push(category.href);
   };
 
   // Efecto para verificar flechas al cargar y redimensionar
@@ -73,7 +119,7 @@ export default function CategorySelector() {
                 <div 
                   key={category.id}
                   className="inline-flex flex-col items-center cursor-pointer group"
-                  onClick={() => router.push(`/categoria/${category.id}`)}
+                  onClick={() => handleCategoryClick(category)}
                 >
                   <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-all mb-4 object-cover">
                     <Image
