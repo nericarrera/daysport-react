@@ -461,21 +461,19 @@ export default function Navbar() {
         {/* MegaMenu desktop */}
         {!isMobileView && (
           <div 
-  ref={megaMenuRef}
-  onMouseEnter={handleMegaMenuEnter}
-  onMouseLeave={handleMegaMenuLeave}
-  className="absolute left-0 right-0" // ← ÁREA DE HOVER EXTENDIDA
-  style={{ top: '100%', height: '20px' }} // ← ZONA DE TRANSICIÓN
->
-  <MegaMenu
-    isOpen={isMegaMenuOpen && activeCategory !== null}
-    onClose={() => {
-      setIsMegaMenuOpen(false);
-      setActiveCategory(null);
-    }}
-    categoryData={activeCategory !== null ? categories[activeCategory] : null}
-  />
-</div>
+            ref={megaMenuRef}
+            onMouseEnter={handleMegaMenuEnter}
+            onMouseLeave={handleMegaMenuLeave}
+          >
+            <MegaMenu
+              isOpen={isMegaMenuOpen && activeCategory !== null}
+              onClose={() => {
+                setIsMegaMenuOpen(false);
+                setActiveCategory(null);
+              }}
+              categoryData={activeCategory !== null ? categories[activeCategory] : null}
+            />
+          </div>
         )}
       </>
     </UserContext.Provider>
