@@ -53,12 +53,6 @@ export default function CategorySelector() {
       image: '/menu-categoria-img/categoria-ofertas1.jpg',
       href: '/ofertas' // ← O CREAR ESTA PÁGINA
     },
-    { 
-      id: 'colecciones', 
-      name: 'Colecciones', 
-      image: '/menu-categoria-img/categoria-coleccion.jpg',
-      href: '/colecciones' // ← O CREAR ESTA PÁGINA
-    }
   ];
 
   // Verificar visibilidad de flechas
