@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -458,24 +457,37 @@ export default function Navbar() {
           </div>
         </nav>
 
+
         {/* MegaMenu desktop */}
-        {!isMobileView && (
-          <div 
-            ref={megaMenuRef}
-            onMouseEnter={handleMegaMenuEnter}
-            onMouseLeave={handleMegaMenuLeave}
-          >
-            <MegaMenu
-              isOpen={isMegaMenuOpen && activeCategory !== null}
-              onClose={() => {
-                setIsMegaMenuOpen(false);
-                setActiveCategory(null);
-              }}
-              categoryData={activeCategory !== null ? categories[activeCategory] : null}
-            />
-          </div>
-        )}
-      </>
-    </UserContext.Provider>
-  );
+
+{!isMobileView && (
+  <>
+    {/* Zona de transición invisible - PRIMERO */}
+    {isMegaMenuOpen && (
+      <div 
+        className="absolute left-0 right-0 top-full h-3 bg-transparent z-40"
+        onMouseEnter={handleMegaMenuEnter}
+      />
+    )}
+    
+    {/* MegaMenu - DESPUÉS */}
+    <div 
+      ref={megaMenuRef}
+      onMouseEnter={handleMegaMenuEnter}
+      onMouseLeave={handleMegaMenuLeave}
+    >
+      <MegaMenu
+        isOpen={isMegaMenuOpen && activeCategory !== null}
+        onClose={() => {
+          setIsMegaMenuOpen(false);
+          setActiveCategory(null);
+        }}
+        categoryData={activeCategory !== null ? categories[activeCategory] : null}
+      />
+    </div>
+</>
+)}
+     </>
+   </UserContext.Provider> 
+   );
 }
