@@ -13,16 +13,6 @@ import { Product } from '../types/product';
 // Datos de las categorías circulares PARA HOMBRE
 const subcategories = [
   {
-    name: 'Remeras',
-    slug: 'remeras',
-    image: '/menu-seccion-img/hombre/menu-remeras.jpg'
-  },
-  {
-    name: 'Shorts',
-    slug: 'shorts', 
-    image: '/menu-seccion-img/hombre/menu-shorts.jpg'
-  },
-  {
     name: 'Buzos',
     slug: 'buzos',
     image: '/menu-seccion-img/hombre/menu-buzos.jpg'
@@ -33,14 +23,34 @@ const subcategories = [
     image: '/menu-seccion-img/hombre/menu-camperas.jpg'
   },
   {
+    name: 'Conjuntos',
+    slug: 'conjuntos',
+    image: '/menu-seccion-img/hombre/menu-conjuntos.jpg'
+  },
+  {
+    name: 'Deportes',
+    slug: 'deportes',
+    image: '/menu-seccion-img/hombre/menu-deportes.jpg'
+  },
+  {
+    name: 'Remeras',
+    slug: 'remeras',
+    image: '/menu-seccion-img/hombre/menu-remeras.jpg'
+  },
+  {
+    name: 'Shorts',
+    slug: 'shorts', 
+    image: '/menu-seccion-img/hombre/menu-shorts.jpg'
+  },
+  {
     name: 'Pantalones',
     slug: 'pantalones',
     image: '/menu-seccion-img/hombre/menu-pantalones.jpg'
   },
   {
-    name: 'Accesorios',
-    slug: 'accesorios',
-    image: '/menu-seccion-img/hombre/menu-accesorios.jpg'
+    name: 'Sweaters',
+    slug: 'sweaters',
+    image: '/menu-seccion-img/hombre/menu-sweaters.jpg'
   }
 ];
 
