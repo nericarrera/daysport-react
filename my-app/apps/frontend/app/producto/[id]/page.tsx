@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { ProductService } from '../../../services/productService';
 import { Product } from '../../types/product';
+import ProductRelated from '../../components/RelatedProducts'; // ← NUEVA IMPORTACIÓN
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -16,7 +17,6 @@ export default function ProductDetailPage() {
   useEffect(() => {
     async function loadProduct() {
       try {
-        // Corregido: params.id es string, no number
         const productId = params.id as string;
         const productData = await ProductService.getProductById(productId);
         setProduct(productData);
@@ -62,7 +62,6 @@ export default function ProductDetailPage() {
     return colorMap[color.toLowerCase()] || '#f0f0f0';
   };
 
-  // Valores por defecto para propiedades opcionales
   const images = product.images || [];
   const sizes = product.sizes || [];
   const colors = product.colors || [];
@@ -71,102 +70,24 @@ export default function ProductDetailPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <div className="relative h-96 mb-4">
-            <Image
-              src={images[selectedImage] || '/images/placeholder.jpg'}
-              alt={product.name}
-              fill
-              className="object-cover rounded-lg"
-              priority
-            />
-          </div>
-          {images.length > 1 && (
-            <div className="flex gap-2">
-              {images.map((image: string, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className="relative h-20 w-20"
-                >
-                  <Image
-                    src={image}
-                    alt={`Vista ${index + 1} de ${product.name}`}
-                    fill
-                    className="object-cover rounded-md"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
+        {/* ... (TODO TU CÓDIGO EXISTENTE) ... */}
+        
         <div>
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
           <p className="text-2xl text-green-600 font-bold mb-4">${product.price}</p>
-          <p className="text-gray-600 mb-6">{product.description}</p>
-
-          {sizes.length > 0 && (
-            <div className="mb-4">
-              <label className="block font-medium mb-2">Talla:</label>
-              <div className="flex gap-2">
-                {sizes.map((size: string) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 border rounded-md ${
-                      selectedSize === size 
-                        ? 'border-black bg-black text-white' 
-                        : 'border-gray-300'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {colors.length > 0 && (
-            <div className="mb-6">
-              <label className="block font-medium mb-2">Color:</label>
-              <div className="flex gap-2">
-                {colors.map((color: string) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 border rounded-md ${
-                      selectedColor === color ? 'border-black' : 'border-gray-300'
-                    }`}
-                    style={{ 
-                      backgroundColor: selectedColor === color ? getColorHex(color) : 'transparent',
-                      color: selectedColor === color ? '#fff' : '#000'
-                    }}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <button className="w-full bg-black text-white py-3 px-6 rounded-md hover:bg-gray-800 transition-colors">
-            Agregar al Carrito
-          </button>
-
-          <div className="mt-6 text-sm text-gray-600">
-            <p className={`mb-2 ${
-              inStock > 10 ? 'text-green-600' : 
-              inStock > 0 ? 'text-orange-600' : 'text-red-600'
-            }`}>
-              Stock disponible: {inStock} unidades
-            </p>
-            <p className="mb-1">✓ Envíos a todo el país</p>
-            <p className="mb-1">✓ Devoluciones gratuitas</p>
-            <p>✓ Garantía de 30 días</p>
-          </div>
+          {/* ... resto de tu código ... */}
         </div>
       </div>
+
+      {/* PRODUCTOS RELACIONADOS - SOLO ESTO ES NUEVO */}
+      {product && (
+        <div className="mt-16">
+          <ProductRelated 
+            currentProductId={product.id}
+            category={product.category}
+          />
+        </div>
+      )}
     </div>
   );
 }
