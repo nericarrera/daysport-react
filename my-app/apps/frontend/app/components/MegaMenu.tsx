@@ -56,7 +56,7 @@ export default function MegaMenu({ isOpen, onClose, categoryData }: MegaMenuProp
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ 
-        maxHeight: '60vh', // Altura máxima reducida
+        maxHeight: '70vh', // Altura máxima reducida
         overflowY: 'auto'  // Scroll interno
       }}
     >

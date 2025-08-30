@@ -18,14 +18,29 @@ const subcategories = [
     image: '/menu-seccion-img/mujer/menu-remeras.jpg'
   },
   {
-    name: 'Shorts',
-    slug: 'shorts', 
-    image: '/menu-seccion-img/mujer/menu-shorts.jpg'
-  },
-  {
     name: 'Buzos',
     slug: 'buzos',
     image: '/menu-seccion-img/mujer/menu-buzos.jpg'
+  },
+  {
+    name: 'Pantalones',
+    slug: 'pantalones',
+    image: '/menu-seccion-img/mujer/menu-pantalones.webp'
+  },
+  {
+    name: 'Camperas',
+    slug: 'camperas',
+    image: '/menu-seccion-img/mujer/menu-camperas.jpg'
+  },
+  {
+    name: 'Calzas',
+    slug: 'calzas',
+    image: '/menu-seccion-img/mujer/menu-calzas.jpg'
+  },
+  {
+    name: 'Shorts',
+    slug: 'shorts', 
+    image: '/menu-seccion-img/mujer/menu-shorts.webp'
   },
   {
     name: 'Camperas',
@@ -35,12 +50,12 @@ const subcategories = [
   {
     name: 'Pantalones',
     slug: 'pantalones',
-    image: '/menu-seccion-img/mujer/menu-pantalones.jpg'
+    image: '/menu-seccion-img/mujer/menu-pantalones.webp'
   },
   {
-    name: 'Accesorios',
-    slug: 'accesorios',
-    image: '/menu-seccion-img/mujer/menu-accesorios.jpg'
+    name: 'Conjuntos',
+    slug: 'conjuntos',
+    image: '/menu-seccion-img/mujer/menu-conjuntos.jpg'
   }
 ];
 
