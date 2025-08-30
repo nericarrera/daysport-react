@@ -9,11 +9,18 @@ interface Product {
   price: number;
   images: string[];
   category: string;
+  mainImage?: string; // Agregado por si acaso
+  mainImageUrl?: string; // Agregado por si acaso
 }
 
 interface RelatedProductsProps {
   currentProductId: number;
   category: string;
+}
+
+interface ApiResponse {
+  products: Product[];
+  total: number;
 }
 
 export default function RelatedProducts({ 
@@ -26,10 +33,13 @@ export default function RelatedProducts({
   useEffect(() => {
     setLoading(true);
     
-    fetch(`http://localhost:3001/api/products?category=${category}&limit=4`)
+    fetch(`http://localhost:3001/api/products?category=${category}&limit=5`)
       .then(res => res.json())
-      .then((data: Product[]) => {
-        const filtered = data.filter(product => product.id !== currentProductId);
+      .then((data: ApiResponse) => {
+        // Filtrar el producto actual y limitar a 4 productos
+        const filtered = data.products
+          .filter(product => product.id !== currentProductId)
+          .slice(0, 4);
         setRelatedProducts(filtered);
       })
       .catch(error => {
@@ -62,26 +72,38 @@ export default function RelatedProducts({
       <h2 className="text-2xl font-bold text-gray-900 mb-6">💡 Productos relacionados</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {relatedProducts.map((product) => (
-          <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-100">
-            <Link href={`/producto/${product.id}`} className="block">
-              <div className="relative h-48 overflow-hidden">
-                <Image
-                  src={product.images[0] || '/placeholder.jpg'}
-                  alt={product.name}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </div>
+        {relatedProducts.map((product) => {
+          // Determinar la mejor imagen a mostrar
+          const mainImage = product.images?.[0] || 
+                           product.mainImageUrl || 
+                           product.mainImage || 
+                           '/placeholder.jpg';
+          
+          return (
+            <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-100">
+              <Link href={`/producto/${product.id}`} className="block">
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={mainImage}
+                    alt={product.name}
+                    fill
+                    className="object-cover hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      // Fallback si la imagen falla
+                      e.currentTarget.src = '/placeholder.jpg';
+                    }}
+                  />
+                </div>
 
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-1 line-clamp-2">{product.name}</h3>
-                <p className="text-lg font-bold text-green-600 mb-2">${product.price}</p>
-                <p className="text-sm text-gray-600 capitalize">{product.category}</p>
-              </div>
-            </Link>
-          </div>
-        ))}
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg mb-1 line-clamp-2">{product.name}</h3>
+                  <p className="text-lg font-bold text-green-600 mb-2">${product.price}</p>
+                  <p className="text-sm text-gray-600 capitalize">{product.category}</p>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
