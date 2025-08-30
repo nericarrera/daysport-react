@@ -73,13 +73,13 @@ export default function Footer() {
             </ul>
             <div className="flex space-x-4 mt-4">
               <Link href="#">
-                <Image src="/img/iconos/instagram.png" alt="Instagram" width={24} height={24} />
+                <Image src="/iconos/icono-instagram.png" alt="Instagram" width={35} height={35} />
               </Link>
               <Link href="#">
-                <Image src="/img/iconos/facebook.png" alt="Facebook" width={24} height={24} />
+                <Image src="/iconos/icono-facebook.png" alt="Facebook" width={35} height={35} />
               </Link>
               <Link href="#">
-                <Image src="/img/iconos/whatsapp.png" alt="WhatsApp" width={24} height={24} />
+                <Image src="/iconos/icono-whatsapp.png" alt="WhatsApp" width={35} height={35} />
               </Link>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <Image
-              src="/img/logo/Copilot_20250623_112142.png"
+              src="/logo-daysport-00.png"
               alt="Daysport Logo"
               width={120}
               height={40}
