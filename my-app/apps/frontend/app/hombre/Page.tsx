@@ -1,5 +1,5 @@
 'use client';
-import { use } from 'react';
+import { use } from 'react'; // ← AGREGAR ESTA IMPORTACIÓN
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
@@ -78,14 +78,17 @@ function getProductsArray(data: unknown): Product[] {
   return [];
 }
 
-// SOLO UNA FUNCIÓN HombrePage - ESTA ES LA CORRECTA
+// SOLO UNA FUNCIÓN HombrePage - CORREGIDA
 export default function HombrePage({ 
   searchParams 
 }: { 
-  searchParams: { subcategory?: string } 
+  searchParams: Promise<{ subcategory?: string }>  // ← AGREGAR Promise
 }) {
+  // Desempaqueta los searchParams con use()
+  const resolvedSearchParams = use(searchParams);
+  
   const [selectedSubcategory, setSelectedSubcategory] = useState(
-    searchParams.subcategory || ''
+    resolvedSearchParams.subcategory || ''  // ← USAR valor desempaquetado
   );
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -93,10 +96,10 @@ export default function HombrePage({
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  // AGREGAR este useEffect para los parámetros de URL
+  // AGREGAR este useEffect para los parámetros de URL - ACTUALIZADO
   useEffect(() => {
-    if (searchParams.subcategory) {
-      setSelectedSubcategory(searchParams.subcategory);
+    if (resolvedSearchParams.subcategory) {  // ← USAR resolvedSearchParams
+      setSelectedSubcategory(resolvedSearchParams.subcategory);
       // Scroll automático a los productos después de un breve delay
       setTimeout(() => {
         const productsSection = document.getElementById('productos');
@@ -108,7 +111,7 @@ export default function HombrePage({
         }
       }, 300);
     }
-  }, [searchParams.subcategory]);
+  }, [resolvedSearchParams.subcategory]);  // ← DEPENDENCIA ACTUALIZADA
 
   // Función para cargar productos con manejo de errores mejorado
   const loadProducts = useCallback(async () => {
