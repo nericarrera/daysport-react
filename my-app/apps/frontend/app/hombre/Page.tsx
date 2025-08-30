@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
