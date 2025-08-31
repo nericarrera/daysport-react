@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { Product } from '../types/product';
 import AddToCartButton from './AddToCartButton';
 
@@ -25,6 +27,33 @@ const COLOR_MAP: Record<string, string> = {
 export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Verificar si el producto es favorito al cargar
+  useEffect(() => {
+    const checkIfFavorite = () => {
+      try {
+        const savedFavorites = localStorage.getItem('favoriteProducts');
+        if (savedFavorites) {
+          const favorites: Product[] = JSON.parse(savedFavorites);
+          const isFav = favorites.some(fav => fav.id === product.id);
+          setIsFavorite(isFav);
+        }
+      } catch (error) {
+        console.error('Error checking favorites:', error);
+      }
+    };
+
+    checkIfFavorite();
+
+    // Escuchar eventos de actualización de favoritos
+    const handleFavoritesUpdate = () => {
+      checkIfFavorite();
+    };
+
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
+    return () => window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
+  }, [product.id]);
 
   // Debug solo en desarrollo
   useEffect(() => {
@@ -42,6 +71,35 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
   const getColorHex = useCallback((color: string): string => {
     return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
   }, []);
+
+  // Función para toggle de favoritos
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      const savedFavorites = localStorage.getItem('favoriteProducts');
+      let favorites: Product[] = savedFavorites ? JSON.parse(savedFavorites) : [];
+      
+      if (isFavorite) {
+        // Remover de favoritos
+        favorites = favorites.filter(fav => fav.id !== product.id);
+        setIsFavorite(false);
+      } else {
+        // Agregar a favoritos
+        favorites.push(product);
+        setIsFavorite(true);
+      }
+      
+      localStorage.setItem('favoriteProducts', JSON.stringify(favorites));
+      
+      // Disparar evento personalizado para actualizar contadores en otras partes
+      window.dispatchEvent(new CustomEvent('favoritesUpdated'));
+      
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
 
   // Memoizar cálculos costosos
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
@@ -116,26 +174,39 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         )}
       </div>
 
+      {/* Botón de favoritos en la esquina superior derecha */}
+      <button
+        onClick={toggleFavorite}
+        className="absolute top-2 right-2 z-20 p-2 bg-white rounded-full shadow-md hover:bg-pink-50 transition-colors group/favorite"
+        title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+      >
+        {isFavorite ? (
+          <HeartSolid className="h-5 w-5 text-pink-600 group-hover/favorite:scale-110 transition-transform" />
+        ) : (
+          <HeartOutline className="h-5 w-5 text-gray-400 hover:text-pink-400 group-hover/favorite:scale-110 transition-transform" />
+        )}
+      </button>
+
       <Link 
         href={`/producto/${product.id}`} 
         className="block relative flex-grow"
         aria-label={`Ver detalles de ${product.name}`}
       >
         {/* Imagen del producto con skeleton loading */}
-   <div className="relative h-48 w-full overflow-hidden">
-  {imageLoading && (
-    <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div> // ← z-0 en lugar de z-10
-  )}
-  <Image
-    src={imageSrc}
-    alt={product.name}
-    fill
-    className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
-    unoptimized={true}
-    onError={handleImageError}
-    onLoad={handleImageLoad}
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
+        <div className="relative h-48 w-full overflow-hidden">
+          {imageLoading && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
+          )}
+          <Image
+            src={imageSrc}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
+            unoptimized={true}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
           
           {!isOutOfStock && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
@@ -273,8 +344,21 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         
         {!isOutOfStock && (
           <div className="flex gap-2 mt-2">
-            <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
-              ❤️ Favorito
+            <button 
+              onClick={toggleFavorite}
+              className="flex-1 text-xs text-gray-600 hover:text-pink-600 transition-colors flex items-center justify-center gap-1"
+            >
+              {isFavorite ? (
+                <>
+                  <HeartSolid className="h-4 w-4 text-pink-600" />
+                  Quitar favorito
+                </>
+              ) : (
+                <>
+                  <HeartOutline className="h-4 w-4" />
+                  Agregar favorito
+                </>
+              )}
             </button>
             <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
               🔄 Comparar

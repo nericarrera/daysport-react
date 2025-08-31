@@ -1,4 +1,4 @@
-'use client'
+'use server'; // ← CAMBIAR 'use client' por 'use server'
 
 import { NextResponse } from "next/server";
 
@@ -7,9 +7,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     
-    // Usar JSON Server directamente
+    // Conectar con backend REAL
     let url = 'http://localhost:3001/products';
-    if (category) {
+    if (category && category !== 'all') {
       url += `?category=${category}`;
     }
     
@@ -21,7 +21,8 @@ export async function GET(request: Request) {
     
     const products = await response.json();
     return NextResponse.json(products);
-  } catch  {
+  } catch (error) {
+    console.error('Error fetching products:', error);
     return NextResponse.json([], { status: 200 });
   }
 }
