@@ -10,11 +10,8 @@ export default function FavoritosPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular la carga de productos favoritos
-    // En una app real, esto vendría de localStorage, context o API
     const loadFavorites = () => {
       try {
-        // Intentar obtener favoritos de localStorage
         const savedFavorites = localStorage.getItem('favoriteProducts');
         if (savedFavorites) {
           const favorites = JSON.parse(savedFavorites);
@@ -28,6 +25,14 @@ export default function FavoritosPage() {
     };
 
     loadFavorites();
+
+    // Escuchar eventos de actualización de favoritos desde otros componentes
+    const handleFavoritesUpdate = () => {
+      loadFavorites();
+    };
+
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
+    return () => window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
   }, []);
 
   const removeFromFavorites = (productId: number) => {
@@ -36,11 +41,15 @@ export default function FavoritosPage() {
     
     // Guardar en localStorage
     localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
+    
+    // Disparar evento para sincronizar otros componentes
+    window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   };
 
   const clearAllFavorites = () => {
     setFavoriteProducts([]);
     localStorage.removeItem('favoriteProducts');
+    window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   };
 
   if (loading) {
@@ -68,7 +77,7 @@ export default function FavoritosPage() {
         {favoriteProducts.length > 0 && (
           <button
             onClick={clearAllFavorites}
-            className="text-sm text-gray-500 hover:text-red-600 transition-colors"
+            className="text-sm text-gray-500 hover:text-red-600 transition-colors px-3 py-1 border border-gray-300 rounded-md hover:border-red-300"
           >
             Limpiar todos
           </button>
@@ -95,22 +104,28 @@ export default function FavoritosPage() {
         </div>
       ) : (
         <>
-          <div className="mb-6">
+          <div className="flex items-center justify-between mb-6">
             <p className="text-gray-600">
               {favoriteProducts.length} {favoriteProducts.length === 1 ? 'producto' : 'productos'} favorito{favoriteProducts.length !== 1 ? 's' : ''}
             </p>
+            <button
+              onClick={clearAllFavorites}
+              className="text-sm text-red-600 hover:text-red-800 transition-colors font-medium"
+            >
+              Eliminar todos
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favoriteProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100">
+              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 group">
                 <Link href={`/producto/${product.id}`} className="block">
                   <div className="relative h-48 overflow-hidden">
                     <Image
                       src={product.images?.[0] || product.mainImageUrl || '/placeholder-product.jpg'}
                       alt={product.name}
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder-product.jpg';
                       }}
@@ -127,7 +142,7 @@ export default function FavoritosPage() {
                     </Link>
                     <button
                       onClick={() => removeFromFavorites(product.id)}
-                      className="text-pink-600 hover:text-pink-800 transition-colors ml-2"
+                      className="text-pink-600 hover:text-pink-800 transition-colors ml-2 p-1"
                       title="Quitar de favoritos"
                     >
                       <HeartIcon className="h-6 w-6 fill-current" />
@@ -143,13 +158,33 @@ export default function FavoritosPage() {
                     </p>
                   )}
 
-                  <div className="flex gap-2">
+                  {/* Rating */}
+                  {product.rating && (
+                    <div className="flex items-center mb-3">
+                      <div className="flex text-yellow-400 text-sm">
+                        {'★'.repeat(Math.round(product.rating))}
+                        {'☆'.repeat(5 - Math.round(product.rating))}
+                      </div>
+                      <span className="text-sm text-gray-600 ml-2">
+                        ({product.rating.toFixed(1)})
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 mt-4">
                     <Link
                       href={`/producto/${product.id}`}
-                      className="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
                     >
                       Ver producto
                     </Link>
+                    <button
+                      onClick={() => removeFromFavorites(product.id)}
+                      className="px-3 py-2 border border-gray-300 text-gray-600 rounded-lg hover:border-red-300 hover:text-red-600 transition-colors text-sm"
+                      title="Quitar de favoritos"
+                    >
+                      Quitar
+                    </button>
                   </div>
                 </div>
               </div>
