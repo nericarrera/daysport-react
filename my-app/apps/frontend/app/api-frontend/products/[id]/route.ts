@@ -1,9 +1,7 @@
-'use server';
-
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> } // ← Next.js 15: params es Promise
 ) {
   try {
@@ -11,7 +9,7 @@ export async function GET(
     const resolvedParams = await context.params;
     const { id } = resolvedParams;
     
-    // Tu lógica aquí
+    // Tu lógica aquí...
     const response = await fetch(`http://localhost:3001/products/${id}`);
     
     if (!response.ok) {
