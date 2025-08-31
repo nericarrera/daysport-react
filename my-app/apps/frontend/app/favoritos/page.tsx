@@ -5,6 +5,12 @@ import Image from 'next/image';
 import { HeartIcon, ArrowLeftIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { Product } from '../types/product';
 
+// ✅ AGREGAR METADATA - Esto ayuda a Next.js a reconocer la ruta
+export const metadata = {
+  title: 'Mis Favoritos - DaySport',
+  description: 'Tus productos favoritos en DaySport',
+};
+
 export default function FavoritosPage() {
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
