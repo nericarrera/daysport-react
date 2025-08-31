@@ -27,17 +27,22 @@ export default function ProductDetailPage() {
           throw new Error('ID de producto no proporcionado');
         }
 
-        // DEBUG: Verificar si el servicio funciona
-        console.log('🔍 Calling ProductService.getProductById...');
-        const productData = await ProductService.getProductById(productId);
+        // SOLUCIÓN: Obtener TODOS los productos y filtrar
+        console.log('🔍 Getting all products to filter...');
+        const allProductsData = await ProductService.getProductsByCategory('all');
         
-        console.log('✅ Product data received:', productData);
+        // Buscar el producto específico por ID
+        const foundProduct = allProductsData.find((p: Product) => 
+          p.id.toString() === productId || p.id === parseInt(productId)
+        );
+
+        console.log('🔎 Product found:', foundProduct);
         
-        if (!productData) {
-          throw new Error('Producto no encontrado en la respuesta');
+        if (!foundProduct) {
+          throw new Error(`Producto con ID ${productId} no encontrado`);
         }
 
-        setProduct(productData);
+        setProduct(foundProduct);
       } catch (error) {
         console.error('💥 Error loading product:', error);
         setError(error instanceof Error ? error.message : 'Error desconocido');
@@ -53,17 +58,6 @@ export default function ProductDetailPage() {
       setError('ID de producto no encontrado en la URL');
     }
   }, [params?.id]);
-
-  // DEBUG: Mostrar información útil
-  useEffect(() => {
-    console.log('📊 Current state:', {
-      params: params,
-      productId: params?.id,
-      loading,
-      error,
-      product
-    });
-  }, [params, loading, error, product]);
 
   if (loading) {
     return (
@@ -88,15 +82,6 @@ export default function ProductDetailPage() {
             ID solicitado: {params?.id}
           </p>
           
-          <div className="bg-gray-100 p-4 rounded-lg text-left max-w-md mx-auto mb-6">
-            <h3 className="font-semibold mb-2">¿Qué puede estar pasando?</h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• El producto no existe en la base de datos</li>
-              <li>• El backend no está ejecutándose</li>
-              <li>• Error en la conexión con la API</li>
-            </ul>
-          </div>
-
           <div className="space-x-4">
             <button
               onClick={() => window.location.reload()}
@@ -116,7 +101,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // ... (el resto de tu código para cuando SÍ hay producto) ...
   const getColorHex = (color: string): string => {
     const colorMap: Record<string, string> = {
       'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
@@ -170,13 +154,50 @@ export default function ProductDetailPage() {
               }}
             />
           </div>
+
+          {/* Galería de miniaturas */}
+          {images.length > 1 && (
+            <div className="grid grid-cols-4 gap-2">
+              {images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`relative aspect-square overflow-hidden rounded-md border-2 ${
+                    selectedImage === index ? 'border-blue-600' : 'border-gray-200'
+                  }`}
+                >
+                  <Image
+                    src={image}
+                    alt={`${product.name} - Vista ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder-product.jpg';
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Información del producto */}
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+            {product.brand && (
+              <p className="text-sm text-gray-500 mb-3">Marca: {product.brand}</p>
+            )}
             <p className="text-2xl font-bold text-green-600 mb-4">${product.price}</p>
+            
+            {product.originalPrice && product.originalPrice > product.price && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-lg text-gray-500 line-through">${product.originalPrice}</span>
+                <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
+                  {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                </span>
+              </div>
+            )}
           </div>
 
           {product.description && (
@@ -186,13 +207,97 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          <div className="flex gap-4">
-            <button
-              className="flex-1 px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Agregar al carrito
-            </button>
+          {/* Selector de color */}
+          {colors.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Color</h3>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 ${
+                      selectedColor === color 
+                        ? 'border-blue-600 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                  >
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: getColorHex(color) }}
+                    />
+                    <span className="text-sm capitalize">{color}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Selector de talla */}
+          {sizes.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Talla</h3>
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 rounded-md border-2 ${
+                      selectedSize === size 
+                        ? 'border-blue-600 bg-blue-50 text-blue-800' 
+                        : 'border-gray-200 text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Stock y botones de acción */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className={`inline-block w-3 h-3 rounded-full ${
+                inStock > 0 ? 'bg-green-500' : 'bg-red-500'
+              }`}></span>
+              <span className="text-sm text-gray-600">
+                {inStock > 0 ? `${inStock} disponibles` : 'Sin stock'}
+              </span>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                disabled={inStock === 0}
+                className={`flex-1 px-8 py-3 rounded-lg font-semibold transition-colors ${
+                  inStock > 0
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {inStock > 0 ? 'Agregar al carrito' : 'Sin stock'}
+              </button>
+              
+              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                ❤️
+              </button>
+            </div>
           </div>
+
+          {/* Especificaciones */}
+          {product.specifications && Object.keys(product.specifications).length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Especificaciones</h3>
+              <div className="grid gap-2 text-sm">
+                {Object.entries(product.specifications).map(([key, value]) => (
+                  <div key={key} className="flex justify-between">
+                    <span className="text-gray-600 capitalize">{key}:</span>
+                    <span className="text-gray-900">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
