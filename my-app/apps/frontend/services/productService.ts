@@ -129,10 +129,10 @@ export class ProductService {
   }
 
   // Obtener productos por categoría
-  static async getProductsByCategory(category: string): Promise<Product[]> {
-    const url = `${API_CONFIG.BASE_URL}/api/products?category=${encodeURIComponent(
-      category
-    )}`;
+  static async getProductsByCategory(category: string = 'all'): Promise<Product[]> {
+    const url = category === 'all' 
+      ? `${API_CONFIG.BASE_URL}/api/products`
+      : `${API_CONFIG.BASE_URL}/api/products?category=${encodeURIComponent(category)}`;
 
     console.log('🔄 Fetching products for:', category, 'from:', url);
 
@@ -151,15 +151,28 @@ export class ProductService {
     }
   }
 
-  // Obtener producto por ID
+  // Obtener producto por ID - VERSIÓN CORREGIDA
   static async getProductById(id: string): Promise<Product | null> {
-    const url = `${API_CONFIG.BASE_URL}/api/products/${id}`;
     try {
-      const response = await this.fetchWithTimeout(url);
-      const product = await this.handleResponse<Product>(response);
+      console.log('🔍 Getting product by ID:', id);
+      
+      // Obtener TODOS los productos primero
+      const allProducts = await this.getProductsByCategory('all');
+      
+      // Buscar el producto por ID
+      const product = allProducts.find(p => 
+        p.id.toString() === id || p.id === parseInt(id)
+      );
+      
+      if (!product) {
+        console.warn('❌ Product not found with ID:', id);
+        return null;
+      }
+      
+      console.log('✅ Product found:', product.name);
       return product;
     } catch (error) {
-      console.error('❌ Error fetching product:', error);
+      console.error('❌ Error in getProductById:', error);
       return null;
     }
   }

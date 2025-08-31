@@ -27,22 +27,16 @@ export default function ProductDetailPage() {
           throw new Error('ID de producto no proporcionado');
         }
 
-        // SOLUCIÓN: Obtener TODOS los productos y filtrar
-        console.log('🔍 Getting all products to filter...');
-        const allProductsData = await ProductService.getProductsByCategory('all');
+        // ✅ Ahora usa el ProductService corregido
+        const productData = await ProductService.getProductById(productId);
         
-        // Buscar el producto específico por ID
-        const foundProduct = allProductsData.find((p: Product) => 
-          p.id.toString() === productId || p.id === parseInt(productId)
-        );
-
-        console.log('🔎 Product found:', foundProduct);
+        console.log('✅ Product data received:', productData);
         
-        if (!foundProduct) {
-          throw new Error(`Producto con ID ${productId} no encontrado`);
+        if (!productData) {
+          throw new Error('Producto no encontrado');
         }
 
-        setProduct(foundProduct);
+        setProduct(productData);
       } catch (error) {
         console.error('💥 Error loading product:', error);
         setError(error instanceof Error ? error.message : 'Error desconocido');
