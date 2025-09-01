@@ -211,7 +211,6 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           {/* ✅ COLORES CON IMÁGENES */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
-              <p className="text-sm text-gray-600 mb-2">Colores:</p>
               <div className="flex gap-1">
                 {product.colors.slice(0, 4).map((color: string, index: number) => {
                   const colorImage = getColorImage(color);
