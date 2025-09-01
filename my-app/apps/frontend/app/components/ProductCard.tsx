@@ -46,15 +46,6 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     return { hasDiscount, discountPercentage, isNew, isOutOfStock };
   }, [product, showNewBadge]);
 
-  // ✅ Estado de stock memoizado
-  const stockStatus = useMemo(() => {
-    if (isOutOfStock) return { text: '❌ Agotado', color: 'text-red-600' };
-    
-    if (product.stock > 10) return { text: '✅ Disponible', color: 'text-green-600' };
-    
-    return { text: `⚠️ Últimas ${product.stock}`, color: 'text-orange-600' };
-  }, [isOutOfStock, product.stock]);
-
   // ✅ URL de imagen memoizada
   const imageSrc = useMemo(() => {
     return imageError 
@@ -176,7 +167,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           )}
         </div>
 
-        {/* Contenido de la tarjeta - SIMPLIFICADO */}
+        {/* Contenido de la tarjeta - MÁS SIMPLIFICADO */}
         <div className="p-4 flex-grow">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-violet-700 transition-colors min-h-[3rem]">
             {product.name}
@@ -217,7 +208,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             )}
           </div>
 
-          {/* ✅ COLORES CON IMÁGENES - NUEVA FUNCIONALIDAD */}
+          {/* ✅ COLORES CON IMÁGENES */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Colores:</p>
@@ -259,22 +250,18 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             </div>
           )}
 
-          {/* Estado de stock */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <span className={`text-sm font-medium ${stockStatus.color}`}>
-              {stockStatus.text}
-            </span>
-            
-            {product.price > 50 && !isOutOfStock && (
+          {/* ✅ ENVÍO GRATIS (se mantiene porque es una ventaja promocional) */}
+          {product.price > 50 && !isOutOfStock && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                 🚚 Envío gratis
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Link>
 
-      {/* Botones de acción - SIMPLIFICADO */}
+      {/* Botones de acción */}
       <div className="px-4 pb-4 mt-auto">
         <AddToCartButton 
           product={product} 
