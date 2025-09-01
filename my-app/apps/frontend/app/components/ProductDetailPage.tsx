@@ -15,10 +15,6 @@ import ProductSpecifications from '../components/ProductSpecifications';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
 
-interface ProductDetailProps {
-  product: Product;
-}
-
 // Mapa de colores para el selector
 const COLOR_MAP: Record<string, string> = {
   negro: '#000000',
@@ -46,8 +42,8 @@ interface ProductDetailProps {
   product: Product;
 }
 
-// ✅ Componente ProductDetail con props definidas
-function ProductDetail({ product }: ProductDetailProps) {
+// ✅ Componente ProductDetail con props definidas (RENOMBRADO para evitar conflicto)
+function ProductDetailContent({ product }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
@@ -100,7 +96,7 @@ function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Breadcrumb - ✅ Corregido: sin espacio antes de = */}
+      {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -254,13 +250,20 @@ export default function ProductDetailPage() {
   const loadProduct = useCallback(async () => {
     try {
       setError('');
-      if (!productId) throw new Error('ID de producto no proporcionado');
+      if (!productId) {
+        console.error('❌ Product ID not provided');
+        throw new Error('ID de producto no proporcionado');
+      }
 
       console.log('🔄 Loading product ID:', productId);
 
       const productData = await ProductService.getProductById(productId);
-      if (!productData) throw new Error('Producto no encontrado');
+      if (!productData) {
+        console.error('❌ Product not found for ID:', productId);
+        throw new Error('Producto no encontrado');
+      }
 
+      console.log('✅ Product loaded:', productData.name);
       setProduct(productData);
       
     } catch (error) {
@@ -272,8 +275,21 @@ export default function ProductDetailPage() {
   }, [productId]);
 
   useEffect(() => {
-    loadProduct();
-  }, [loadProduct]);
+    if (productId) {
+      loadProduct();
+    } else {
+      setLoading(false);
+      setError('ID de producto no proporcionado');
+    }
+  }, [productId, loadProduct]);
+
+  // ✅ Debug: Ver qué estamos obteniendo
+  console.log('📋 ProductDetailPage state:', {
+    productId,
+    loading,
+    error,
+    hasProduct: !!product
+  });
 
   if (loading) {
     return <LoadingSpinner productId={productId} />;
@@ -289,6 +305,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // ✅ Ahora pasa el product como prop correctamente
-  return <ProductDetail product={product} />;
+  // ✅ Ahora pasa el product como prop correctamente al componente renombrado
+  return <ProductDetailContent product={product} />; 
 }
