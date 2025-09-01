@@ -12,6 +12,7 @@ import ProductSpecifications from './ProductSpecifications';
 import SizeGuideModal from './SizeGuideModal';
 import ProductReviews from './ProductReviews';
 
+
 const COLOR_MAP: Record<string, string> = {
   negro: '#000000',
   blanco: '#ffffff',
