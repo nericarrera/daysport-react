@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> } // ← Next.js 15: params es Promise
+  context: { params: { id: string } } // 👈 Ahora no es Promise
 ) {
   try {
-    // Desempaquetar params
-    const resolvedParams = await context.params;
-    const { id } = resolvedParams;
+    const { id } = context.params; // 👈 Ya no necesitas await
     
     // Tu lógica aquí...
     const response = await fetch(`http://localhost:3001/products/${id}`);
