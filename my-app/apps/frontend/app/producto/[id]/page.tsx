@@ -1,16 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { ProductService } from '../../../services/productService';
+import { ProductService } from '@/services/productService';
 import { Product } from '../../types/product';
 import ProductRelated from '../../components/RelatedProducts';
 
-
-
-export default function ProductDetailPage() {
-  const params = useParams<{ id: string }>();
+export default function ProductDetailPage({ productId }: { productId: string }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -22,19 +18,12 @@ export default function ProductDetailPage() {
     async function loadProduct() {
       try {
         setError('');
-        const productId = params?.id;
-
-        if (!productId) {
-          throw new Error('ID de producto no proporcionado');
-        }
+        if (!productId) throw new Error('ID de producto no proporcionado');
 
         console.log('🔄 Loading product ID:', productId);
 
         const productData = await ProductService.getProductById(productId);
-
-        if (!productData) {
-          throw new Error('Producto no encontrado');
-        }
+        if (!productData) throw new Error('Producto no encontrado');
 
         setProduct(productData);
       } catch (error) {
@@ -45,13 +34,8 @@ export default function ProductDetailPage() {
       }
     }
 
-    if (params?.id) {
-      loadProduct();
-    } else {
-      setLoading(false);
-      setError('ID de producto no encontrado en la URL');
-    }
-  }, [params?.id]);
+    loadProduct();
+  }, [productId]);
 
   if (loading) {
     return (
@@ -59,7 +43,7 @@ export default function ProductDetailPage() {
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Cargando producto...</p>
-          <p className="text-sm text-gray-400">ID: {params?.id}</p>
+          <p className="text-sm text-gray-400">ID: {product?.id}</p>
         </div>
       </div>
     );
@@ -72,7 +56,7 @@ export default function ProductDetailPage() {
           <div className="text-6xl mb-4">😢</div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Error al cargar el producto</h1>
           <p className="text-gray-600 mb-4">{error || 'Producto no encontrado'}</p>
-          <p className="text-sm text-gray-500 mb-6">ID solicitado: {params?.id}</p>
+          <p className="text-sm text-gray-500 mb-6">ID solicitado: {product?.id}</p>
 
           <div className="space-x-4">
             <button
