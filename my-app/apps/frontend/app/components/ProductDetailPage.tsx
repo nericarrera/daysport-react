@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { ProductService } from '@/services/productService';
 import { Product } from '../types/product';
 import ProductRelated from '../components/RelatedProducts';
@@ -15,6 +14,10 @@ import PriceDisplay from '../components/PriceDisplay';
 import ProductSpecifications from '../components/ProductSpecifications';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorDisplay from '../components/ErrorDisplay';
+
+interface ProductDetailProps {
+  product: Product;
+}
 
 // Mapa de colores para el selector
 const COLOR_MAP: Record<string, string> = {
@@ -38,100 +41,17 @@ const COLOR_MAP: Record<string, string> = {
   borravino: '#800020',
 };
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const productId = params.id as string;
-  
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+// ✅ Define la interfaz para las props del componente ProductDetail
+interface ProductDetailProps {
+  product: Product;
+}
+
+// ✅ Componente ProductDetail con props definidas
+function ProductDetail({ product }: ProductDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [addingToCart, setAddingToCart] = useState(false);
-
-  // Función para cargar el producto
-  const loadProduct = useCallback(async () => {
-    try {
-      setError('');
-      if (!productId) throw new Error('ID de producto no proporcionado');
-
-      console.log('🔄 Loading product ID:', productId);
-
-      const productData = await ProductService.getProductById(productId);
-      if (!productData) throw new Error('Producto no encontrado');
-
-      setProduct(productData);
-      
-      // Seleccionar primer color y talla por defecto si existen
-      if (productData.colors && productData.colors.length > 0) {
-        setSelectedColor(productData.colors[0]);
-      }
-      if (productData.sizes && productData.sizes.length > 0) {
-        setSelectedSize(productData.sizes[0]);
-      }
-    } catch (error) {
-      console.error('💥 Error loading product:', error);
-      setError(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
-  }, [productId]);
-
-  useEffect(() => {
-    loadProduct();
-  }, [loadProduct]);
-
-  // Función para manejar agregar al carrito
-  const handleAddToCart = async () => {
-    if (!product || !product.inStock) return;
-    
-    setAddingToCart(true);
-    try {
-      // Aquí iría la lógica para agregar al carrito
-      console.log('Agregando al carrito:', {
-        productId: product.id,
-        name: product.name,
-        size: selectedSize,
-        color: selectedColor,
-        price: product.price
-      });
-      
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mostrar feedback al usuario
-      // Podrías usar un toast notification aquí
-      alert('¡Producto agregado al carrito!');
-    } catch (error) {
-      console.error('Error al agregar al carrito:', error);
-      alert('Error al agregar el producto al carrito');
-    } finally {
-      setAddingToCart(false);
-    }
-  };
-
-  // Función para manejar favoritos
-  const handleAddToFavorites = () => {
-    // Lógica para agregar a favoritos
-    console.log('Agregando a favoritos:', product?.id);
-    // Podrías implementar un estado local para favoritos
-  };
-
-  if (loading) {
-    return <LoadingSpinner productId={productId} />;
-  }
-
-  if (error || !product) {
-    return (
-      <ErrorDisplay 
-        error={error} 
-        productId={productId}
-        onRetry={loadProduct}
-      />
-    );
-  }
 
   const images = product.images || [];
   const sizes = product.sizes || [];
@@ -149,10 +69,39 @@ export default function ProductDetailPage() {
     { label: product.name, href: `#` }
   ];
 
+  // Función para manejar agregar al carrito
+  const handleAddToCart = async () => {
+    if (!product || !product.inStock) return;
+    
+    setAddingToCart(true);
+    try {
+      console.log('Agregando al carrito:', {
+        productId: product.id,
+        name: product.name,
+        size: selectedSize,
+        color: selectedColor,
+        price: product.price
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      alert('¡Producto agregado al carrito!');
+    } catch (error) {
+      console.error('Error al agregar al carrito:', error);
+      alert('Error al agregar el producto al carrito');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  // Función para manejar favoritos
+  const handleAddToFavorites = () => {
+    console.log('Agregando a favoritos:', product.id);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <Breadcrumb items ={breadcrumbItems} />
+      {/* Breadcrumb - ✅ Corregido: sin espacio antes de = */}
+      <Breadcrumb items={breadcrumbItems} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {/* Galería de imágenes */}
@@ -289,4 +238,57 @@ export default function ProductDetailPage() {
       </div>
     </div>
   );
+}
+
+// ✅ Componente principal de la página
+export default function ProductDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const productId = params.id as string;
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  // Función para cargar el producto
+  const loadProduct = useCallback(async () => {
+    try {
+      setError('');
+      if (!productId) throw new Error('ID de producto no proporcionado');
+
+      console.log('🔄 Loading product ID:', productId);
+
+      const productData = await ProductService.getProductById(productId);
+      if (!productData) throw new Error('Producto no encontrado');
+
+      setProduct(productData);
+      
+    } catch (error) {
+      console.error('💥 Error loading product:', error);
+      setError(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  }, [productId]);
+
+  useEffect(() => {
+    loadProduct();
+  }, [loadProduct]);
+
+  if (loading) {
+    return <LoadingSpinner productId={productId} />;
+  }
+
+  if (error || !product) {
+    return (
+      <ErrorDisplay 
+        error={error} 
+        productId={productId}
+        onRetry={loadProduct}
+      />
+    );
+  }
+
+  // ✅ Ahora pasa el product como prop correctamente
+  return <ProductDetail product={product} />;
 }
