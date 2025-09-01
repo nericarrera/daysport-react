@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { HeartIcon, ArrowLeftIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { Product } from '../types/product';
 
-// ✅ AGREGAR METADATA - Esto ayuda a Next.js a reconocer la ruta
+// ✅ METADATA (Next.js la detecta en rutas app/)
 export const metadata = {
   title: 'Mis Favoritos - DaySport',
   description: 'Tus productos favoritos en DaySport',
@@ -33,23 +33,16 @@ export default function FavoritosPage() {
 
     loadFavorites();
 
-    // Escuchar eventos de actualización de favoritos desde otros componentes
-    const handleFavoritesUpdate = () => {
-      loadFavorites();
-    };
-
+    // 🔄 Sincronizar cuando otros componentes modifiquen favoritos
+    const handleFavoritesUpdate = () => loadFavorites();
     window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
     return () => window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
   }, []);
 
   const removeFromFavorites = (productId: number) => {
-    const updatedFavorites = favoriteProducts.filter(product => product.id !== productId);
+    const updatedFavorites = favoriteProducts.filter(p => p.id !== productId);
     setFavoriteProducts(updatedFavorites);
-    
-    // Guardar en localStorage
     localStorage.setItem('favoriteProducts', JSON.stringify(updatedFavorites));
-    
-    // Disparar evento para sincronizar otros componentes
     window.dispatchEvent(new CustomEvent('favoritesUpdated'));
   };
 
@@ -72,7 +65,7 @@ export default function FavoritosPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Header */}
+      {/* 🔹 Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="text-gray-600 hover:text-pink-600 transition-colors">
@@ -80,7 +73,7 @@ export default function FavoritosPage() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Mis Favoritos</h1>
         </div>
-        
+
         {favoriteProducts.length > 0 && (
           <button
             onClick={clearAllFavorites}
@@ -91,7 +84,7 @@ export default function FavoritosPage() {
         )}
       </div>
 
-      {/* Contenido */}
+      {/* 🔹 Contenido */}
       {favoriteProducts.length === 0 ? (
         <div className="text-center py-16">
           <div className="w-24 h-24 mx-auto mb-6 bg-pink-100 rounded-full flex items-center justify-center">
@@ -111,9 +104,11 @@ export default function FavoritosPage() {
         </div>
       ) : (
         <>
+          {/* 🔹 Info de favoritos */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-600">
-              {favoriteProducts.length} {favoriteProducts.length === 1 ? 'producto' : 'productos'} favorito{favoriteProducts.length !== 1 ? 's' : ''}
+              {favoriteProducts.length} {favoriteProducts.length === 1 ? 'producto' : 'productos'} favorito
+              {favoriteProducts.length !== 1 ? 's' : ''}
             </p>
             <button
               onClick={clearAllFavorites}
@@ -123,9 +118,13 @@ export default function FavoritosPage() {
             </button>
           </div>
 
+          {/* 🔹 Grid de productos */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favoriteProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 group">
+              <div
+                key={product.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 group"
+              >
                 <Link href={`/producto/${product.id}`} className="block">
                   <div className="relative h-48 overflow-hidden">
                     <Image
@@ -134,7 +133,8 @@ export default function FavoritosPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
-                        e.currentTarget.src = '/placeholder-product.jpg';
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder-product.jpg';
                       }}
                     />
                   </div>
@@ -157,7 +157,7 @@ export default function FavoritosPage() {
                   </div>
 
                   <p className="text-lg font-bold text-green-600 mb-2">${product.price}</p>
-                  
+
                   {product.category && (
                     <p className="text-sm text-gray-600 capitalize mb-3">
                       {product.category}
@@ -165,7 +165,7 @@ export default function FavoritosPage() {
                     </p>
                   )}
 
-                  {/* Rating */}
+                  {/* 🔹 Rating */}
                   {product.rating && (
                     <div className="flex items-center mb-3">
                       <div className="flex text-yellow-400 text-sm">
@@ -178,6 +178,7 @@ export default function FavoritosPage() {
                     </div>
                   )}
 
+                  {/* 🔹 Acciones */}
                   <div className="flex gap-2 mt-4">
                     <Link
                       href={`/producto/${product.id}`}
