@@ -118,8 +118,11 @@ export default function ProductDetailPage() {
   const images = product.images || [];
   const sizes = product.sizes || [];
   const colors = product.colors || [];
-  const inStock =
-    product.inStock !== undefined ? product.inStock : product.stockQuantity || 0;
+  
+  // ✅ CORRECCIÓN: Lógica de stock actualizada
+  const isAvailable = product.inStock; // boolean
+  const stockQuantity = product.stock || product.stockQuantity || 0; // number
+  
   const mainImage =
     product.mainImageUrl ||
     product.mainImage ||
@@ -284,24 +287,29 @@ export default function ProductDetailPage() {
             <div className="flex items-center gap-2">
               <span
                 className={`inline-block w-3 h-3 rounded-full ${
-                  inStock > 0 ? 'bg-green-500' : 'bg-red-500'
+                  isAvailable ? 'bg-green-500' : 'bg-red-500'
                 }`}
               ></span>
               <span className="text-sm text-gray-600">
-                {inStock > 0 ? `${inStock} disponibles` : 'Sin stock'}
+                {isAvailable 
+                  ? stockQuantity > 0 
+                    ? `${stockQuantity} disponibles` 
+                    : 'Disponible'
+                  : 'Sin stock'
+                }
               </span>
             </div>
 
             <div className="flex gap-4">
               <button
-                disabled={inStock === 0}
+                disabled={!isAvailable}
                 className={`flex-1 px-8 py-3 rounded-lg font-semibold transition-colors ${
-                  inStock > 0
+                  isAvailable
                     ? 'bg-blue-600 text-white hover:bg-blue-700'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                {inStock > 0 ? 'Agregar al carrito' : 'Sin stock'}
+                {isAvailable ? 'Agregar al carrito' : 'Sin stock'}
               </button>
 
               <button
