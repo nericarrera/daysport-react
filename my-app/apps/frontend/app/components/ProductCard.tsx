@@ -10,9 +10,10 @@ import AddToCartButton from './AddToCartButton';
 interface ProductCardProps {
   product: Product;
   showNewBadge?: boolean;
+  priority?: boolean;
 }
 
-// Mapa de colores fuera del componente para mejor rendimiento
+// Mapa de colores optimizado
 const COLOR_MAP: Record<string, string> = {
   'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
   'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
@@ -24,84 +25,12 @@ const COLOR_MAP: Record<string, string> = {
   'ocre': '#cc7722', 'vino': '#722f37'
 };
 
-export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
+export default function ProductCard({ product, showNewBadge = false, priority = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Verificar si el producto es favorito al cargar
-  useEffect(() => {
-    const checkIfFavorite = () => {
-      try {
-        const savedFavorites = localStorage.getItem('favoriteProducts');
-        if (savedFavorites) {
-          const favorites: Product[] = JSON.parse(savedFavorites);
-          const isFav = favorites.some(fav => fav.id === product.id);
-          setIsFavorite(isFav);
-        }
-      } catch (error) {
-        console.error('Error checking favorites:', error);
-      }
-    };
-
-    checkIfFavorite();
-
-    // Escuchar eventos de actualización de favoritos
-    const handleFavoritesUpdate = () => {
-      checkIfFavorite();
-    };
-
-    window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
-    return () => window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
-  }, [product.id]);
-
-  // Debug solo en desarrollo
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const imgUrl = product.mainImageUrl || product.mainImage;
-      console.log('🔍 IMAGE DEBUG:', {
-        url: imgUrl,
-        exists: !!imgUrl,
-        isExternal: imgUrl?.includes('http'),
-        isLocalhost: imgUrl?.includes('localhost')
-      });
-    }
-  }, [product]);
-
-  const getColorHex = useCallback((color: string): string => {
-    return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
-  }, []);
-
-  // Función para toggle de favoritos
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    try {
-      const savedFavorites = localStorage.getItem('favoriteProducts');
-      let favorites: Product[] = savedFavorites ? JSON.parse(savedFavorites) : [];
-      
-      if (isFavorite) {
-        // Remover de favoritos
-        favorites = favorites.filter(fav => fav.id !== product.id);
-        setIsFavorite(false);
-      } else {
-        // Agregar a favoritos
-        favorites.push(product);
-        setIsFavorite(true);
-      }
-      
-      localStorage.setItem('favoriteProducts', JSON.stringify(favorites));
-      
-      // Disparar evento personalizado para actualizar contadores en otras partes
-      window.dispatchEvent(new CustomEvent('favoritesUpdated'));
-      
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-    }
-  };
-
-  // Memoizar cálculos costosos
+  // ✅ Memoizar cálculos costosos
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercentage = hasDiscount 
@@ -109,44 +38,77 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
       : 0;
 
     const isNew = showNewBadge && product.createdAt 
-      ? (new Date().getTime() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
+      ? (Date.now() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
       : false;
 
-    const isOutOfStock = (product.stockQuantity === 0 || !product.inStock);
+    const isOutOfStock = product.stock === 0 || !product.inStock;
 
     return { hasDiscount, discountPercentage, isNew, isOutOfStock };
   }, [product, showNewBadge]);
 
-  // Determinar el estado de stock
+  // ✅ Estado de stock memoizado
   const stockStatus = useMemo(() => {
     if (isOutOfStock) return { text: '❌ Agotado', color: 'text-red-600' };
     
-    if (product.stockQuantity && product.stockQuantity > 10) {
-      return { text: '✅ Disponible', color: 'text-green-600' };
-    }
+    if (product.stock > 10) return { text: '✅ Disponible', color: 'text-green-600' };
     
-    return { 
-      text: `⚠️ Últimas ${product.stockQuantity} unidades`, 
-      color: 'text-orange-600' 
-    };
-  }, [isOutOfStock, product.stockQuantity]);
+    return { text: `⚠️ Últimas ${product.stock}`, color: 'text-orange-600' };
+  }, [isOutOfStock, product.stock]);
 
-  // URL de la imagen con fallback
+  // ✅ URL de imagen memoizada
   const imageSrc = useMemo(() => {
     return imageError 
       ? '/images/placeholder.jpg' 
       : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg');
   }, [imageError, product.mainImageUrl, product.mainImage]);
 
-  // Manejo de errores de imagen
-  const handleImageError = useCallback(() => {
-    setImageError(true);
-    setImageLoading(false);
-  }, []);
+  // ✅ Manejo de favoritos optimizado
+  const toggleFavorite = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      const saved = localStorage.getItem('favoriteProducts');
+      const favorites: Product[] = saved ? JSON.parse(saved) : [];
+      
+      const newFavorites = isFavorite
+        ? favorites.filter(fav => fav.id !== product.id)
+        : [...favorites, product];
+      
+      localStorage.setItem('favoriteProducts', JSON.stringify(newFavorites));
+      setIsFavorite(!isFavorite);
+      window.dispatchEvent(new CustomEvent('favoritesUpdated'));
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  }, [isFavorite, product]);
 
-  const handleImageLoad = useCallback(() => {
-    setImageLoading(false);
-  }, []);
+  // ✅ Efecto para favoritos
+  useEffect(() => {
+    const checkFavorite = () => {
+      try {
+        const saved = localStorage.getItem('favoriteProducts');
+        if (saved) {
+          const favorites: Product[] = JSON.parse(saved);
+          setIsFavorite(favorites.some(fav => fav.id === product.id));
+        }
+      } catch (error) {
+        console.error('Error checking favorites:', error);
+      }
+    };
+
+    checkFavorite();
+    window.addEventListener('favoritesUpdated', checkFavorite);
+    return () => window.removeEventListener('favoritesUpdated', checkFavorite);
+  }, [product.id]);
+
+  // ✅ Obtener la primera imagen de color si existe
+  const getColorImage = useCallback((color: string) => {
+    if (product.colorImages && product.colorImages[color] && product.colorImages[color].length > 0) {
+      return product.colorImages[color][0];
+    }
+    return null;
+  }, [product.colorImages]);
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
@@ -174,7 +136,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         )}
       </div>
 
-      {/* Botón de favoritos en la esquina superior derecha */}
+      {/* Botón de favoritos */}
       <button
         onClick={toggleFavorite}
         className="absolute top-2 right-2 z-20 p-2 bg-white rounded-full shadow-md hover:bg-pink-50 transition-colors group/favorite"
@@ -188,11 +150,11 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
       </button>
 
       <Link 
-        href={`/producto/${product.id}`} 
+        href={`/producto/${product.slug || product.id}`} 
         className="block relative flex-grow"
         aria-label={`Ver detalles de ${product.name}`}
       >
-        {/* Imagen del producto con skeleton loading */}
+        {/* Imagen del producto */}
         <div className="relative h-48 w-full overflow-hidden">
           {imageLoading && (
             <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
@@ -203,8 +165,9 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
             unoptimized={true}
-            onError={handleImageError}
-            onLoad={handleImageLoad}
+            priority={priority}
+            onError={() => setImageError(true)}
+            onLoad={() => setImageLoading(false)}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           
@@ -213,7 +176,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
           )}
         </div>
 
-        {/* Contenido de la tarjeta */}
+        {/* Contenido de la tarjeta - SIMPLIFICADO */}
         <div className="p-4 flex-grow">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-violet-700 transition-colors min-h-[3rem]">
             {product.name}
@@ -225,6 +188,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             </p>
           )}
 
+          {/* Categoría */}
           <div className="flex items-center text-sm text-gray-500 mb-3">
             <span className="capitalize">{product.category}</span>
             {product.subcategory && (
@@ -253,69 +217,49 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
             )}
           </div>
 
-          {/* Rating */}
-          {product.rating && (
-            <div className="flex items-center mb-3">
-              <div className="flex text-yellow-400">
-                {'★'.repeat(Math.round(product.rating))}
-                {'☆'.repeat(5 - Math.round(product.rating))}
-              </div>
-              <span className="text-sm text-gray-600 ml-2">
-                ({product.rating.toFixed(1)})
-              </span>
-              {product.reviewCount && (
-                <span className="text-sm text-gray-500 ml-2">
-                  ({product.reviewCount} reviews)
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Colores */}
+          {/* ✅ COLORES CON IMÁGENES - NUEVA FUNCIONALIDAD */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
-              <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
-              <div className="flex gap-2">
-                {product.colors.slice(0, 5).map((color: string, index: number) => (
-                  <span
-                    key={index}
-                    className="w-5 h-5 rounded-full border-2 border-gray-200 shadow-sm"
-                    style={{ backgroundColor: getColorHex(color) }}
-                    title={color.charAt(0).toUpperCase() + color.slice(1)}
-                  />
-                ))}
-                {product.colors.length > 5 && (
+              <p className="text-sm text-gray-600 mb-2">Colores:</p>
+              <div className="flex gap-1">
+                {product.colors.slice(0, 4).map((color: string, index: number) => {
+                  const colorImage = getColorImage(color);
+                  return (
+                    <div
+                      key={index}
+                      className="relative w-6 h-6 rounded-full border-2 border-gray-200 shadow-sm overflow-hidden group/color"
+                      title={color.charAt(0).toUpperCase() + color.slice(1)}
+                    >
+                      {/* Mostrar imagen del color si existe, sino mostrar círculo de color */}
+                      {colorImage ? (
+                        <Image
+                          src={colorImage}
+                          alt={`${product.name} - Color ${color}`}
+                          fill
+                          className="object-cover"
+                          sizes="24px"
+                        />
+                      ) : (
+                        <div 
+                          className="w-full h-full"
+                          style={{ backgroundColor: COLOR_MAP[color.toLowerCase()] || '#f0f0f0' }}
+                        />
+                      )}
+                      {/* Tooltip en hover */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover/color:bg-opacity-20 transition-opacity" />
+                    </div>
+                  );
+                })}
+                {product.colors.length > 4 && (
                   <span className="text-xs text-gray-500 self-center">
-                    +{product.colors.length - 5}
+                    +{product.colors.length - 4}
                   </span>
                 )}
               </div>
             </div>
           )}
 
-          {/* Tallas */}
-          {product.sizes && product.sizes.length > 0 && product.sizes[0] !== 'Único' && (
-            <div className="mb-3">
-              <p className="text-sm text-gray-600 mb-2">Tallas:</p>
-              <div className="flex flex-wrap gap-1">
-                {product.sizes.slice(0, 6).map((size: string, index: number) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-gray-100 text-xs rounded-md text-gray-700 border border-gray-200"
-                  >
-                    {size}
-                  </span>
-                ))}
-                {product.sizes.length > 6 && (
-                  <span className="text-xs text-gray-500 self-center">
-                    +{product.sizes.length - 6}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Estado de stock y envío */}
+          {/* Estado de stock */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <span className={`text-sm font-medium ${stockStatus.color}`}>
               {stockStatus.text}
@@ -330,7 +274,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         </div>
       </Link>
 
-      {/* Botones de acción */}
+      {/* Botones de acción - SIMPLIFICADO */}
       <div className="px-4 pb-4 mt-auto">
         <AddToCartButton 
           product={product} 
@@ -343,27 +287,22 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         />
         
         {!isOutOfStock && (
-          <div className="flex gap-2 mt-2">
-            <button 
-              onClick={toggleFavorite}
-              className="flex-1 text-xs text-gray-600 hover:text-pink-600 transition-colors flex items-center justify-center gap-1"
-            >
-              {isFavorite ? (
-                <>
-                  <HeartSolid className="h-4 w-4 text-pink-600" />
-                  Quitar favorito
-                </>
-              ) : (
-                <>
-                  <HeartOutline className="h-4 w-4" />
-                  Agregar favorito
-                </>
-              )}
-            </button>
-            <button className="flex-1 text-xs text-gray-600 hover:text-blue-600 transition-colors">
-              🔄 Comparar
-            </button>
-          </div>
+          <button 
+            onClick={toggleFavorite}
+            className="w-full mt-2 text-xs text-gray-600 hover:text-pink-600 transition-colors flex items-center justify-center gap-1 py-1"
+          >
+            {isFavorite ? (
+              <>
+                <HeartSolid className="h-4 w-4 text-pink-600" />
+                Quitar favorito
+              </>
+            ) : (
+              <>
+                <HeartOutline className="h-4 w-4" />
+                Agregar favorito
+              </>
+            )}
+          </button>
         )}
       </div>
     </div>
