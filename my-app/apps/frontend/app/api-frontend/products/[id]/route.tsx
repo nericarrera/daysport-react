@@ -6,7 +6,7 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-    const url = `http://localhost:3001/api/products/${id}`; // Llama al backend NestJS
+    const url = `http://localhost:3001/api/products/${id}`;
 
     const response = await fetch(url);
     if (!response.ok) {
