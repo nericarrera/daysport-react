@@ -5,10 +5,8 @@ import ProductRelated from './RelatedProducts';
 import Breadcrumb from './ui/Breadcrumbs';
 import ColorSelector from './ColorSelector';
 import SizeSelector from './SizeSelector';
-import ImageGallery from './ImageGallery';
 import StockBadge from './StockBadge';
 import PriceDisplay from './PriceDisplay';
-import ProductSpecifications from './ProductSpecifications';
 
 const COLOR_MAP: Record<string, string> = {
   negro: '#000000',
@@ -36,7 +34,6 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
-  const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [addingToCart, setAddingToCart] = useState(false);
@@ -75,57 +72,74 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <Breadcrumb items={breadcrumbItems} />
+    <div className="bg-white min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Migas de pan */}
+        <Breadcrumb items={breadcrumbItems} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <ImageGallery
-          images={images}
-          productName={product.name}
-          selectedImage={selectedImage}
-          onSelectImage={setSelectedImage}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+          {/* Galería de imágenes */}
+          <div className="grid grid-cols-2 gap-4">
+            {images.length > 0 ? (
+              images.map((img, idx) => (
+                <div key={idx} className="relative w-full aspect-square">
+                  <img
+                    src={img}
+                    alt={`${product.name} ${idx + 1}`}
+                    className="w-full h-full object-cover rounded-lg shadow"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="col-span-2 flex items-center justify-center bg-gray-100 rounded-lg h-96">
+                <span className="text-gray-500">Sin imágenes disponibles</span>
+              </div>
+            )}
+          </div>
 
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+          {/* Información del producto */}
+          <div className="space-y-6">
+            <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
 
-          <PriceDisplay price={product.price} originalPrice={product.originalPrice} className="mb-4" />
+            <PriceDisplay price={product.price} originalPrice={product.originalPrice} className="mb-4" />
 
-          {product.description && (
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Descripción</h3>
-              <p className="text-gray-600 leading-relaxed">{product.description}</p>
-            </div>
-          )}
+            {product.description && (
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Descripción</h3>
+                <p className="text-gray-600 leading-relaxed">{product.description}</p>
+              </div>
+            )}
 
-          {colors.length > 0 && (
-            <ColorSelector
-              colors={colors}
-              selectedColor={selectedColor}
-              onSelectColor={setSelectedColor}
-              colorMap={COLOR_MAP}
-            />
-          )}
+            {colors.length > 0 && (
+              <ColorSelector
+                colors={colors}
+                selectedColor={selectedColor}
+                onSelectColor={setSelectedColor}
+                colorMap={COLOR_MAP}
+              />
+            )}
 
-          {sizes.length > 0 && (
-            <SizeSelector sizes={sizes} selectedSize={selectedSize} onSelectSize={setSelectedSize} />
-          )}
+            {sizes.length > 0 && (
+              <SizeSelector sizes={sizes} selectedSize={selectedSize} onSelectSize={setSelectedSize} />
+            )}
 
-          <StockBadge isAvailable={isAvailable} stockQuantity={stockQuantity} />
+            <StockBadge isAvailable={isAvailable} stockQuantity={stockQuantity} />
 
-          <button
-            onClick={handleAddToCart}
-            disabled={!isAvailable || addingToCart}
-            className="px-8 py-3 rounded-lg bg-blue-600 text-white"
-          >
-            {addingToCart ? 'Agregando...' : 'Agregar al carrito'}
-          </button>
+            <button
+              onClick={handleAddToCart}
+              disabled={!isAvailable || addingToCart}
+              className="w-full md:w-auto px-8 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
+            >
+              {addingToCart ? 'Agregando...' : 'Agregar al carrito'}
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-6">Productos relacionados</h2>
-        <ProductRelated currentProductId={product.id} category={product.category} />
+        {/* Productos relacionados */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-6">Productos relacionados</h2>
+          <ProductRelated currentProductId={product.id} category={product.category} />
+        </div>
       </div>
     </div>
   );
