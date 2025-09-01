@@ -1,36 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: Request) {
   try {
-    const resolvedParams = await context.params;
-    const { id } = resolvedParams;
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
     
-    console.log('🔄 Fetching product from NestJS backend, ID:', id);
-    
-    // ✅ Usa el endpoint CORRECTO de NestJS
-    const response = await fetch(`http://localhost:3001/api/products/${id}`);
-    
-    console.log('📊 NestJS response status:', response.status);
-    
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Producto no encontrado" }, 
-        { status: 404 }
-      );
+    // ✅ Usar NestJS endpoint
+    let url = 'http://localhost:3001/api/products';
+    if (category) {
+      url += `?category=${category}`;
     }
     
-    const product = await response.json();
-    console.log('✅ Product found in NestJS:', product.name);
+    const response = await fetch(url);
     
-    return NextResponse.json(product);
-  } catch (error) {
-    console.error('💥 Error fetching product from NestJS:', error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" }, 
-      { status: 500 }
-    );
+    if (!response.ok) {
+      return NextResponse.json([], { status: 200 });
+    }
+    
+    const products = await response.json();
+    return NextResponse.json(products);
+  } catch {
+    return NextResponse.json([], { status: 200 });
   }
 }
