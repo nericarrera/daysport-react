@@ -1,37 +1,49 @@
+// types/product.ts
+
 export interface Product {
   id: number;
   name: string;
-  slug: string;  // ← NUEVO: esencial para URLs amigables
+  slug: string;
   description: string;
   price: number;
-  originalPrice?: number;
+  originalPrice?: number;           // precio tachado
   category: string;
   subcategory?: string;
   brand?: string;
-  images: string[];
-  mainImage: string;
-  mainImageUrl?: string;
-  sizes?: string[];
-  colors?: string[];
-  inStock: boolean;  // ← CAMBIADO: de number a boolean
-  stock: number;     // ← NUEVO: cantidad real en stock
-  stockQuantity?: number;
-  featured?: boolean;
-  discountPercentage?: number;
-  rating?: number;
-  reviewCount?: number;
-  specifications?: Record<string, string>;
+  images: string[];                 // galería de imágenes
+  mainImage: string;                // imagen principal (obligatoria)
+  mainImageUrl?: string;            // URL externa de la imagen principal
+  sizes?: string[];                 // tallas disponibles
+  colors?: string[];                // colores disponibles
+  inStock: boolean;                 // disponible o no
+  stock: number;                    // stock numérico
+  stockQuantity?: number;           // stock alternativo
+  featured?: boolean;               // destacado
+  discountPercentage?: number;      // % de descuento
+  rating?: number;                  // promedio de reviews
+  reviewCount?: number;             // cantidad de reviews
+  specifications?: Record<string, string>; // ficha técnica
   createdAt?: string;
   updatedAt?: string;
-  // Campos adicionales que podrías necesitar
-  tags?: string[];
+  tags?: string[];                  // etiquetas SEO, búsqueda
   weight?: number;
   dimensions?: {
     width: number;
     height: number;
     depth: number;
   };
-  sku?: string;
+  sku?: string;                     // código interno
+  fit?: string;                     // ajuste (ej: regular, slim, oversize)
+  
+  // 🚀 NUEVOS CAMPOS ÚTILES
+  material?: string;                // material principal (algodón, cuero, etc.)
+  gender?: 'hombre' | 'mujer' | 'niño' | 'unisex'; // público objetivo
+  season?: 'verano' | 'invierno' | 'otoño' | 'primavera' | 'todas'; // temporada
+  shippingInfo?: string;            // información de envío
+  returnPolicy?: string;            // política de devoluciones
+  warranty?: string;                // garantía
+  isLimitedEdition?: boolean;       // edición limitada
+  videoUrl?: string;                // video promocional / review
 }
 
 // Tipo para la respuesta paginada

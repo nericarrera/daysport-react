@@ -19,31 +19,55 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
 
   return (
     <div className="space-y-4">
-      {/* Imagen principal */}
-      <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-gray-100">
-        <img
-          src={images[selectedImage]}
-          alt={`${productName} - Vista ${selectedImage + 1}`}
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Miniaturas */}
-      {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
-          {images.map((image, index) => (
+      {/* Layout principal: 2 columnas */}
+      <div className="grid grid-cols-2">
+        {/* Columna izquierda - Miniaturas */}
+        <div className="space-0">
+          {images.slice(0, 2).map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
-              className={`relative aspect-square overflow-hidden rounded-md border-2 ${
+              className={`relative w-full aspect-square overflow-hidden rounded-lg border-2 transition-all ${
                 selectedImage === index
-                  ? 'border-blue-600'
+                  ? 'border-blue-600 ring-2 ring-blue-200'
                   : 'border-gray-200 hover:border-gray-400'
               }`}
             >
               <img
                 src={image}
                 alt={`${productName} - Miniatura ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Columna derecha - Imagen principal */}
+        <div className="relative aspect-square">
+          <img
+            src={images[selectedImage]}
+            alt={`${productName} - Vista principal`}
+            className="w-full h-full object-cover rounded-lg shadow-lg"
+          />
+        </div>
+      </div>
+
+      {/* Fila adicional de imágenes si hay más de 2 */}
+      {images.length > 2 && (
+        <div className="grid grid-cols-2 gap-4 pt-4">
+          {images.slice(2).map((image, index) => (
+            <button
+              key={index + 2}
+              onClick={() => setSelectedImage(index + 2)}
+              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                selectedImage === index + 2
+                  ? 'border-blue-600 ring-2 ring-blue-200'
+                  : 'border-gray-200 hover:border-gray-400'
+              }`}
+            >
+              <img
+                src={image}
+                alt={`${productName} - Miniatura ${index + 3}`}
                 className="w-full h-full object-cover"
               />
             </button>
