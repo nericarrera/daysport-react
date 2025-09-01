@@ -7,6 +7,8 @@ import { ProductService } from '../../../services/productService';
 import { Product } from '../../types/product';
 import ProductRelated from '../../components/RelatedProducts';
 
+
+
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
