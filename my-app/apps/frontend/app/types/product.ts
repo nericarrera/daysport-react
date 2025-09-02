@@ -26,9 +26,11 @@ export interface Product {
   tags?: string[];
   weight?: number;
   dimensions?: {
-    width: number;
-    height: number;
-    depth: number;
+  width: number;
+  height: number;
+  depth: number;
+  colorImages?: Record<string, string[]>;
+  detailImages?: string[];
   };
   sku?: string;
   fit?: string;
@@ -57,9 +59,6 @@ export interface Product {
     }>;
   };
   
-  // ✅ Para imágenes por color y detalles
-  colorImages?: Record<string, string[]>;
-  detailImages?: string[];
   
   // ✅ Información de envío y garantía
   shippingInfo?: {

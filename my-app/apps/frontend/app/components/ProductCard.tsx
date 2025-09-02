@@ -13,24 +13,12 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-// Mapa de colores optimizado
-const COLOR_MAP: Record<string, string> = {
-  'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
-  'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
-  'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
-  'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
-  'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
-  'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
-  'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
-  'ocre': '#cc7722', 'vino': '#722f37'
-};
-
 export default function ProductCard({ product, showNewBadge = false, priority = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // ✅ Memoizar cálculos costosos
+  // ✅ CORREGIDO: Usar stockQuantity en lugar de stock
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercentage = hasDiscount 
@@ -41,7 +29,9 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
       ? (Date.now() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
       : false;
 
-    const isOutOfStock = product.stock === 0 || !product.inStock;
+    // ✅ CORREGIDO: Usar stockQuantity si existe, sino usar stock
+    const stock = product.stockQuantity !== undefined ? product.stockQuantity : product.stock;
+    const isOutOfStock = stock === 0 || !product.inStock;
 
     return { hasDiscount, discountPercentage, isNew, isOutOfStock };
   }, [product, showNewBadge]);
@@ -93,8 +83,9 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     return () => window.removeEventListener('favoritesUpdated', checkFavorite);
   }, [product.id]);
 
-  // ✅ Obtener la primera imagen de color si existe
+  // ✅ Obtener la primera imagen de color si existe - MEJORADO
   const getColorImage = useCallback((color: string) => {
+    // ✅ CORREGIDO: Verificar que product.colorImages existe
     if (product.colorImages && product.colorImages[color] && product.colorImages[color].length > 0) {
       return product.colorImages[color][0];
     }
@@ -167,7 +158,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           )}
         </div>
 
-        {/* Contenido de la tarjeta - MÁS SIMPLIFICADO */}
+        {/* Contenido de la tarjeta */}
         <div className="p-4 flex-grow">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-violet-700 transition-colors min-h-[3rem]">
             {product.name}
@@ -208,33 +199,46 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             )}
           </div>
 
-          {/* ✅ COLORES CON IMÁGENES */}
+          {/* ✅ COLORES CON IMÁGENES - MEJORADO */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
-              <div className="flex gap-1">
+              <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
+              <div className="flex gap-2">
                 {product.colors.slice(0, 4).map((color: string, index: number) => {
                   const colorImage = getColorImage(color);
+                  
                   return (
                     <div
                       key={index}
-                      className="relative w-6 h-6 rounded-full border-2 border-gray-200 shadow-sm overflow-hidden group/color"
+                      className="relative w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm overflow-hidden group/color transition-transform hover:scale-110"
                       title={color.charAt(0).toUpperCase() + color.slice(1)}
                     >
-                      {/* Mostrar imagen del color si existe, sino mostrar círculo de color */}
+                      {/* Mostrar imagen del color si existe */}
                       {colorImage ? (
                         <Image
                           src={colorImage}
                           alt={`${product.name} - Color ${color}`}
                           fill
                           className="object-cover"
-                          sizes="24px"
+                          sizes="32px"
+                          onError={(e) => {
+                            // Fallback a círculo de color si la imagen falla
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.parentElement?.querySelector('.color-fallback') as HTMLElement;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
                         />
-                      ) : (
-                        <div 
-                          className="w-full h-full"
-                          style={{ backgroundColor: COLOR_MAP[color.toLowerCase()] || '#f0f0f0' }}
-                        />
-                      )}
+                      ) : null}
+                      
+                      {/* Fallback a círculo de color */}
+                      <div 
+                        className="color-fallback w-full h-full hidden"
+                        style={{ 
+                          backgroundColor: getColorHex(color),
+                          display: colorImage ? 'none' : 'block'
+                        }}
+                      />
+                      
                       {/* Tooltip en hover */}
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover/color:bg-opacity-20 transition-opacity" />
                     </div>
@@ -249,7 +253,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             </div>
           )}
 
-          {/* ✅ ENVÍO GRATIS (se mantiene porque es una ventaja promocional) */}
+          {/* ✅ ENVÍO GRATIS */}
           {product.price > 50 && !isOutOfStock && (
             <div className="mt-3 pt-3 border-t border-gray-100">
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
@@ -293,4 +297,20 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
       </div>
     </div>
   );
+}
+
+// ✅ Función para obtener color hexadecimal (necesaria para el fallback)
+function getColorHex(color: string): string {
+  const COLOR_MAP: Record<string, string> = {
+    'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
+    'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
+    'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
+    'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
+    'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
+    'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
+    'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
+    'ocre': '#cc7722', 'vino': '#722f37'
+  };
+  
+  return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
 }
