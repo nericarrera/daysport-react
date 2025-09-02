@@ -278,47 +278,48 @@ export default function AccesoriosPage() {
 
       {/* Sección de Categorías Circulares */}
       <div className="mb-12 overflow-x-auto">
-        <div className="flex space-x-8 pb-4">
-          {subcategories.map((subcategory) => (
-            <button
-              key={subcategory.slug}
-              onClick={() => setSelectedSubcategory(
-                selectedSubcategory === subcategory.slug ? '' : subcategory.slug
-              )}
-              className={`flex flex-col items-center group min-w-[80px] transition-all ${
-                selectedSubcategory === subcategory.slug 
-                  ? 'scale-110 text-gray-900' 
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-              aria-pressed={selectedSubcategory === subcategory.slug}
-            >
-              <div className={`rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 transition-all duration-300 ${
-                selectedSubcategory === subcategory.slug 
-                  ? 'border-gray-900 shadow-lg ring-2 ring-blue-100' 
-                  : 'border-gray-200 group-hover:border-gray-400 group-hover:shadow-md'
-              }`}>
-                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                  
-                </div>
-                 Backup por si quieres usar imágenes:
-                <Image
-                  src={subcategory.image || '/placeholder-category.jpg'}
-                  alt={subcategory.name}
-                  width={96}
-                  height={96}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder-category.jpg';
-                  }}
-                /> 
-              </div>
-              <span className="mt-2 text-sm font-medium transition-colors text-center">
-                {subcategory.name}
-              </span>
-            </button>
-          ))}
+  <div className="flex space-x-8 pb-4">
+    {subcategories.map((subcategory) => (
+      <button
+        key={subcategory.slug}
+        onClick={() =>
+          setSelectedSubcategory(
+            selectedSubcategory === subcategory.slug ? '' : subcategory.slug
+          )
+        }
+        className={`flex flex-col items-center group min-w-[80px] transition-all ${
+          selectedSubcategory === subcategory.slug
+            ? 'scale-110 text-gray-900'
+            : 'text-gray-600 hover:text-gray-900'
+        }`}
+        aria-pressed={selectedSubcategory === subcategory.slug}
+      >
+        <div
+          className={`relative rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 transition-all duration-300 ${
+            selectedSubcategory === subcategory.slug
+              ? 'border-gray-900 shadow-lg ring-2 ring-blue-100'
+              : 'border-gray-200 group-hover:border-gray-400 group-hover:shadow-md'
+          }`}
+        >
+          <Image
+            src={subcategory.image || '/placeholder-category.jpg'}
+            alt={subcategory.name}
+            fill
+            sizes="96px"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src =
+                '/placeholder-category.jpg';
+            }}
+          />
         </div>
-      </div>
+        <span className="mt-2 text-sm font-medium transition-colors text-center">
+          {subcategory.name}
+        </span>
+      </button>
+    ))}
+  </div>
+</div>
 
       {/* Contenido */}
       <div className="flex flex-col md:flex-row gap-8">
