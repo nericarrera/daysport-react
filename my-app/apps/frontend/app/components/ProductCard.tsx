@@ -117,7 +117,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
 
   return (
     <div 
-      className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full"
+      className="group relative bg-yellow shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-violet-200 flex flex-col h-full w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -148,7 +148,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
 
       <Link href={`/producto/${product.slug || product.id}`} className="block relative flex-grow">
         {/* Imagen principal */}
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className="relative h-90 w-full overflow-hidden">
           {imageLoading && <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>}
           <Image
             src={imageSrc}
@@ -163,38 +163,19 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
         </div>
 
         {/* Contenido */}
-        <div className="p-4 flex-grow">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
-          {product.brand && <p className="text-sm text-gray-500 mb-1 font-medium">{product.brand}</p>}
+        <div className="p-2 flex-grow">
 
-          <div className="flex items-center text-sm text-gray-500 mb-3">
-            <span className="capitalize">{product.category}</span>
-            {product.subcategory && <><span className="mx-1">•</span><span className="capitalize">{product.subcategory}</span></>}
-          </div>
-
-          {/* Precio */}
-          <div className="mb-3">
-            {hasDiscount ? (
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-gray-800">${product.price.toFixed(2)}</span>
-                <span className="text-lg text-red-500 line-through">${product.originalPrice!.toFixed(2)}</span>
-              </div>
-            ) : (
-              <span className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
-            )}
-          </div>
-
-          {/* Miniaturas de colores */}
+           {/* Miniaturas de colores */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
-              <div className="flex gap-2">
+              <div className="flex">
                 {product.colors.slice(0, 4).map((color, index) => {
                   const colorImage = getColorImage(color);
                   const hasError = colorImageErrors[color];
                   return (
                     <div
                       key={index}
-                      className="relative w-10 h-10 rounded-md border border-gray-200 overflow-hidden cursor-pointer"
+                      className="relative w-15 h-15 border-gray-200 overflow-hidden cursor-pointer"
                       onMouseEnter={() => setHoveredImage(colorImage || null)}
                       onMouseLeave={() => setHoveredImage(null)}
                     >
@@ -219,11 +200,31 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             </div>
           )}
 
+          {/* Precio */}
+          <div className="mb-3">
+            {hasDiscount ? (
+              <div className="flex items-center space-x-2">
+                <span className="text-xl font-bold text-gray-800">${product.price.toFixed(2)}</span>
+                <span className="text-lg text-red-500 line-through">${product.originalPrice!.toFixed(2)}</span>
+              </div>
+            ) : (
+              <span className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+            )}
+          </div>
+
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
+          {product.brand && <p className="text-sm text-gray-900 mb-1 font-medium">{product.brand}</p>}
+
+          <div className="flex items-center text-sm text-gray-500 mb-3">
+            <span className="capitalize">{product.category}</span>
+            {product.subcategory && <><span className="mx-1">•</span><span className="capitalize">{product.subcategory}</span></>}
+          </div>
+
           {/* Envío gratis */}
-          {product.price > 50 && !isOutOfStock && (
+          {product.price > 10 && !isOutOfStock && (
             <div className="mt-2">
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full inline-flex items-center">
-                🚚 Envío gratis
+                🚚 Envío 
               </span>
             </div>
           )}
@@ -236,7 +237,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           product={product} 
           disabled={isOutOfStock}
           className={`w-full py-3 rounded-lg font-semibold ${
-            isOutOfStock ? 'bg-gray-400 text-gray-200' : 'bg-blue-600 text-white hover:bg-blue-700'
+            isOutOfStock ? 'bg-gray-400 text-gray-200' : 'bg-gray-900 text-white hover:bg-violet-500'
           }`}
         />
       </div>
