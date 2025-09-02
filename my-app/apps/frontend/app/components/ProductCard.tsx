@@ -13,7 +13,6 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-// Mapa de colores optimizado
 const COLOR_MAP: Record<string, string> = {
   'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
   'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
@@ -31,8 +30,16 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
   const [isFavorite, setIsFavorite] = useState(false);
   const [colorImageErrors, setColorImageErrors] = useState<Record<string, boolean>>({});
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
-  // ✅ Memoizar cálculos costosos
+  // ✅ Imagen secundaria (ej: parte trasera de la prenda)
+  const hoverImage = useMemo(() => {
+    if (product.images && product.images.length > 1) {
+      return product.images[1]; // la segunda imagen del array
+    }
+    return null;
+  }, [product.images]);
+
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercentage = hasDiscount 
@@ -49,15 +56,16 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     return { hasDiscount, discountPercentage, isNew, isOutOfStock };
   }, [product, showNewBadge]);
 
-  // ✅ Imagen principal dinámica (hover sobre miniaturas)
+  // ✅ Imagen principal dinámica
   const imageSrc = useMemo(() => {
-    if (hoveredImage) return hoveredImage;
+    if (hoveredImage) return hoveredImage; // si pasó por miniatura
+    if (isHovered && hoverImage) return hoverImage; // si está sobre la tarjeta
     return imageError 
       ? '/images/placeholder.jpg' 
       : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg');
-  }, [hoveredImage, imageError, product.mainImageUrl, product.mainImage]);
+  }, [hoveredImage, isHovered, hoverImage, imageError, product.mainImageUrl, product.mainImage]);
 
-  // ✅ Manejo de favoritos optimizado
+  // ✅ Manejo de favoritos
   const toggleFavorite = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -78,7 +86,6 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     }
   }, [isFavorite, product]);
 
-  // ✅ Efecto para favoritos
   useEffect(() => {
     const checkFavorite = () => {
       try {
@@ -97,7 +104,6 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     return () => window.removeEventListener('favoritesUpdated', checkFavorite);
   }, [product.id]);
 
-  // ✅ Manejar errores de imágenes de color
   const handleColorImageError = useCallback((color: string) => {
     setColorImageErrors(prev => ({ ...prev, [color]: true }));
   }, []);
@@ -110,7 +116,14 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
   }, [product.colorImages]);
 
   return (
-    <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
+    <div 
+      className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setHoveredImage(null);
+      }}
+    >
       {/* Badges */}
       <div className="absolute top-2 left-2 z-20 flex flex-col space-y-1">
         {isNew && <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">🆕 NUEVO</span>}
