@@ -259,7 +259,7 @@ export default function AccesoriosPage() {
 
       {/* Encabezado */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-1">ACCESORIOS DEPORTIVOS +</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-1">ACCESORIOS +</h1>
         <p className="text-gray-600">COMPLEMENTA TU ENTRENAMIENTO CON LOS MEJORES ACCESORIOS</p>
         
         {/* Contador de productos en el header */}
@@ -298,7 +298,7 @@ export default function AccesoriosPage() {
                   : 'border-gray-200 group-hover:border-gray-400 group-hover:shadow-md'
               }`}>
                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                  <span className="text-2xl">{subcategory.emoji}</span>
+                  <span className="text-2xl"></span>
                 </div>
                 {/* Backup por si quieres usar imágenes:
                 <Image
