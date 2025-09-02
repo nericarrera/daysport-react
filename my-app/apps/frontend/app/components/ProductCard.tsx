@@ -13,12 +13,25 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
+// Mapa de colores optimizado
+const COLOR_MAP: Record<string, string> = {
+  'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
+  'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
+  'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
+  'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
+  'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
+  'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
+  'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
+  'ocre': '#cc7722', 'vino': '#722f37'
+};
+
 export default function ProductCard({ product, showNewBadge = false, priority = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [colorImageErrors, setColorImageErrors] = useState<Record<string, boolean>>({});
 
-  // ✅ CORREGIDO: Usar stockQuantity en lugar de stock
+  // ✅ Memoizar cálculos costosos
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercentage = hasDiscount 
@@ -83,14 +96,34 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     return () => window.removeEventListener('favoritesUpdated', checkFavorite);
   }, [product.id]);
 
-  // ✅ Obtener la primera imagen de color si existe - MEJORADO
+  // ✅ Manejar errores de imágenes de color
+  const handleColorImageError = useCallback((color: string) => {
+    setColorImageErrors(prev => ({ ...prev, [color]: true }));
+  }, []);
+
+  // ✅ Obtener la primera imagen de color si existe - CORREGIDO
   const getColorImage = useCallback((color: string) => {
-    // ✅ CORREGIDO: Verificar que product.colorImages existe
+    // ✅ DEBUG: Verificar qué hay en colorImages
+    console.log('🔍 Color images for', color, ':', product.colorImages?.[color]);
+    
     if (product.colorImages && product.colorImages[color] && product.colorImages[color].length > 0) {
       return product.colorImages[color][0];
     }
     return null;
   }, [product.colorImages]);
+
+  // ✅ DEBUG: Verificar datos del producto
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📦 Producto:', {
+        name: product.name,
+        colors: product.colors,
+        colorImages: product.colorImages,
+        price: product.price,
+        hasFreeShipping: product.price > 50
+      });
+    }
+  }, [product]);
 
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
@@ -199,13 +232,14 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             )}
           </div>
 
-          {/* ✅ COLORES CON IMÁGENES - MEJORADO */}
+          {/* ✅ COLORES CON IMÁGENES - CORREGIDO */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
               <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {product.colors.slice(0, 4).map((color: string, index: number) => {
                   const colorImage = getColorImage(color);
+                  const hasError = colorImageErrors[color];
                   
                   return (
                     <div
@@ -213,31 +247,25 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
                       className="relative w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm overflow-hidden group/color transition-transform hover:scale-110"
                       title={color.charAt(0).toUpperCase() + color.slice(1)}
                     >
-                      {/* Mostrar imagen del color si existe */}
-                      {colorImage ? (
+                      {/* Mostrar imagen del color si existe y no hay error */}
+                      {colorImage && !hasError ? (
                         <Image
                           src={colorImage}
                           alt={`${product.name} - Color ${color}`}
                           fill
                           className="object-cover"
-                          sizes="50px"
-                          onError={(e) => {
-                            // Fallback a círculo de color si la imagen falla
-                            e.currentTarget.style.display = 'none';
-                            const fallback = e.currentTarget.parentElement?.querySelector('.color-fallback') as HTMLElement;
-                            if (fallback) fallback.style.display = 'block';
+                          sizes="32px"
+                          onError={() => handleColorImageError(color)}
+                        />
+                      ) : (
+                        /* Fallback a círculo de color */
+                        <div 
+                          className="w-full h-full"
+                          style={{ 
+                            backgroundColor: COLOR_MAP[color.toLowerCase()] || '#f0f0f0'
                           }}
                         />
-                      ) : null}
-                      
-                      {/* Fallback a círculo de color */}
-                      <div 
-                        className="color-fallback w-full h-full hidden"
-                        style={{ 
-                          backgroundColor: getColorHex(color),
-                          display: colorImage ? 'none' : 'block'
-                        }}
-                      />
+                      )}
                       
                       {/* Tooltip en hover */}
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover/color:bg-opacity-20 transition-opacity" />
@@ -253,11 +281,12 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             </div>
           )}
 
-          {/* ✅ ENVÍO GRATIS */}
+          {/* ✅ ENVÍO GRATIS - CORREGIDO (mostrar siempre que el precio sea mayor a 50) */}
           {product.price > 50 && !isOutOfStock && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                🚚 Envío gratis
+            <div className="mt-2">
+              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full inline-flex items-center">
+                <span className="mr-1">🚚</span>
+                Envío gratis
               </span>
             </div>
           )}
@@ -297,20 +326,4 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
       </div>
     </div>
   );
-}
-
-// ✅ Función para obtener color hexadecimal (necesaria para el fallback)
-function getColorHex(color: string): string {
-  const COLOR_MAP: Record<string, string> = {
-    'negro': '#000000', 'blanco': '#ffffff', 'rojo': '#ff0000',
-    'azul': '#0000ff', 'verde': '#00ff00', 'gris': '#808080',
-    'amarillo': '#ffff00', 'rosa': '#ffc0cb', 'morado': '#800080',
-    'naranja': '#ffa500', 'marron': '#a52a2a', 'beige': '#f5f5dc',
-    'azul marino': '#000080', 'verde oscuro': '#006400', 'cyan': '#00ffff',
-    'magenta': '#ff00ff', 'plateado': '#c0c0c0', 'dorado': '#ffd700',
-    'turquesa': '#40e0d0', 'lavanda': '#e6e6fa', 'coral': '#ff7f50',
-    'ocre': '#cc7722', 'vino': '#722f37'
-  };
-  
-  return COLOR_MAP[color.toLowerCase()] || '#f0f0f0';
 }
