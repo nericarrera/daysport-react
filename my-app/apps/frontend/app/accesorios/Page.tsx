@@ -17,7 +17,6 @@ const subcategories = [
     name: 'Gorras',
     slug: 'gorras',
     image: '/menu-seccion-img/accesorios/menu-gorras.jpg',
-    emoji: '🧢'
   },
   {
     name: 'Mochilas', 
@@ -41,13 +40,11 @@ const subcategories = [
     name: 'Botellas',
     slug: 'botellas',
     image: '/menu-seccion-img/accesorios/menu-botellas.jpg',
-    emoji: '💧'
   },
   {
-    name: 'Toallas',
-    slug: 'toallas',
-    image: '/menu-seccion-img/accesorios/menu-toallas.jpg',
-    emoji: '🧴'
+    name: 'Bolsos',
+    slug: 'bolsos',
+    image: '/menu-seccion-img/accesorios/menu-bolsos.jpeg',
   }
 ];
 

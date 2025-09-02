@@ -14,35 +14,36 @@ import { Product } from '../types/product';
 // Datos de las categorías circulares PARA NIÑOS
 const subcategories = [
   {
-    name: 'Remeras',
-    slug: 'remeras',
-    image: '/menu-seccion-img/ninos/menu-remeras.jpg'
-  },
-  {
-    name: 'Shorts',
-    slug: 'shorts', 
-    image: '/menu-seccion-img/ninos/menu-shorts.jpg'
-  },
-  {
     name: 'Buzos',
     slug: 'buzos',
-    image: '/menu-seccion-img/ninos/menu-buzos.jpg'
+    image: '/menu-seccion-img/niños/menu-buzos.jpg'
   },
   {
     name: 'Camperas',
     slug: 'camperas',
-    image: '/menu-seccion-img/ninos/menu-camperas.jpg'
+    image: '/menu-seccion-img/niños/menu-camperas.jpg'
+  },
+  {
+    name: 'Conjuntos',
+    slug: 'conjuntos',
+    image: '/menu-seccion-img/niños/menu-conjuntos.jpg'
+  },
+  {
+    name: 'Remeras',
+    slug: 'remeras',
+    image: '/menu-seccion-img/niños/menu-remeras.jpg'
+  },
+  {
+    name: 'Shorts',
+    slug: 'shorts', 
+    image: '/menu-seccion-img/niños/menu-shorts.jpg'
   },
   {
     name: 'Pantalones',
     slug: 'pantalones',
-    image: '/menu-seccion-img/ninos/menu-pantalones.jpg'
+    image: '/menu-seccion-img/niños/menu-pantalones.jpg'
   },
-  {
-    name: 'Accesorios',
-    slug: 'accesorios',
-    image: '/menu-seccion-img/ninos/menu-accesorios.jpg'
-  }
+  
 ];
 
 // Función helper para obtener productos de diferentes formatos de respuesta
