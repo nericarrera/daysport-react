@@ -220,7 +220,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
                           alt={`${product.name} - Color ${color}`}
                           fill
                           className="object-cover"
-                          sizes="32px"
+                          sizes="50px"
                           onError={(e) => {
                             // Fallback a círculo de color si la imagen falla
                             e.currentTarget.style.display = 'none';
