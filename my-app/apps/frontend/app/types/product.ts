@@ -29,11 +29,12 @@ export interface Product {
   width: number;
   height: number;
   depth: number;
-  colorImages?: Record<string, string[]>;
-  detailImages?: string[];
+  
   };
   sku?: string;
   fit?: string;
+  colorImages?: Record<string, string[]>;
+  detailImages?: string[];
   
   // ✅ NUEVAS PROPIEDADES para medidas y guía de tallas
   measurements?: {
