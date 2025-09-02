@@ -22,19 +22,16 @@ const subcategories = [
     name: 'Mochilas', 
     slug: 'mochilas',
     image: '/menu-seccion-img/accesorios/menu-mochilas.jpg',
-    emoji: '🎒'
   },
   {
     name: 'Riñoneras',
     slug: 'rinoneras',
     image: '/menu-seccion-img/accesorios/menu-rinoneras.jpg',
-    emoji: '💼'
   },
   {
     name: 'Medias',
     slug: 'medias',
     image: '/menu-seccion-img/accesorios/menu-medias.jpg',
-    emoji: '🧦'
   },
   {
     name: 'Botellas',
