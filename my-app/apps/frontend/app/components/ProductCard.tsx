@@ -104,7 +104,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
       {/* Badges superpuestos */}
-      <div className="absolute top-2 left-2 z-10 flex flex-col space-y-1">
+      <div className="absolute top-2 left-2 z-20 flex flex-col space-y-1">
         {isNew && (
           <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
             🆕 NUEVO
@@ -194,10 +194,10 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           <div className="mb-3">
             {hasDiscount ? (
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-green-600">
+                <span className="text-xl font-bold text-gray-800">
                   ${product.price.toFixed(2)}
                 </span>
-                <span className="text-lg text-gray-500 line-through">
+                <span className="text-lg text-red-500 line-through">
                   ${product.originalPrice!.toFixed(2)}
                 </span>
               </div>
