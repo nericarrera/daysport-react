@@ -30,6 +30,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
   const [imageLoading, setImageLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [colorImageErrors, setColorImageErrors] = useState<Record<string, boolean>>({});
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
 
   // ✅ Memoizar cálculos costosos
   const { hasDiscount, discountPercentage, isNew, isOutOfStock } = useMemo(() => {
@@ -42,19 +43,19 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
       ? (Date.now() - new Date(product.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
       : false;
 
-    // ✅ CORREGIDO: Usar stockQuantity si existe, sino usar stock
     const stock = product.stockQuantity !== undefined ? product.stockQuantity : product.stock;
     const isOutOfStock = stock === 0 || !product.inStock;
 
     return { hasDiscount, discountPercentage, isNew, isOutOfStock };
   }, [product, showNewBadge]);
 
-  // ✅ URL de imagen memoizada
+  // ✅ Imagen principal dinámica (hover sobre miniaturas)
   const imageSrc = useMemo(() => {
+    if (hoveredImage) return hoveredImage;
     return imageError 
       ? '/images/placeholder.jpg' 
       : (product.mainImageUrl || product.mainImage || '/images/placeholder.jpg');
-  }, [imageError, product.mainImageUrl, product.mainImage]);
+  }, [hoveredImage, imageError, product.mainImageUrl, product.mainImage]);
 
   // ✅ Manejo de favoritos optimizado
   const toggleFavorite = useCallback((e: React.MouseEvent) => {
@@ -101,79 +102,41 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
     setColorImageErrors(prev => ({ ...prev, [color]: true }));
   }, []);
 
-  // ✅ Obtener la primera imagen de color si existe - CORREGIDO
   const getColorImage = useCallback((color: string) => {
-    // ✅ DEBUG: Verificar qué hay en colorImages
-    console.log('🔍 Color images for', color, ':', product.colorImages?.[color]);
-    
     if (product.colorImages && product.colorImages[color] && product.colorImages[color].length > 0) {
       return product.colorImages[color][0];
     }
     return null;
   }, [product.colorImages]);
 
-  // ✅ DEBUG: Verificar datos del producto
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📦 Producto:', {
-        name: product.name,
-        colors: product.colors,
-        colorImages: product.colorImages,
-        price: product.price,
-        hasFreeShipping: product.price > 50
-      });
-    }
-  }, [product]);
-
   return (
     <div className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
-      {/* Badges superpuestos */}
+      {/* Badges */}
       <div className="absolute top-2 left-2 z-20 flex flex-col space-y-1">
-        {isNew && (
-          <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            🆕 NUEVO
-          </span>
-        )}
-        {hasDiscount && (
-          <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            🔥 -{discountPercentage}%
-          </span>
-        )}
+        {isNew && <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">🆕 NUEVO</span>}
+        {hasDiscount && <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">🔥 -{discountPercentage}%</span>}
         {product.featured && !hasDiscount && !isNew && (
-          <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            ⭐ DESTACADO
-          </span>
+          <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">⭐ DESTACADO</span>
         )}
-        {isOutOfStock && (
-          <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">
-            🔒 AGOTADO
-          </span>
-        )}
+        {isOutOfStock && <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">🔒 AGOTADO</span>}
       </div>
 
       {/* Botón de favoritos */}
       <button
         onClick={toggleFavorite}
-        className="absolute top-2 right-2 z-20 p-2 bg-white rounded-full shadow-md hover:bg-pink-50 transition-colors group/favorite"
-        title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+        className="absolute top-2 right-2 z-20 p-2 bg-white rounded-full shadow-md hover:bg-pink-50"
       >
         {isFavorite ? (
-          <HeartSolid className="h-5 w-5 text-pink-600 group-hover/favorite:scale-110 transition-transform" />
+          <HeartSolid className="h-5 w-5 text-pink-600" />
         ) : (
-          <HeartOutline className="h-5 w-5 text-gray-400 hover:text-pink-400 group-hover/favorite:scale-110 transition-transform" />
+          <HeartOutline className="h-5 w-5 text-gray-400 hover:text-pink-400" />
         )}
       </button>
 
-      <Link 
-        href={`/producto/${product.slug || product.id}`} 
-        className="block relative flex-grow"
-        aria-label={`Ver detalles de ${product.name}`}
-      >
-        {/* Imagen del producto */}
+      <Link href={`/producto/${product.slug || product.id}`} className="block relative flex-grow">
+        {/* Imagen principal */}
         <div className="relative h-48 w-full overflow-hidden">
-          {imageLoading && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
-          )}
+          {imageLoading && <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>}
           <Image
             src={imageSrc}
             alt={product.name}
@@ -183,146 +146,86 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             priority={priority}
             onError={() => setImageError(true)}
             onLoad={() => setImageLoading(false)}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          
-          {!isOutOfStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
-          )}
         </div>
 
-        {/* Contenido de la tarjeta */}
+        {/* Contenido */}
         <div className="p-4 flex-grow">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-violet-700 transition-colors min-h-[3rem]">
-            {product.name}
-          </h3>
-          
-          {product.brand && (
-            <p className="text-sm text-gray-500 mb-1 font-medium">
-              {product.brand}
-            </p>
-          )}
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
+          {product.brand && <p className="text-sm text-gray-500 mb-1 font-medium">{product.brand}</p>}
 
-          {/* Categoría */}
           <div className="flex items-center text-sm text-gray-500 mb-3">
             <span className="capitalize">{product.category}</span>
-            {product.subcategory && (
-              <>
-                <span className="mx-1">•</span>
-                <span className="capitalize">{product.subcategory}</span>
-              </>
-            )}
+            {product.subcategory && <><span className="mx-1">•</span><span className="capitalize">{product.subcategory}</span></>}
           </div>
 
           {/* Precio */}
           <div className="mb-3">
             {hasDiscount ? (
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-gray-800">
-                  ${product.price.toFixed(2)}
-                </span>
-                <span className="text-lg text-red-500 line-through">
-                  ${product.originalPrice!.toFixed(2)}
-                </span>
+                <span className="text-xl font-bold text-gray-800">${product.price.toFixed(2)}</span>
+                <span className="text-lg text-red-500 line-through">${product.originalPrice!.toFixed(2)}</span>
               </div>
             ) : (
-              <span className="text-2xl font-bold text-gray-900">
-                ${product.price.toFixed(2)}
-              </span>
+              <span className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
             )}
           </div>
 
-          {/* ✅ COLORES CON IMÁGENES - CORREGIDO */}
+          {/* Miniaturas de colores */}
           {product.colors && product.colors.length > 0 && (
             <div className="mb-3">
-              <p className="text-sm text-gray-600 mb-2">Colores disponibles:</p>
-              <div className="flex gap-2 flex-wrap">
-                {product.colors.slice(0, 4).map((color: string, index: number) => {
+              <div className="flex gap-2">
+                {product.colors.slice(0, 4).map((color, index) => {
                   const colorImage = getColorImage(color);
                   const hasError = colorImageErrors[color];
-                  
                   return (
                     <div
                       key={index}
-                      className="relative w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm overflow-hidden group/color transition-transform hover:scale-110"
-                      title={color.charAt(0).toUpperCase() + color.slice(1)}
+                      className="relative w-10 h-10 rounded-md border border-gray-200 overflow-hidden cursor-pointer"
+                      onMouseEnter={() => setHoveredImage(colorImage || null)}
+                      onMouseLeave={() => setHoveredImage(null)}
                     >
-                      {/* Mostrar imagen del color si existe y no hay error */}
                       {colorImage && !hasError ? (
                         <Image
                           src={colorImage}
-                          alt={`${product.name} - Color ${color}`}
+                          alt={`${product.name} - ${color}`}
                           fill
                           className="object-cover"
-                          sizes="32px"
                           onError={() => handleColorImageError(color)}
                         />
                       ) : (
-                        /* Fallback a círculo de color */
-                        <div 
+                        <div
                           className="w-full h-full"
-                          style={{ 
-                            backgroundColor: COLOR_MAP[color.toLowerCase()] || '#f0f0f0'
-                          }}
+                          style={{ backgroundColor: COLOR_MAP[color.toLowerCase()] || '#f0f0f0' }}
                         />
                       )}
-                      
-                      {/* Tooltip en hover */}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover/color:bg-opacity-20 transition-opacity" />
                     </div>
                   );
                 })}
-                {product.colors.length > 4 && (
-                  <span className="text-xs text-gray-500 self-center">
-                    +{product.colors.length - 4}
-                  </span>
-                )}
               </div>
             </div>
           )}
 
-          {/* ✅ ENVÍO GRATIS - CORREGIDO (mostrar siempre que el precio sea mayor a 50) */}
+          {/* Envío gratis */}
           {product.price > 50 && !isOutOfStock && (
             <div className="mt-2">
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full inline-flex items-center">
-                <span className="mr-1">🚚</span>
-                Envío gratis
+                🚚 Envío gratis
               </span>
             </div>
           )}
         </div>
       </Link>
 
-      {/* Botones de acción */}
+      {/* Botón agregar al carrito */}
       <div className="px-4 pb-4 mt-auto">
         <AddToCartButton 
           product={product} 
           disabled={isOutOfStock}
-          className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 ${
-            isOutOfStock 
-              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-              : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg transform hover:scale-105'
+          className={`w-full py-3 rounded-lg font-semibold ${
+            isOutOfStock ? 'bg-gray-400 text-gray-200' : 'bg-blue-600 text-white hover:bg-blue-700'
           }`}
         />
-        
-        {!isOutOfStock && (
-          <button 
-            onClick={toggleFavorite}
-            className="w-full mt-2 text-xs text-gray-600 hover:text-pink-600 transition-colors flex items-center justify-center gap-1 py-1"
-          >
-            {isFavorite ? (
-              <>
-                <HeartSolid className="h-4 w-4 text-pink-600" />
-                Quitar favorito
-              </>
-            ) : (
-              <>
-                <HeartOutline className="h-4 w-4" />
-                Agregar favorito
-              </>
-            )}
-          </button>
-        )}
       </div>
     </div>
   );
