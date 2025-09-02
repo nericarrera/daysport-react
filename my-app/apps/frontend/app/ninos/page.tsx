@@ -260,7 +260,7 @@ export default function NinosPage() {
 
       {/* Encabezado */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-1">ROPA DEPORTIVA PARA NIÑOS +</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-1">ROPA PARA NIÑOS +</h1>
         <p className="text-gray-600">DESCUBRE NUESTRA COLECCIÓN DISEÑADA PARA NIÑOS ACTIVOS</p>
         
         {/* Contador de productos en el header */}

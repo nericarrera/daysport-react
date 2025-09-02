@@ -273,7 +273,7 @@ export default function MujerPage() {
 
       {/* Encabezado */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-1">ROPA DEPORTIVA PARA MUJER +</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-1">ROPA PARA MUJER +</h1>
         <p className="text-gray-600">DESCUBRE NUESTRA COLECCIÓN DISEÑADA PARA MUJERES ACTIVAS</p>
         
         {/* Contador de productos en el header */}
