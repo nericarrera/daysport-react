@@ -13,6 +13,16 @@ import { Product } from '../types/product';
 
 // Datos de las categorías circulares PARA ACCESORIOS
 const subcategories = [
+   {
+    name: 'Botellas',
+    slug: 'botellas',
+    image: '/menu-seccion-img/accesorios/menu-botellas.jpg',
+  },
+  {
+    name: 'Bolsos',
+    slug: 'bolsos',
+    image: '/menu-seccion-img/accesorios/menu-bolsos.jpeg',
+  },
   {
     name: 'Gorras',
     slug: 'gorras',
@@ -24,25 +34,16 @@ const subcategories = [
     image: '/menu-seccion-img/accesorios/menu-mochilas.jpg',
   },
   {
-    name: 'Riñoneras',
-    slug: 'rinoneras',
-    image: '/menu-seccion-img/accesorios/menu-rinoneras.jpg',
+    name: 'Calzado',
+    slug: 'calzado',
+    image: '/menu-seccion-img/accesorios/menu-calzado.jpg',
   },
   {
     name: 'Medias',
     slug: 'medias',
     image: '/menu-seccion-img/accesorios/menu-medias.jpg',
   },
-  {
-    name: 'Botellas',
-    slug: 'botellas',
-    image: '/menu-seccion-img/accesorios/menu-botellas.jpg',
-  },
-  {
-    name: 'Bolsos',
-    slug: 'bolsos',
-    image: '/menu-seccion-img/accesorios/menu-bolsos.jpeg',
-  }
+ 
 ];
 
 // Función helper para obtener productos de diferentes formatos de respuesta
