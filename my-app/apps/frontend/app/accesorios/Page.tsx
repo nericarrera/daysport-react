@@ -298,9 +298,9 @@ export default function AccesoriosPage() {
                   : 'border-gray-200 group-hover:border-gray-400 group-hover:shadow-md'
               }`}>
                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                  <span className="text-2xl"></span>
+                  
                 </div>
-                {/* Backup por si quieres usar imágenes:
+                 Backup por si quieres usar imágenes:
                 <Image
                   src={subcategory.image || '/placeholder-category.jpg'}
                   alt={subcategory.name}
@@ -310,7 +310,7 @@ export default function AccesoriosPage() {
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder-category.jpg';
                   }}
-                /> */}
+                /> 
               </div>
               <span className="mt-2 text-sm font-medium transition-colors text-center">
                 {subcategory.name}
