@@ -252,9 +252,9 @@ export default function HombrePage({
   }
 
   return (
-    <div className="max-w-full mx-auto px-4 py-14 bg-white min-h-screen">
+    <div className="max-w-mediun mx-auto px-4 py-14 bg-white min-h-screen">
       {/* Breadcrumbs y Botón de Regreso */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 justify-center">
         <Link 
           href="/" 
           className="flex items-center text-gray-600 hover:text-purple-700 transition-colors group"
@@ -314,25 +314,25 @@ export default function HombrePage({
       </div>
 
       {/* Sección de Categorías Circulares */}
-      <div className="mb-12 overflow-x-auto">
-        <div className="flex space-x-8 pb-4">
+      <div className="h-auto mb-12 overflow-x-auto text-center">
+        <div className="flex space-x-8 pb-4 justify-center">
           {subcategories.map((subcategory) => (
             <button
               key={subcategory.slug}
               onClick={() => setSelectedSubcategory(
                 selectedSubcategory === subcategory.slug ? '' : subcategory.slug
               )}
-              className={`flex flex-col items-center group min-w-[80px] transition-all ${
+              className={`flex flex-col items-center group min-w-[90px] transition-all justify-center cursor-pointer ${
                 selectedSubcategory === subcategory.slug 
                   ? 'scale-110 text-gray-900' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-gray-00'
               }`}
               aria-pressed={selectedSubcategory === subcategory.slug}
             >
               <div className={`rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 transition-all duration-300 ${
                 selectedSubcategory === subcategory.slug 
                   ? 'border-gray-900 shadow-lg ring-2 ring-blue-100' 
-                  : 'border-gray-200 group-hover:border-gray-400 group-hover:shadow-md'
+                  : 'border-gray-200 group-hover:border-yellow-400 group-hover:shadow-md'
               }`}>
                 <Image
                   src={subcategory.image || '/placeholder-category.jpg'}
@@ -352,10 +352,11 @@ export default function HombrePage({
           ))}
         </div>
       </div>
+      
 
 
       {/* Contenido */}
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex md:flex-row gap-8">
         {/* Filtros */}
         <div className="md:w-1/4">
           <div className="sticky top-4 space-y-4">

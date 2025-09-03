@@ -10,7 +10,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-900 text-lg">
           No se encontraron productos en esta categoría.
         </p>
       </div>
@@ -18,7 +18,12 @@ export default function ProductGrid({ products }: ProductGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div 
+      className="grid gap-4 w-full"
+      style={{
+        gridTemplateColumns: 'repeat(auto-fit, minmax(263px, 1fr))'
+      }}
+    >
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

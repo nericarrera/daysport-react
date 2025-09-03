@@ -163,7 +163,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
         </div>
 
         {/* Contenido */}
-        <div className="p-2 flex-grow">
+        <div className="p-0 flex-grow">
 
            {/* Miniaturas de colores */}
           {product.colors && product.colors.length > 0 && (
@@ -175,7 +175,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
                   return (
                     <div
                       key={index}
-                      className="relative w-15 h-15 border-gray-200 overflow-hidden cursor-pointer"
+                      className="relative w-14 h-14 border-gray-200 overflow-hidden cursor-pointer"
                       onMouseEnter={() => setHoveredImage(colorImage || null)}
                       onMouseLeave={() => setHoveredImage(null)}
                     >
@@ -201,21 +201,21 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           )}
 
           {/* Precio */}
-          <div className="mb-3">
+          <div className="mb-3 p-1">
             {hasDiscount ? (
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-gray-800">${product.price.toFixed(2)}</span>
-                <span className="text-lg text-red-500 line-through">${product.originalPrice!.toFixed(2)}</span>
+              <div className="flex items-center space-x-2 ml-1">
+                <span className="text-m font-bold text-gray-800">${product.price.toFixed(2)}</span>
+                <span className="text-l text-red-500 line-through">${product.originalPrice!.toFixed(2)}</span>
               </div>
             ) : (
               <span className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
             )}
           </div>
 
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
-          {product.brand && <p className="text-sm text-gray-900 mb-1 font-medium">{product.brand}</p>}
+          <h3 className="font-light text-s mb-2 p-2 line-clamp-2 text-gray-900">{product.name}</h3>
+          {product.brand && <p className="text-sm text-gray-900 mb-1 ml-2 font-medium">{product.brand}</p>}
 
-          <div className="flex items-center text-sm text-gray-500 mb-3">
+          <div className="flex items-center text-sm text-gray-500 mb-3 ml-2">
             <span className="capitalize">{product.category}</span>
             {product.subcategory && <><span className="mx-1">•</span><span className="capitalize">{product.subcategory}</span></>}
           </div>
@@ -223,7 +223,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           {/* Envío gratis */}
           {product.price > 10 && !isOutOfStock && (
             <div className="mt-2">
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full inline-flex items-center">
+              <span className="text-xs text-green-800 px-2 py-1 rounded-full inline-flex items-center mb-2">
                 🚚 Envío 
               </span>
             </div>
@@ -236,8 +236,8 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
         <AddToCartButton 
           product={product} 
           disabled={isOutOfStock}
-          className={`w-full py-3 rounded-lg font-semibold ${
-            isOutOfStock ? 'bg-gray-400 text-gray-200' : 'bg-gray-900 text-white hover:bg-violet-500'
+          className={`w-30 py-3 rounded-lg font-semibold ${
+            isOutOfStock ? 'bg-gray-400 text-gray-200' : 'bg-gray-900 text-white hover:bg-violet-500 cursor-pointer'
           }`}
         />
       </div>
