@@ -1,9 +1,8 @@
 'use client';
-import { use } from 'react'; // ← AGREGAR ESTA IMPORTACIÓN
+import { use } from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
-import FilterButton from '../components/FilterButton';
 import { ChevronLeftIcon, HomeIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Filters, { FilterState } from '../components/Filters';
@@ -79,28 +78,107 @@ function getProductsArray(data: unknown): Product[] {
   return [];
 }
 
-// SOLO UNA FUNCIÓN HombrePage - CORREGIDA
+// Función para normalizar colores (convierte cualquier formato a array de strings)
+function normalizeColors(colors: unknown): string[] {
+  if (!colors) return [];
+  
+  if (Array.isArray(colors)) {
+    return colors.map(color => {
+      if (typeof color === 'string') return color.toLowerCase();
+      return String(color).toLowerCase();
+    });
+  }
+  
+  if (typeof colors === 'string') {
+    // Si es un string, intentar dividirlo por comas o retornar como array de un elemento
+    if (colors.includes(',')) {
+      return colors.split(',').map(c => c.trim().toLowerCase());
+    }
+    return [colors.toLowerCase()];
+  }
+  
+  return [String(colors).toLowerCase()];
+}
+
+// Función para aplicar filtros a los productos
+function applyFilters(products: Product[], filters: FilterState): Product[] {
+  if (!filters) return products;
+  
+  return products.filter(product => {
+    // Filtrar por subcategoría
+    if (filters.subcategory && product.subcategory?.toLowerCase() !== filters.subcategory.toLowerCase()) {
+      return false;
+    }
+    
+    // Filtrar por rango de precio
+    if (filters.priceRange) {
+      const [min, max] = filters.priceRange.split('-').map(Number);
+      const productPrice = product.price || 0;
+      
+      if (filters.priceRange.endsWith('+')) {
+        if (productPrice < min) return false;
+      } else if (productPrice < min || productPrice > max) {
+        return false;
+      }
+    }
+    
+    // Filtrar por talles (con verificación de existencia)
+    if (filters.sizes.length > 0 && product.sizes && Array.isArray(product.sizes)) {
+      const hasMatchingSize = filters.sizes.some(size => 
+        product.sizes!.includes(size)
+      );
+      if (!hasMatchingSize) return false;
+    }
+    
+    // Filtrar por colores (con verificación de existencia)
+    if (filters.colors.length > 0 && product.colors) {
+      // Normalizar los colores del producto a un array de strings en minúsculas
+      const productColors = normalizeColors(product.colors);
+      
+      // Verificar si alguno de los colores filtrados coincide
+      const hasMatchingColor = filters.colors.some(filterColor => {
+        const normalizedFilterColor = filterColor.toLowerCase();
+        return productColors.some(productColor => 
+          productColor.includes(normalizedFilterColor)
+        );
+      });
+      
+      if (!hasMatchingColor) return false;
+    }
+    
+    return true;
+  });
+}
+
 export default function HombrePage({ 
   searchParams 
 }: { 
-  searchParams: Promise<{ subcategory?: string }>  // ← AGREGAR Promise
+  searchParams: Promise<{ subcategory?: string }>
 }) {
   // Desempaqueta los searchParams con use()
   const resolvedSearchParams = use(searchParams);
   
-  const [selectedSubcategory, setSelectedSubcategory] = useState(
-    resolvedSearchParams.subcategory || ''  // ← USAR valor desempaquetado
-  );
+  const [filters, setFilters] = useState<FilterState>({
+    subcategory: resolvedSearchParams.subcategory || '',
+    priceRange: '',
+    sizes: [],
+    colors: []
+  });
+  
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  // AGREGAR este useEffect para los parámetros de URL - ACTUALIZADO
+  // Actualizar filtros cuando cambien los parámetros de URL
   useEffect(() => {
-    if (resolvedSearchParams.subcategory) {  // ← USAR resolvedSearchParams
-      setSelectedSubcategory(resolvedSearchParams.subcategory);
+    if (resolvedSearchParams.subcategory) {
+      setFilters(prev => ({
+        ...prev,
+        subcategory: resolvedSearchParams.subcategory || ''
+      }));
+      
       // Scroll automático a los productos después de un breve delay
       setTimeout(() => {
         const productsSection = document.getElementById('productos');
@@ -112,7 +190,7 @@ export default function HombrePage({
         }
       }, 300);
     }
-  }, [resolvedSearchParams.subcategory]);  // ← DEPENDENCIA ACTUALIZADA
+  }, [resolvedSearchParams.subcategory]);
 
   // Función para cargar productos con manejo de errores mejorado
   const loadProducts = useCallback(async () => {
@@ -128,7 +206,6 @@ export default function HombrePage({
       const productsArray = getProductsArray(productsData);
       
       setAllProducts(productsArray);
-      setFilteredProducts(productsArray);
       
     } catch (err) {
       console.error('💥 Error completo:', err);
@@ -145,30 +222,24 @@ export default function HombrePage({
     loadProducts();
   }, [loadProducts]);
 
+  // Aplicar filtros cuando cambien los productos o los filtros
+  useEffect(() => {
+    const filtered = applyFilters(allProducts, filters);
+    setFilteredProducts(filtered);
+  }, [allProducts, filters]);
+
   // Función para recargar productos
   const handleRefresh = () => {
     setRefreshing(true);
     loadProducts();
   };
 
-  // Filtrar productos cuando cambia la subcategoría seleccionada
-  useEffect(() => {
-    if (selectedSubcategory === '') {
-      setFilteredProducts(allProducts);
-    } else {
-      const filtered = allProducts.filter(product => 
-        product.subcategory?.toLowerCase() === selectedSubcategory.toLowerCase()
-      );
-      setFilteredProducts(filtered);
-    }
-  }, [selectedSubcategory, allProducts]);
-
   // DEBUG: Ver productos en consola (solo en desarrollo) - AMPLIADO
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       console.log('📊 Todos los productos:', allProducts);
       console.log('🔍 Productos filtrados:', filteredProducts);
-      console.log('🎯 Subcategoría seleccionada:', selectedSubcategory);
+      console.log('🎯 Filtros aplicados:', filters);
       
       // ✅ DEBUG ESPECÍFICO PARA IMÁGENES
       if (allProducts.length > 0) {
@@ -185,7 +256,10 @@ export default function HombrePage({
             hasMainImageUrl: !!product.mainImageUrl,
             hasImages: !!product.images?.length,
             category: product.category,
-            subcategory: product.subcategory
+            subcategory: product.subcategory,
+            colors: product.colors,
+            sizes: product.sizes,
+            normalizedColors: normalizeColors(product.colors)
           });
         });
 
@@ -201,11 +275,13 @@ export default function HombrePage({
         console.log('   mainImage:', typeof firstProduct?.mainImage, firstProduct?.mainImage);
         console.log('   mainImageUrl:', typeof firstProduct?.mainImageUrl, firstProduct?.mainImageUrl);
         console.log('   images:', Array.isArray(firstProduct?.images) ? 'Array' : typeof firstProduct?.images);
+        console.log('   colors:', Array.isArray(firstProduct?.colors) ? 'Array' : typeof firstProduct?.colors);
+        console.log('   sizes:', Array.isArray(firstProduct?.sizes) ? 'Array' : typeof firstProduct?.sizes);
       } else {
         console.log('❌ No hay productos para debuggear');
       }
     }
-  }, [allProducts, filteredProducts, selectedSubcategory]);
+  }, [allProducts, filteredProducts, filters]);
 
   const compatibleProducts = filteredProducts;
 
@@ -273,11 +349,11 @@ export default function HombrePage({
           >
             Hombre
           </Link>
-          {selectedSubcategory && (
+          {filters.subcategory && (
             <>
               <span className="mx-2">/</span>
               <span className="text-gray-800 font-medium capitalize">
-                {selectedSubcategory}
+                {filters.subcategory}
               </span>
             </>
           )}
@@ -320,18 +396,19 @@ export default function HombrePage({
           {subcategories.map((subcategory) => (
             <button
               key={subcategory.slug}
-              onClick={() => setSelectedSubcategory(
-                selectedSubcategory === subcategory.slug ? '' : subcategory.slug
-              )}
+              onClick={() => setFilters(prev => ({
+                ...prev,
+                subcategory: prev.subcategory === subcategory.slug ? '' : subcategory.slug
+              }))}
               className={`flex flex-col items-center group min-w-[90px] transition-all justify-center cursor-pointer ${
-                selectedSubcategory === subcategory.slug 
+                filters.subcategory === subcategory.slug 
                   ? 'scale-110 text-gray-900' 
                   : 'text-gray-600 hover:text-gray-00'
               }`}
-              aria-pressed={selectedSubcategory === subcategory.slug}
+              aria-pressed={filters.subcategory === subcategory.slug}
             >
               <div className={`rounded-full overflow-hidden w-20 h-20 md:w-24 md:h-24 border-2 transition-all duration-300 ${
-                selectedSubcategory === subcategory.slug 
+                filters.subcategory === subcategory.slug 
                   ? 'border-gray-900 shadow-lg ring-2 ring-blue-100' 
                   : 'border-gray-200 group-hover:border-yellow-400 group-hover:shadow-md'
               }`}>
@@ -354,102 +431,76 @@ export default function HombrePage({
         </div>
       </div>
       
+      {/* Filtro tipo Adidas (modal) */}
+      <Filters 
+        category="hombre" 
+        onFilterChange={setFilters}
+        selectedFilters={filters}
+      />
 
       {/* Contenido */}
-      <div className="flex md:flex-row gap-8">
-        {/* Filtros */}
-        <div className="md:w-1/4">
-          <div className="sticky top-4 space-y-4">
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-              <h3 className="font-bold text-lg mb-4 flex items-center">
-                <span className="mr-2">⚙️</span>
-                Filtros
-              </h3>
-              
-              {/* Botón de filtro con funcionalidad completa */}
-              <FilterButton 
-                category="hombre"
-                onFilterChange={setSelectedSubcategory}
-              />
-              
-              {/* Mostrar filtro activo */}
-              {selectedSubcategory && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                  <p className="text-sm font-medium text-blue-800">
-                    Filtro activo: 
-                    <span className="ml-2 capitalize font-bold">
-                      {selectedSubcategory}
-                    </span>
-                  </p>
-                  <button 
-                    onClick={() => setSelectedSubcategory('')}
-                    className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline flex items-center"
-                  >
-                    Limpiar filtro
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Contador de productos */}
-            <div className="bg-white p-4 rounded-lg shadow-md text-center border border-gray-100">
-              <p className="text-2xl font-bold text-gray-800">
-                {compatibleProducts.length}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                {compatibleProducts.length === 1 ? 'producto' : 'productos'} 
-                {selectedSubcategory ? ` en ${selectedSubcategory}` : ' disponibles'}
-              </p>
-            </div>
-          </div>
-        </div>
-        
+      <div className="mt-8">
         {/* Productos - AGREGAR ID PARA EL SCROLL */}
-        <div className="md:w-3/4" id="productos">
+        <div id="productos">
           {compatibleProducts.length > 0 ? (
             <>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-800">
-                  {selectedSubcategory 
-                    ? `Productos en ${selectedSubcategory}` 
+                  {filters.subcategory 
+                    ? `Productos en ${filters.subcategory}` 
                     : 'Todos los productos de hombre'
                   }
                   <span className="text-gray-500 ml-2 text-base font-normal">
                     ({compatibleProducts.length})
                   </span>
                 </h2>
+                
+                {/* Mostrar filtros activos */}
+                {(filters.priceRange || filters.sizes.length > 0 || filters.colors.length > 0) && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {filters.priceRange && (
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                        Precio: {filters.priceRange.includes('+') ? `Más de $${filters.priceRange.replace('+', '')}` : `$${filters.priceRange}`}
+                      </span>
+                    )}
+                    {filters.sizes.map(size => (
+                      <span key={size} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                        Talle: {size}
+                      </span>
+                    ))}
+                    {filters.colors.map(color => (
+                      <span key={color} className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                        Color: {color}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <ProductGrid products={compatibleProducts} />
             </>
           ) : (
             <div className="text-center py-20 bg-gray-50 rounded-lg">
-              <div className="text-gray-400 text-6xl mb-4">🛒</div>
+              <div className="text-gray-40 text-6xl mb-4">🛒</div>
               <p className="text-gray-500 text-lg font-medium mb-2">
                 No se encontraron productos
               </p>
               <p className="text-gray-400 mb-6">
-                {selectedSubcategory 
-                  ? `Prueba con otra subcategoría o limpia los filtros`
+                {filters.subcategory || filters.priceRange || filters.sizes.length > 0 || filters.colors.length > 0
+                  ? `Prueba con otros filtros o limpia los filtros actuales`
                   : 'No hay productos en la categoría hombre aún'
                 }
               </p>
-              {selectedSubcategory ? (
-                <button 
-                  onClick={() => setSelectedSubcategory('')}
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Ver todos los productos
-                </button>
-              ) : (
-                <button 
-                  onClick={handleRefresh}
-                  disabled={refreshing}
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center mx-auto"
-                >
-                  <ArrowPathIcon className={`h-5 w-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                  Reintentar
-                </button>
-              )}
+              <button 
+                onClick={() => setFilters({
+                  subcategory: '',
+                  priceRange: '',
+                  sizes: [],
+                  colors: []
+                })}
+                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Limpiar todos los filtros
+              </button>
             </div>
           )}
         </div>
