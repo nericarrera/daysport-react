@@ -6,6 +6,7 @@ import ProductGrid from '../components/ProductGrid';
 import FilterButton from '../components/FilterButton';
 import { ChevronLeftIcon, HomeIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import Filters, { FilterState } from '../components/Filters';
 
 // Importamos el servicio de productos que conecta con la API
 import { ProductService } from '../../services/productService';
