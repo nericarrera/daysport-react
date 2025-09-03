@@ -5,7 +5,6 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { Product } from '../types/product';
-import AddToCartButton from './AddToCartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -117,7 +116,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
 
   return (
     <div 
-      className="group relative bg-yellow shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-violet-200 flex flex-col h-full w-full"
+      className="group relative bg-yellow shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -231,16 +230,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
         </div>
       </Link>
 
-      {/* Botón agregar al carrito */}
-      <div className="px-4 pb-4 mt-auto">
-        <AddToCartButton 
-          product={product} 
-          disabled={isOutOfStock}
-          className={`w-30 py-3 rounded-lg font-semibold ${
-            isOutOfStock ? 'bg-gray-400 text-gray-200' : 'bg-gray-900 text-white hover:bg-violet-500 cursor-pointer'
-          }`}
-        />
-      </div>
+      
     </div>
   );
 }

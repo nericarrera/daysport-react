@@ -1,6 +1,6 @@
 export const camperaslivianasHombre = [
   {
-    name: "Campera Liviana Deportiva Hombre",
+    name: "Campera Liviana Deportiva",
     price: 35.00,
     originalPrice: 40.00,
     category: "hombre",
@@ -53,7 +53,7 @@ export const camperaslivianasHombre = [
   },
 
   {
-    name: "Campera Liviana Deportiva Clásica Hombre",
+    name: "Campera Liviana Deportiva Clásica",
     price: 35.99,
     originalPrice: 45.00,
     category: "hombre",
@@ -100,7 +100,7 @@ export const camperaslivianasHombre = [
   },
 
   {
-    name: "Campera Liviana Impermeable Hombre",
+    name: "Campera Liviana Impermeable",
     price: 42.50,
     originalPrice: 50.00,
     category: "hombre",
