@@ -354,7 +354,6 @@ export default function HombrePage({
       </div>
       
 
-
       {/* Contenido */}
       <div className="flex md:flex-row gap-8">
         {/* Filtros */}
