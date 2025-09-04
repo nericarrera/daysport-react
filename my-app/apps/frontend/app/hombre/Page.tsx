@@ -125,15 +125,18 @@ function applyFilters(products: Product[], filters: FilterState): Product[] {
 }
 
 // Construir filtros para backend - CORREGIDO
-function buildBackendFilters(filters: FilterState): ProductFilterParams {
-  return {
-    category: 'hombre', // obligatorio
-    subcategory: filters.subcategory || undefined,
-    sizes: filters.sizes.length ? filters.sizes.join(',') : undefined,
-    colors: filters.colors.length ? filters.colors.join(',') : undefined,
-    priceRange: filters.priceRange || undefined,
+const buildBackendFilters = (filters: FilterState) => {
+  const params: Record<string, string> = { 
+    category: filters.category // ✅ Ahora sí incluye category
   };
-}
+  
+  if (filters.subcategory) params.subcategory = filters.subcategory;
+  if (filters.priceRange) params.priceRange = filters.priceRange;
+  if (filters.sizes.length) params.sizes = filters.sizes.join(',');
+  if (filters.colors.length) params.colors = filters.colors.join(',');
+  
+  return params;
+};
 
 export default function HombrePage({ 
   searchParams 
@@ -189,16 +192,18 @@ export default function HombrePage({
       console.log('🔄 Cargando productos de hombre...');
       
       let productsData;
-      
       if (backendMode) {
-        // Modo backend: usar filtros en el servidor
-        const params = buildBackendFilters(filters);
-        // ✅ Ahora params incluye category, así que es compatible
-        productsData = await ProductService.getProductsWithFilters(params);
-      } else {
-        // Modo local: traer todos y filtrar en cliente
-        productsData = await ProductService.getProductsByCategory('hombre');
-      }
+  // Modo backend: usar filtros en el servidor
+  const params = {
+    category: 'hombre',        // O la categoría que corresponda
+    ...buildBackendFilters(filters) // Merge con otros filtros
+  };
+  
+  productsData = await ProductService.getProductsWithFilters(params);
+} else {
+  // Modo local: traer todos y filtrar en cliente
+  productsData = await ProductService.getProductsByCategory('hombre');
+}
       
       console.log('🎯 Productos desde el servicio:', productsData);
       
