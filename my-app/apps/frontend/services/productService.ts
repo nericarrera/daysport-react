@@ -101,18 +101,50 @@ export class ProductService {
     }
   }
 
-  // Manejo de respuesta
+  // Manejo de respuesta MEJORADO
   private static async handleResponse<T>(response: Response): Promise<T> {
+    // ✅ Log para debug
+    console.log('📨 Response status:', response.status, response.statusText);
+    console.log('📨 Response URL:', response.url);
+    
     if (!response.ok) {
-      const errorText = await response.text().catch(() => response.statusText);
+      let errorText = response.statusText;
+      
+      try {
+        // Intentar obtener el cuerpo del error
+        errorText = await response.text();
+        
+        // Intentar parsear como JSON si parece JSON
+        if (errorText.trim().startsWith('{') || errorText.trim().startsWith('[')) {
+          try {
+            const errorJson = JSON.parse(errorText);
+            errorText = JSON.stringify(errorJson, null, 2);
+          } catch {
+            // Si no es JSON válido, mantener como texto
+          }
+        }
+      } catch {
+        // Si falla, usar statusText
+        errorText = response.statusText;
+      }
+      
+      console.error('❌ API Error Details:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        body: errorText
+      });
+      
       throw new ApiError(
         response.status,
         response.statusText,
         errorText || `HTTP error! status: ${response.status}`
       );
     }
+    
     try {
-      return await response.json();
+      const data = await response.json();
+      return data;
     } catch {
       throw new Error('Failed to parse JSON response');
     }
@@ -193,102 +225,207 @@ export class ProductService {
     }
   }
 
-  // Obtener productos con filtros (VERSIÓN MEJORADA)
+
+  // Obtener productos con filtros (VERSIÓN MEJORADA CON MEJOR MANEJO DE ERRORES 500)
   static async getProductsWithFilters(filters: {
-    category: string;
-    subcategory?: string;
-    sizes?: string | string[];
-    colors?: string | string[];
-    brands?: string | string[];
-    priceRange?: string;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-    page?: number;
-    limit?: number;
-    [key: string]: any; // Para filtros adicionales
-  }): Promise<FilteredProductsResponse> {
-    const params = new URLSearchParams();
-    
-    // Parámetros base
-    params.append('category', filters.category);
-    
-    // Parámetros opcionales
-    if (filters.subcategory) params.append('subcategory', filters.subcategory);
-    
-    // Manejar arrays y strings para sizes
-    if (filters.sizes) {
-      if (Array.isArray(filters.sizes)) {
-        params.append('sizes', filters.sizes.join(','));
-      } else {
-        params.append('sizes', filters.sizes);
-      }
-    }
-    
-    // Manejar arrays y strings para colors
-    if (filters.colors) {
-      if (Array.isArray(filters.colors)) {
-        params.append('colors', filters.colors.join(','));
-      } else {
-        params.append('colors', filters.colors);
-      }
-    }
-    
-    // Manejar arrays y strings para brands
-    if (filters.brands) {
-      if (Array.isArray(filters.brands)) {
-        params.append('brands', filters.brands.join(','));
-      } else {
-        params.append('brands', filters.brands);
-      }
-    }
-    
-    if (filters.priceRange) params.append('priceRange', filters.priceRange);
-    if (filters.sortBy) params.append('sortBy', filters.sortBy);
-    if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
-    if (filters.page) params.append('page', filters.page.toString());
-    if (filters.limit) params.append('limit', filters.limit.toString());
-
-    const url = `${API_CONFIG.BASE_URL}/api/products/filtered?${params.toString()}`;
-    
-    console.log('🎯 Fetching filtered products from:', url);
-    console.log('📋 Filters applied:', filters);
-
-    try {
-      const response = await this.retry(async () => {
-        return await this.fetchWithTimeout(url);
-      });
-
-      const data = await this.handleResponse<FilteredProductsResponse>(response);
-      
-      console.log('✅ Filtered products received:', data.products?.length || 0, 'items');
-      return data;
-      
-    } catch (error) {
-      console.error('❌ Error fetching filtered products:', error);
-      
-      // Fallback: intentar obtener productos sin filtros
-      if (error instanceof ApiError && error.status === 404) {
-        console.log('🔄 Endpoint not found, trying without filters...');
-        try {
-          const fallbackProducts = await this.getProductsByCategory(filters.category);
-          return {
-            products: fallbackProducts,
-            pagination: {
-              total: fallbackProducts.length,
-              currentPage: 1,
-              totalPages: 1,
-              hasNextPage: false,
-              hasPrevPage: false
-            }
-          };
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
-        }
-      }
-      
-      throw error;
+  category: string;
+  subcategory?: string;
+  sizes?: string | string[];
+  colors?: string | string[];
+  brands?: string | string[];
+  priceRange?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+  [key: string]: any;
+}): Promise<FilteredProductsResponse> {
+  const params = new URLSearchParams();
+  
+  // Parámetros base
+  params.append('category', filters.category);
+  
+  // Parámetros opcionales - solo si tienen valor
+  if (filters.subcategory) params.append('subcategory', filters.subcategory);
+  
+  if (filters.sizes) {
+    if (Array.isArray(filters.sizes) && filters.sizes.length > 0) {
+      params.append('sizes', filters.sizes.join(','));
+    } else if (typeof filters.sizes === 'string' && filters.sizes.length > 0) {
+      params.append('sizes', filters.sizes);
     }
   }
+  
+  if (filters.colors) {
+    if (Array.isArray(filters.colors) && filters.colors.length > 0) {
+      params.append('colors', filters.colors.join(','));
+    } else if (typeof filters.colors === 'string' && filters.colors.length > 0) {
+      params.append('colors', filters.colors);
+    }
+  }
+  
+  if (filters.brands) {
+    if (Array.isArray(filters.brands) && filters.brands.length > 0) {
+      params.append('brands', filters.brands.join(','));
+    } else if (typeof filters.brands === 'string' && filters.brands.length > 0) {
+      params.append('brands', filters.brands);
+    }
+  }
+  
+  if (filters.priceRange) params.append('priceRange', filters.priceRange);
+  if (filters.sortBy) params.append('sortBy', filters.sortBy);
+  if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
+  if (filters.page) params.append('page', filters.page.toString());
+  if (filters.limit) params.append('limit', filters.limit.toString());
+
+  const url = `${API_CONFIG.BASE_URL}/api/products/filtered?${params.toString()}`;
+  
+  console.log('🎯 Fetching filtered products from:', url);
+  console.log('📋 Filters applied:', JSON.stringify(filters, null, 2));
+
+  try {
+    const response = await this.retry(async () => {
+      return await this.fetchWithTimeout(url);
+    });
+
+    // ✅ Log adicional para debug
+    console.log('🔍 Response received, processing...');
+    
+    const data = await this.handleResponse<FilteredProductsResponse>(response);
+    
+    console.log('✅ Filtered products received:', data.products?.length || 0, 'items');
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Error fetching filtered products:', error);
+    
+    // ✅ MEJOR FALLBACK: Manejar específicamente errores 500 y 404
+    if (error instanceof ApiError && (error.status === 500 || error.status === 404)) {
+      console.log('🔄 Backend endpoint /api/products/filtered no disponible, usando fallback...');
+      
+      try {
+        // Obtener todos los productos de la categoría
+        const fallbackProducts = await this.getProductsByCategory(filters.category);
+        
+        // Aplicar filtros localmente como fallback
+        let filteredProducts = fallbackProducts;
+        
+        // Filtrar por subcategoría
+        if (filters.subcategory) {
+          filteredProducts = filteredProducts.filter(product => 
+            product.subcategory?.toLowerCase() === filters.subcategory?.toLowerCase()
+          );
+        }
+
+        
+        // ✅ CORRECCIÓN: Filtrar por talles de forma segura
+        if (filters.sizes) {
+  const sizesArray = Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes];
+  if (sizesArray.length > 0) {
+    filteredProducts = filteredProducts.filter(product => {
+      // Verificar que product.sizes existe y es un array
+      if (!product.sizes || !Array.isArray(product.sizes)) return false;
+      
+      // Usar el operador de aserción no nula (!) porque ya verificamos que existe
+      return sizesArray.some(size => 
+        product.sizes!.includes(size)
+      );
+    });
+  }
+}
+        
+        // ✅ CORRECCIÓN COMPLETA: Filtrar por colores de forma segura
+       if (filters.colors) {
+  // Normalizar filtros a string[]
+  const colorsArray = Array.isArray(filters.colors)
+  ? (filters.colors as string[])
+  : [filters.colors as string];
+
+  const normalizedFilterColors = colorsArray
+    .map(c => c.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (normalizedFilterColors.length > 0) {
+    filteredProducts = filteredProducts.filter(product => {
+      if (!product.colors) return false;
+
+      const productColors = product.colors;
+      let normalizedProductColors: string[] = [];
+
+      if (typeof productColors === 'string') {
+        normalizedProductColors = [productColors.toLowerCase()];
+      } else if (Array.isArray(productColors)) {
+        normalizedProductColors = productColors.map(c => String(c).toLowerCase()).filter(Boolean);
+      } else {
+        return false;
+      }
+
+      return normalizedFilterColors.some(fc =>
+        normalizedProductColors.some(pc => pc.includes(fc))
+      );
+    });
+  }
+}
+        
+        // ✅ CORRECCIÓN: Filtrar por marcas de forma segura
+       if (filters.brands) {
+  const brandsArray = Array.isArray(filters.brands) ? filters.brands : [filters.brands];
+  if (brandsArray.length > 0) {
+    // Normalizar las marcas del filtro primero
+    const normalizedFilterBrands = brandsArray.map(brand => brand.toLowerCase());
+    
+    filteredProducts = filteredProducts.filter(product => {
+      if (!product.brand) return false;
+      
+      // Normalizar la marca del producto
+      const normalizedProductBrand = product.brand.toLowerCase();
+      
+      return normalizedFilterBrands.some(filterBrand => 
+        normalizedProductBrand.includes(filterBrand)
+      );
+    });
+  }
+}
+        
+        // Filtrar por rango de precio
+        if (filters.priceRange) {
+          const [min, max] = filters.priceRange.split('-').map(Number);
+          filteredProducts = filteredProducts.filter(product => {
+            const price = product.price || 0;
+            if (filters.priceRange?.endsWith('+')) {
+              return price >= min;
+            } else {
+              return price >= min && price <= max;
+            }
+          });
+        }
+        
+        return {
+          products: filteredProducts,
+          pagination: {
+            total: filteredProducts.length,
+            currentPage: 1,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false
+          },
+          filters: {
+            sizes: [],
+            colors: [],
+            brands: [],
+            categories: []
+          }
+        };
+        
+      } catch (fallbackError) {
+        console.error('❌ Fallback también falló:', fallbackError);
+        throw new Error('No se pudieron cargar los productos');
+      }
+    }
+    
+    throw error;
+  }
+}
 
   // Obtener opciones de filtro desde el backend
   static async getFilterOptions(category: string): Promise<{

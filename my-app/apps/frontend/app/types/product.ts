@@ -278,3 +278,18 @@ export interface PricingInfo {
   onSale: boolean;
   saleEnds?: string;
 }
+
+export interface FilterState {
+  category?: string;
+  subcategory?: string | string[];
+  sizes?: string | string[];
+  colors?: string | string[];   // <- importante para evitar el error de never
+  brands?: string | string[];
+  priceRange?: [number, number]; 
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+  search?: string;
+  tags?: string[];
+}
