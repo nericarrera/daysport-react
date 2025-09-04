@@ -9,7 +9,7 @@ import {
   FireIcon,
   ArrowsUpDownIcon
 } from '@heroicons/react/24/outline';
-import { FilterService, FilterOptions } from '../';
+import { FilterService, FilterOptions } from '../../services/filterService';
 
 interface FiltersProps {
   category: string;
