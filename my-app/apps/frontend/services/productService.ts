@@ -1,4 +1,5 @@
 import { Product } from '../app/types/product';
+
 // Usamos fetch universal para cliente y servidor
 const _fetch = globalThis.fetch;
 
@@ -100,52 +101,61 @@ export class ProductService {
     }
   }
 
-  // Manejo de respuesta MEJORADO
+  // Manejo de respuesta MEJORADO Y DETALLADO
   private static async handleResponse<T>(response: Response): Promise<T> {
-    // ✅ Log para debug
     console.log('📨 Response status:', response.status, response.statusText);
     console.log('📨 Response URL:', response.url);
     
     if (!response.ok) {
+      // ✅ Obtener MÁS información del error
       let errorText = response.statusText;
+      let errorJson = null;
       
       try {
-        // Intentar obtener el cuerpo del error
+        // Intentar leer el cuerpo del error
         errorText = await response.text();
+        console.log('📄 Texto crudo del error:', errorText);
         
-        // Intentar parsear como JSON si parece JSON
-        if (errorText.trim().startsWith('{') || errorText.trim().startsWith('[')) {
-          try {
-            const errorJson = JSON.parse(errorText);
-            errorText = JSON.stringify(errorJson, null, 2);
-          } catch {
-            // Si no es JSON válido, mantener como texto
-          }
+        // Intentar parsear como JSON
+        try {
+          errorJson = JSON.parse(errorText);
+          console.log('📦 JSON parseado del error:', errorJson);
+        } catch (jsonError) {
+          console.log('ℹ️ El error no es JSON, es texto plano');
         }
-      } catch {
-        // Si falla, usar statusText
-        errorText = response.statusText;
+      } catch (textError) {
+        console.error('💥 No se pudo leer el cuerpo del error:', textError);
       }
       
-      console.error('❌ API Error Details:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url,
-        body: errorText
-      });
+      // ✅ Mostrar información COMPLETA
+      console.error('🚨 ERROR DETALLADO DEL BACKEND:');
+      console.error('   Status:', response.status);
+      console.error('   Status Text:', response.statusText);
+      console.error('   URL:', response.url);
+      console.error('   Body:', errorText);
+      
+      // ✅ Crear mensaje de error más útil
+      let userMessage = `Error ${response.status}: ${response.statusText}`;
+      
+      if (errorJson) {
+        if (errorJson.message) userMessage = errorJson.message;
+        else if (errorJson.error) userMessage = errorJson.error;
+      }
       
       throw new ApiError(
         response.status,
         response.statusText,
-        errorText || `HTTP error! status: ${response.status}`
+        userMessage
       );
     }
     
+    // ✅ Si la respuesta es exitosa, procesar JSON
     try {
       const data = await response.json();
       return data;
-    } catch {
-      throw new Error('Failed to parse JSON response');
+    } catch (jsonError) {
+      console.error('💥 Error parseando JSON de respuesta:', jsonError);
+      throw new Error('El servidor respondió con formato inválido');
     }
   }
 
@@ -224,226 +234,263 @@ export class ProductService {
     }
   }
 
-
-  // Obtener productos con filtros (VERSIÓN MEJORADA CON MEJOR MANEJO DE ERRORES 500)
+  // Obtener productos con filtros (VERSIÓN MEJORADA CON DEBUG DETALLADO)
   static async getProductsWithFilters(filters: {
-  category: string;
-  subcategory?: string;
-  sizes?: string | string[];
-  colors?: string | string[];
-  brands?: string | string[];
-  priceRange?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-  [key: string]: any;
-}): Promise<FilteredProductsResponse> {
-  const params = new URLSearchParams();
-  
-  // Parámetros base
-  params.append('category', filters.category);
-  
-  // Parámetros opcionales - solo si tienen valor
-  if (filters.subcategory) params.append('subcategory', filters.subcategory);
-  
-  if (filters.sizes) {
-    if (Array.isArray(filters.sizes) && filters.sizes.length > 0) {
-      params.append('sizes', filters.sizes.join(','));
-    } else if (typeof filters.sizes === 'string' && filters.sizes.length > 0) {
-      params.append('sizes', filters.sizes);
+    category: string;
+    subcategory?: string;
+    sizes?: string | string[];
+    colors?: string | string[];
+    brands?: string | string[];
+    priceRange?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+    [key: string]: any;
+  }): Promise<FilteredProductsResponse> {
+    
+    // ✅ DEBUG DETALLADO: Verificar CADA parámetro
+    console.log('🛠️ === DEBUG DETALLADO DE FILTROS ===');
+    console.log('📍 category:', filters.category);
+    console.log('📍 subcategory:', filters.subcategory);
+    console.log('📍 sizes:', filters.sizes, 'Tipo:', typeof filters.sizes);
+    console.log('📍 colors:', filters.colors, 'Tipo:', typeof filters.colors);
+    console.log('📍 brands:', filters.brands, 'Tipo:', typeof filters.brands);
+    console.log('📍 priceRange:', filters.priceRange);
+    console.log('=====================================');
+    
+    const params = new URLSearchParams();
+    
+    // ✅ 1. Parámetro OBLIGATORIO (siempre debe ir)
+    params.append('category', filters.category);
+    console.log('✅ Parámetro enviado - category:', filters.category);
+    
+    // ✅ 2. Parámetros OPCIONALES (solo si tienen valor)
+    if (filters.subcategory && filters.subcategory !== '') {
+      params.append('subcategory', filters.subcategory);
+      console.log('✅ Parámetro enviado - subcategory:', filters.subcategory);
+    } else {
+      console.log('❌ Parámetro omitido - subcategory: vacío o undefined');
     }
-  }
-  
-  if (filters.colors) {
-    if (Array.isArray(filters.colors) && filters.colors.length > 0) {
-      params.append('colors', filters.colors.join(','));
-    } else if (typeof filters.colors === 'string' && filters.colors.length > 0) {
-      params.append('colors', filters.colors);
-    }
-  }
-  
-  if (filters.brands) {
-    if (Array.isArray(filters.brands) && filters.brands.length > 0) {
-      params.append('brands', filters.brands.join(','));
-    } else if (typeof filters.brands === 'string' && filters.brands.length > 0) {
-      params.append('brands', filters.brands);
-    }
-  }
-  
-  if (filters.priceRange) params.append('priceRange', filters.priceRange);
-  if (filters.sortBy) params.append('sortBy', filters.sortBy);
-  if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
-  if (filters.page) params.append('page', filters.page.toString());
-  if (filters.limit) params.append('limit', filters.limit.toString());
-
-  const url = `${API_CONFIG.BASE_URL}/api/products/filtered?${params.toString()}`;
-  
-  console.log('🎯 Fetching filtered products from:', url);
-  console.log('📋 Filters applied:', JSON.stringify(filters, null, 2));
-
-  try {
-    const response = await this.retry(async () => {
-      return await this.fetchWithTimeout(url);
-    });
-
-    // ✅ Log adicional para debug
-    console.log('🔍 Response received, processing...');
     
-    const data = await this.handleResponse<FilteredProductsResponse>(response);
-    
-    console.log('✅ Filtered products received:', data.products?.length || 0, 'items');
-    return data;
-    
-  } catch (error) {
-    console.error('❌ Error fetching filtered products:', error);
-    
-    // ✅ MEJOR FALLBACK: Manejar específicamente errores 500 y 404
-    if (error instanceof ApiError && (error.status === 500 || error.status === 404)) {
-      console.log('🔄 Backend endpoint /api/products/filtered no disponible, usando fallback...');
+    if (filters.sizes) {
+      // Convertir array a string o dejar el string tal cual
+      const sizesValue = Array.isArray(filters.sizes) 
+        ? filters.sizes.filter(size => size && size !== '').join(',')
+        : filters.sizes;
       
-      try {
-        // Obtener todos los productos de la categoría
-        const fallbackProducts = await this.getProductsByCategory(filters.category);
-        
-        // Aplicar filtros localmente como fallback
-        let filteredProducts = fallbackProducts;
-        
-        // Filtrar por subcategoría
-        if (filters.subcategory) {
-          filteredProducts = filteredProducts.filter(product => 
-            product.subcategory?.toLowerCase() === filters.subcategory?.toLowerCase()
-          );
-        }
-
-        
-        // ✅ CORRECCIÓN: Filtrar por talles de forma segura
-        if (filters.sizes) {
-  const sizesArray = Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes];
-  if (sizesArray.length > 0) {
-    filteredProducts = filteredProducts.filter(product => {
-      // Verificar que product.sizes existe y es un array
-      if (!product.sizes || !Array.isArray(product.sizes)) return false;
-      
-      // Usar el operador de aserción no nula (!) porque ya verificamos que existe
-      return sizesArray.some(size => 
-        product.sizes!.includes(size)
-      );
-    });
-  }
-}
-        
-        // ✅ CORRECCIÓN COMPLETA: Filtrar por colores de forma segura
-    // ✅ DEBUG: Verificar el tipo y valor de filters.colors
-console.log('=== DEBUG filters.colors ===');
-console.log('Tipo de filters.colors:', typeof filters.colors);
-console.log('Valor de filters.colors:', filters.colors);
-console.log('Es array?:', Array.isArray(filters.colors));
-if (filters.colors) {
-  console.log('Longitud:', Array.isArray(filters.colors) ? filters.colors.length : 1);
-  console.log('Primer elemento:', Array.isArray(filters.colors) ? filters.colors[0] : filters.colors);
-  console.log('Tipo primer elemento:', Array.isArray(filters.colors) ? typeof filters.colors[0] : typeof filters.colors);
-}
-console.log('===========================');
-
-// ✅ CORRECCIÓN COMPLETA: Filtrar por colores de forma segura
-if (filters.colors) {
-  try {
-    // @ts-ignore - Ignorar TypeScript momentáneamente
-    const colorsArray = Array.isArray(filters.colors) ? filters.colors : [filters.colors];
-    
-    // @ts-ignore  
-    const normalizedFilterColors = colorsArray.map(color => {
-      return String(color).toLowerCase();
-    }).filter(color => color && color !== '');
-
-    if (normalizedFilterColors.length > 0) {
-      filteredProducts = filteredProducts.filter(product => {
-        if (!product.colors) return false;
-        
-        try {
-          // @ts-ignore
-          const normalizedProductColors = typeof product.colors === 'string' 
-            ? [product.colors.toLowerCase()]
-            // @ts-ignore  
-            : Array.isArray(product.colors) 
-              ? product.colors.map(c => String(c).toLowerCase()).filter(c => c && c !== '')
-              : [];
-          
-          return normalizedFilterColors.some(filterColor =>
-            normalizedProductColors.some(productColor =>
-              productColor.includes(filterColor)
-            )
-          );
-        } catch {
-          return false;
-        }
-      });
-    }
-  } catch (error) {
-    console.warn('Error en filtro de colores (approach nuclear):', error);
-  }
-}
-        
-        // ✅ CORRECCIÓN: Filtrar por marcas de forma segura
-       if (filters.brands) {
-  const brandsArray = Array.isArray(filters.brands) ? filters.brands : [filters.brands];
-  if (brandsArray.length > 0) {
-    // Normalizar las marcas del filtro primero
-    const normalizedFilterBrands = brandsArray.map(brand => brand.toLowerCase());
-    
-    filteredProducts = filteredProducts.filter(product => {
-      if (!product.brand) return false;
-      
-      // Normalizar la marca del producto
-      const normalizedProductBrand = product.brand.toLowerCase();
-      
-      return normalizedFilterBrands.some(filterBrand => 
-        normalizedProductBrand.includes(filterBrand)
-      );
-    });
-  }
-}
-        
-        // Filtrar por rango de precio
-        if (filters.priceRange) {
-          const [min, max] = filters.priceRange.split('-').map(Number);
-          filteredProducts = filteredProducts.filter(product => {
-            const price = product.price || 0;
-            if (filters.priceRange?.endsWith('+')) {
-              return price >= min;
-            } else {
-              return price >= min && price <= max;
-            }
-          });
-        }
-        
-        return {
-          products: filteredProducts,
-          pagination: {
-            total: filteredProducts.length,
-            currentPage: 1,
-            totalPages: 1,
-            hasNextPage: false,
-            hasPrevPage: false
-          },
-          filters: {
-            sizes: [],
-            colors: [],
-            brands: [],
-            categories: []
-          }
-        };
-        
-      } catch (fallbackError) {
-        console.error('❌ Fallback también falló:', fallbackError);
-        throw new Error('No se pudieron cargar los productos');
+      if (sizesValue && sizesValue !== '') {
+        params.append('sizes', sizesValue);
+        console.log('✅ Parámetro enviado - sizes:', sizesValue);
+      } else {
+        console.log('❌ Parámetro omitido - sizes: vacío después de filtrar');
       }
     }
     
-    throw error;
+    if (filters.colors) {
+      const colorsValue = Array.isArray(filters.colors) 
+        ? filters.colors.filter(color => color && color !== '').join(',')
+        : filters.colors;
+      
+      if (colorsValue && colorsValue !== '') {
+        params.append('colors', colorsValue);
+        console.log('✅ Parámetro enviado - colors:', colorsValue);
+      } else {
+        console.log('❌ Parámetro omitido - colors: vacío después de filtrar');
+      }
+    }
+    
+    if (filters.brands) {
+      const brandsValue = Array.isArray(filters.brands) 
+        ? filters.brands.filter(brand => brand && brand !== '').join(',')
+        : filters.brands;
+      
+      if (brandsValue && brandsValue !== '') {
+        params.append('brands', brandsValue);
+        console.log('✅ Parámetro enviado - brands:', brandsValue);
+      } else {
+        console.log('❌ Parámetro omitido - brands: vacío después de filtrar');
+      }
+    }
+    
+    if (filters.priceRange && filters.priceRange !== '') {
+      params.append('priceRange', filters.priceRange);
+      console.log('✅ Parámetro enviado - priceRange:', filters.priceRange);
+    } else {
+      console.log('❌ Parámetro omitido - priceRange: vacío o undefined');
+    }
+    
+    // Parámetros adicionales
+    if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.limit) params.append('limit', filters.limit.toString());
+
+    // ✅ 3. Construir URL final
+    const url = `${API_CONFIG.BASE_URL}/api/products/filtered?${params.toString()}`;
+    console.log('🌐 URL final enviada al backend:', url);
+    console.log('=====================================');
+
+    try {
+      const response = await this.retry(async () => {
+        return await this.fetchWithTimeout(url);
+      });
+
+      console.log('🔍 Response received, processing...');
+      
+      const data = await this.handleResponse<FilteredProductsResponse>(response);
+      
+      console.log('✅ Filtered products received:', data.products?.length || 0, 'items');
+      return data;
+      
+    } catch (error) {
+      console.error('❌ Error fetching filtered products:', error);
+      
+      // ✅ MEJOR FALLBACK: Manejar específicamente errores 500 y 404
+      if (error instanceof ApiError && (error.status === 500 || error.status === 404)) {
+        console.log('🔄 Backend endpoint /api/products/filtered no disponible, usando fallback...');
+        
+        try {
+          // Obtener todos los productos de la categoría
+          const fallbackProducts = await this.getProductsByCategory(filters.category);
+          
+          // Aplicar filtros localmente como fallback
+          let filteredProducts = fallbackProducts;
+          
+          // Filtrar por subcategoría
+          if (filters.subcategory) {
+            filteredProducts = filteredProducts.filter(product => 
+              product.subcategory?.toLowerCase() === filters.subcategory?.toLowerCase()
+            );
+          }
+
+          
+          // ✅ CORRECCIÓN: Filtrar por talles de forma segura
+          if (filters.sizes) {
+            const sizesArray = Array.isArray(filters.sizes) ? filters.sizes : [filters.sizes];
+            if (sizesArray.length > 0) {
+              filteredProducts = filteredProducts.filter(product => {
+                // Verificar que product.sizes existe y es un array
+                if (!product.sizes || !Array.isArray(product.sizes)) return false;
+                
+                // Usar el operador de aserción no nula (!) porque ya verificamos que existe
+                return sizesArray.some(size => 
+                  product.sizes!.includes(size)
+                );
+              });
+            }
+          }
+          
+          // ✅ DEBUG: Verificar el tipo y valor de filters.colors
+          console.log('=== DEBUG filters.colors ===');
+          console.log('Tipo de filters.colors:', typeof filters.colors);
+          console.log('Valor de filters.colors:', filters.colors);
+          console.log('Es array?:', Array.isArray(filters.colors));
+          if (filters.colors) {
+            console.log('Longitud:', Array.isArray(filters.colors) ? filters.colors.length : 1);
+            console.log('Primer elemento:', Array.isArray(filters.colors) ? filters.colors[0] : filters.colors);
+            console.log('Tipo primer elemento:', Array.isArray(filters.colors) ? typeof filters.colors[0] : typeof filters.colors);
+          }
+          console.log('===========================');
+
+          // ✅ CORRECCIÓN COMPLETA: Filtrar por colores de forma segura
+          if (filters.colors) {
+            try {
+              // @ts-ignore - Ignorar TypeScript momentáneamente
+              const colorsArray = Array.isArray(filters.colors) ? filters.colors : [filters.colors];
+              
+              // @ts-ignore  
+              const normalizedFilterColors = colorsArray.map(color => {
+                return String(color).toLowerCase();
+              }).filter(color => color && color !== '');
+
+              if (normalizedFilterColors.length > 0) {
+                filteredProducts = filteredProducts.filter(product => {
+                  if (!product.colors) return false;
+                  
+                  try {
+                    // @ts-ignore
+                    const normalizedProductColors = typeof product.colors === 'string' 
+                      ? [product.colors.toLowerCase()]
+                      // @ts-ignore  
+                      : Array.isArray(product.colors) 
+                        ? product.colors.map(c => String(c).toLowerCase()).filter(c => c && c !== '')
+                        : [];
+                    
+                    return normalizedFilterColors.some(filterColor =>
+                      normalizedProductColors.some(productColor =>
+                        productColor.includes(filterColor)
+                      )
+                    );
+                  } catch {
+                    return false;
+                  }
+                });
+              }
+            } catch (error) {
+              console.warn('Error en filtro de colores (approach nuclear):', error);
+            }
+          }
+          
+          // ✅ CORRECCIÓN: Filtrar por marcas de forma segura
+          if (filters.brands) {
+            const brandsArray = Array.isArray(filters.brands) ? filters.brands : [filters.brands];
+            if (brandsArray.length > 0) {
+              // Normalizar las marcas del filtro primero
+              const normalizedFilterBrands = brandsArray.map(brand => brand.toLowerCase());
+              
+              filteredProducts = filteredProducts.filter(product => {
+                if (!product.brand) return false;
+                
+                // Normalizar la marca del producto
+                const normalizedProductBrand = product.brand.toLowerCase();
+                
+                return normalizedFilterBrands.some(filterBrand => 
+                  normalizedProductBrand.includes(filterBrand)
+                );
+              });
+            }
+          }
+          
+          // Filtrar por rango de precio
+          if (filters.priceRange) {
+            const [min, max] = filters.priceRange.split('-').map(Number);
+            filteredProducts = filteredProducts.filter(product => {
+              const price = product.price || 0;
+              if (filters.priceRange?.endsWith('+')) {
+                return price >= min;
+              } else {
+                return price >= min && price <= max;
+              }
+            });
+          }
+          
+          return {
+            products: filteredProducts,
+            pagination: {
+              total: filteredProducts.length,
+              currentPage: 1,
+              totalPages: 1,
+              hasNextPage: false,
+              hasPrevPage: false
+            },
+            filters: {
+              sizes: [],
+              colors: [],
+              brands: [],
+              categories: []
+            }
+          };
+          
+        } catch (fallbackError) {
+          console.error('❌ Fallback también falló:', fallbackError);
+          throw new Error('No se pudieron cargar los productos');
+        }
+      }
+      
+      throw error;
+    }
   }
-}
 
   // Obtener opciones de filtro desde el backend
   static async getFilterOptions(category: string): Promise<{
