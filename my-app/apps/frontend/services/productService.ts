@@ -39,6 +39,11 @@ export class TimeoutError extends Error {
 // Tipo de respuesta
 interface ProductsResponse {
   products?: Product[];
+  pagination?: {
+    total: number;
+    currentPage: number;
+    totalPages: number;
+  };
   message?: string;
   status?: string;
 }
@@ -151,58 +156,53 @@ export class ProductService {
     }
   }
 
-  // Obtener producto por ID - VERSIÓN CORREGIDA
+  // Obtener producto por ID
   static async getProductById(id: string): Promise<Product | null> {
     try {
       console.log('🔍 Getting product by ID:', id);
-      
-      // Obtener TODOS los productos primero
-      const allProducts = await this.getProductsByCategory('all');
-      
-      // Buscar el producto por ID
-      const product = allProducts.find(p => 
-        p.id.toString() === id || p.id === parseInt(id)
-      );
-      
-      if (!product) {
-        console.warn('❌ Product not found with ID:', id);
-        return null;
-      }
-      
-      console.log('✅ Product found:', product.name);
-      return product;
+      const url = `${API_CONFIG.BASE_URL}/api/products/${id}`;
+      const response = await this.fetchWithTimeout(url);
+      const data = await this.handleResponse<Product>(response);
+      return data;
     } catch (error) {
       console.error('❌ Error in getProductById:', error);
       return null;
     }
   }
 
-  // Obtener productos con filtros
-  static async getProductsWithFilters(filters: {
-    category?: string;
+  // Obtener productos con filtros (NUEVO método)
+  static async getFilteredProducts(filters: {
+    category: string;
     subcategory?: string;
-    priceRange?: [number, number];
-    limit?: number;
+    sizes?: string[];
+    colors?: string[];
+    brands?: string[];
+    priceRange?: string;
     sortBy?: string;
-  }): Promise<Product[]> {
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+  }): Promise<ProductsResponse> {
     const params = new URLSearchParams();
-    if (filters.category) params.append('category', filters.category);
-    if (filters.subcategory) params.append('subcategory', filters.subcategory);
-    if (filters.priceRange) {
-      params.append('minPrice', filters.priceRange[0].toString());
-      params.append('maxPrice', filters.priceRange[1].toString());
-    }
-    if (filters.limit) params.append('limit', filters.limit.toString());
-    if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    params.append('category', filters.category);
 
-    const url = `${API_CONFIG.BASE_URL}/api/products?${params.toString()}`;
+    if (filters.subcategory) params.append('subcategory', filters.subcategory);
+    if (filters.sizes?.length) params.append('sizes', filters.sizes.join(','));
+    if (filters.colors?.length) params.append('colors', filters.colors.join(','));
+    if (filters.brands?.length) params.append('brands', filters.brands.join(','));
+    if (filters.priceRange) params.append('priceRange', filters.priceRange);
+    if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.limit) params.append('limit', filters.limit.toString());
+
+    const url = `${API_CONFIG.BASE_URL}/api/products/filtered/list?${params.toString()}`;
 
     try {
       const response = await this.fetchWithTimeout(url);
-      const data = await this.handleResponse<ProductsResponse | Product[]>(response);
-      return this.extractProductsFromResponse(data);
+      return this.handleResponse<ProductsResponse>(response);
     } catch (error) {
-      console.error('❌ Error fetching products with filters:', error);
+      console.error('❌ Error fetching filtered products:', error);
       throw error;
     }
   }
