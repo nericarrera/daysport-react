@@ -42,7 +42,7 @@ export class ProductsService {
     return `${host}/assets/images/${imagePath}`;
   }
 
-  // Función segura para manejar colorImages como JsonValue - CORREGIDA
+  // Función segura para manejar colorImages como JsonValue
   private parseColorImages(colorImages: JsonValue | null | undefined): Record<string, string[]> {
     if (!colorImages || typeof colorImages !== 'object' || colorImages === null) {
       return {};
@@ -85,7 +85,6 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      // DEBUG: Ver la estructura real
       if (products.length > 0) {
         console.log('📦 Estructura real del primer producto:', JSON.stringify(products[0], null, 2));
       }
@@ -151,6 +150,72 @@ export class ProductsService {
     } catch (error) {
       console.error('❌ Error fetching featured products:', error);
       throw new Error('Error fetching featured products');
+    }
+  }
+
+  // ✅ Nuevo método: getFilteredProducts
+  async getFilteredProducts(filters: {
+    category?: string;
+    subcategory?: string;
+    sizes?: string[];
+    colors?: string[];
+    brands?: string[];
+    priceRange?: [number, number];
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+  }) {
+    try {
+      const where: any = {};
+
+      if (filters.category) where.category = filters.category;
+      if (filters.subcategory) where.subcategory = filters.subcategory;
+      if (filters.brands) where.brand = { in: filters.brands };
+      if (filters.sizes) where.sizes = { hasSome: filters.sizes };
+      if (filters.colors) where.colors = { hasSome: filters.colors };
+
+      if (filters.priceRange) {
+        where.price = {
+          gte: filters.priceRange[0],
+          lte: filters.priceRange[1],
+        };
+      }
+
+      const page = filters.page || 1;
+      const limit = filters.limit || 12;
+
+      const [products, total] = await this.prisma.$transaction([
+        this.prisma.product.findMany({
+          where,
+          orderBy: filters.sortBy
+            ? { [filters.sortBy]: filters.sortOrder || 'asc' }
+            : { createdAt: 'desc' },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        this.prisma.product.count({ where }),
+      ]);
+
+      const productsWithImages = products.map((p: any) => {
+        const product = p as PrismaProduct;
+        return {
+          ...product,
+          mainImageUrl: this.buildImageUrl(product.mainImage),
+          images: (product.images || []).map((img: string) => this.buildImageUrl(img)),
+          colorImages: this.buildColorImages(product.colorImages),
+        };
+      });
+
+      return {
+        products: productsWithImages,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      };
+    } catch (error) {
+      console.error('❌ Error fetching filtered products:', error);
+      throw new Error('Error fetching filtered products');
     }
   }
 }
