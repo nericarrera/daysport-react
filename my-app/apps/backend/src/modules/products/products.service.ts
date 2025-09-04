@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { IdGeneratorService } from '../../common/services/id-generator.service';
 
-// Interfaz exacta para el producto de Prisma
+// Interfaz actualizada para el producto de Prisma (ID como string)
 interface PrismaProduct {
-  id: number;
+  id: string; // ← CAMBIO: Ahora es string
   name: string;
   description: string | null;
   price: number;
@@ -28,7 +29,10 @@ interface PrismaProduct {
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private idGenerator: IdGeneratorService // ← Nuevo servicio inyectado
+  ) {}
 
   private buildImageUrl(imagePath: string): string {
     const host = process.env.HOST_BACKEND || 'http://localhost:3001';
@@ -74,6 +78,32 @@ export class ProductsService {
     );
   }
 
+  // ✅ NUEVO MÉTODO: Crear producto con ID semántico
+  async createProduct(productData: any) {
+    try {
+      const newId = await this.idGenerator.generateProductId(productData.category);
+      
+      const product = await this.prisma.product.create({
+        data: {
+          ...productData,
+          id: newId
+        }
+      });
+
+      const productTyped = product as PrismaProduct;
+
+      return { 
+        ...productTyped, 
+        mainImageUrl: this.buildImageUrl(productTyped.mainImage),
+        images: (productTyped.images || []).map((img: string) => this.buildImageUrl(img)),
+        colorImages: this.buildColorImages(productTyped.colorImages),
+      };
+    } catch (error) {
+      console.error('❌ Error creating product:', error);
+      throw new Error('Error creating product');
+    }
+  }
+
   async getProducts(category?: string, subcategory?: string) {
     try {
       const where: any = {};
@@ -106,10 +136,11 @@ export class ProductsService {
     }
   }
 
-  async getProductById(id: number) {
+  // ✅ ACTUALIZADO: Ahora acepta string ID
+  async getProductById(id: string) {
     try {
       const product = await this.prisma.product.findUnique({ 
-        where: { id } 
+        where: { id } // ← Ahora busca por string ID
       });
       
       if (!product) throw new NotFoundException('Product not found');
@@ -153,7 +184,6 @@ export class ProductsService {
     }
   }
 
-  // ✅ Nuevo método: getFilteredProducts
   async getFilteredProducts(filters: {
     category?: string;
     subcategory?: string;
@@ -216,6 +246,90 @@ export class ProductsService {
     } catch (error) {
       console.error('❌ Error fetching filtered products:', error);
       throw new Error('Error fetching filtered products');
+    }
+  }
+
+  // ✅ NUEVO MÉTODO: Migrar IDs existentes
+  async migrateProductIds() {
+    try {
+      // Obtener todos los productos con ID numérico
+      const products = await this.prisma.product.findMany({
+        where: {
+          id: {
+            not: {
+              contains: '-'
+            }
+          }
+        }
+      });
+
+      let migratedCount = 0;
+      const errors: string[] = [];
+
+      for (const product of products) {
+        try {
+          const newId = await this.idGenerator.migrateExistingProduct(
+            parseInt(product.id, 10),
+            product.category
+          );
+
+          // Actualizar el producto y sus relaciones en una transacción
+          await this.prisma.$transaction([
+            // Actualizar CartItems
+            this.prisma.cartItem.updateMany({
+              where: { productId: product.id },
+              data: { productId: newId }
+            }),
+            // Actualizar el producto
+            this.prisma.product.update({
+              where: { id: product.id },
+              data: { id: newId }
+            })
+          ]);
+
+          migratedCount++;
+          console.log(`✅ Migrado: ${product.id} -> ${newId}`);
+        } catch (error) {
+          const errorMsg = `Error migrando producto ${product.id}: ${error.message}`;
+          errors.push(errorMsg);
+          console.error(`❌ ${errorMsg}`);
+        }
+      }
+
+      return {
+        success: true,
+        migrated: migratedCount,
+        total: products.length,
+        errors: errors.length > 0 ? errors : undefined
+      };
+    } catch (error) {
+      console.error('❌ Error en migración de IDs:', error);
+      throw new Error('Error durante la migración de IDs');
+    }
+  }
+
+  // ✅ NUEVO MÉTODO: Buscar producto por ID legacy (para transición)
+  async getProductByIdLegacy(id: number) {
+    try {
+      // Buscar si existe un producto con el ID numérico
+      const product = await this.prisma.product.findUnique({ 
+        where: { id: id.toString() } 
+      });
+      
+      if (product) {
+        const productTyped = product as PrismaProduct;
+        return { 
+          ...productTyped, 
+          mainImageUrl: this.buildImageUrl(productTyped.mainImage),
+          images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
+          colorImages: this.buildColorImages(productTyped.colorImages),
+        };
+      }
+
+      throw new NotFoundException('Product not found');
+    } catch (error) {
+      console.error('❌ Error fetching product by legacy ID:', error);
+      throw error;
     }
   }
 }
