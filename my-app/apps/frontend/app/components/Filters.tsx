@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { XMarkIcon, FunnelIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 interface FiltersProps {
   category: string;
@@ -137,119 +137,137 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
         </div>
       </div>
 
-      {/* Modal de filtros */}
+      {/* Modal de filtros - VERSIÓN CORREGIDA */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            {/* Fondo del modal */}
-            <div 
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
-              onClick={() => setIsModalOpen(false)}
-            ></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Fondo del modal con mayor opacidad */}
+          <div 
+            className="absolute inset-0 bg-gray-800 bg-opacity-75"
+            onClick={() => setIsModalOpen(false)}
+          ></div>
 
-            {/* Contenido del modal */}
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              {/* Header del modal */}
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between items-center border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-500"
-                >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
-              </div>
+          {/* Contenido del modal - centrado correctamente */}
+          <div className="relative bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-hidden z-50">
+            {/* Header del modal */}
+            <div className="bg-gray-50 px-4 py-3 flex justify-between items-center border-b border-gray-200 sticky top-0">
+              <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-200"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
 
-              {/* Cuerpo del modal */}
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[70vh] overflow-y-auto">
-                <div className="space-y-6">
-                  {/* Categorías */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Categorías</h4>
-                    <div className="space-y-2">
+            {/* Cuerpo del modal con scroll */}
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              <div className="space-y-6">
+                {/* Categorías */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Categorías</h4>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleSubcategoryChange('')}
+                      className={`block w-full text-left px-3 py-2 rounded-md ${
+                        !localFilters.subcategory 
+                          ? 'bg-gray-100 font-medium text-black' 
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Todas las categorías
+                    </button>
+                    {subcategories.map((subcat) => (
                       <button
-                        onClick={() => handleSubcategoryChange('')}
-                        className={`block w-full text-left px-3 py-2 rounded-md ${!localFilters.subcategory ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'}`}
+                        key={subcat}
+                        onClick={() => handleSubcategoryChange(subcat)}
+                        className={`block w-full text-left px-3 py-2 rounded-md capitalize ${
+                          localFilters.subcategory === subcat 
+                            ? 'bg-gray-100 font-medium text-black' 
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
                       >
-                        Todas las categorías
+                        {subcat}
                       </button>
-                      {subcategories.map((subcat) => (
-                        <button
-                          key={subcat}
-                          onClick={() => handleSubcategoryChange(subcat)}
-                          className={`block w-full text-left px-3 py-2 rounded-md capitalize ${localFilters.subcategory === subcat ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'}`}
-                        >
-                          {subcat}
-                        </button>
-                      ))}
-                    </div>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Rango de precios */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Rango de precios</h4>
-                    <div className="space-y-2">
-                      {priceRanges.map((range) => (
-                        <button
-                          key={range.id}
-                          onClick={() => handlePriceRangeChange(range.id)}
-                          className={`block w-full text-left px-3 py-2 rounded-md ${localFilters.priceRange === range.id ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'}`}
-                        >
-                          {range.label}
-                        </button>
-                      ))}
-                    </div>
+                {/* Rango de precios */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Rango de precios</h4>
+                  <div className="space-y-2">
+                    {priceRanges.map((range) => (
+                      <button
+                        key={range.id}
+                        onClick={() => handlePriceRangeChange(range.id)}
+                        className={`block w-full text-left px-3 py-2 rounded-md ${
+                          localFilters.priceRange === range.id 
+                            ? 'bg-gray-100 font-medium text-black' 
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {range.label}
+                      </button>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Talles */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Talles</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {sizesOptions.map((size) => (
-                        <button
-                          key={size}
-                          onClick={() => handleSizeChange(size)}
-                          className={`px-3 py-1.5 rounded-md border ${localFilters.sizes.includes(size) ? 'bg-black text-white border-black' : 'border-gray-300 hover:border-gray-400'}`}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
+                {/* Talles */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Talles</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {sizesOptions.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => handleSizeChange(size)}
+                        className={`px-3 py-1.5 rounded-md border text-sm ${
+                          localFilters.sizes.includes(size) 
+                            ? 'bg-black text-white border-black' 
+                            : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Colores */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Colores</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {colorsOptions.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => handleColorChange(color)}
-                          className={`px-3 py-1.5 rounded-md border ${localFilters.colors.includes(color) ? 'border-black font-medium' : 'border-gray-300 hover:border-gray-400'}`}
-                        >
-                          {color}
-                        </button>
-                      ))}
-                    </div>
+                {/* Colores */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Colores</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {colorsOptions.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => handleColorChange(color)}
+                        className={`px-3 py-1.5 rounded-md border text-sm ${
+                          localFilters.colors.includes(color) 
+                            ? 'border-black font-medium bg-gray-100' 
+                            : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Footer del modal */}
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between border-t border-gray-200">
-                <button
-                  onClick={clearAllFilters}
-                  className="text-gray-600 hover:text-gray-800 font-medium"
-                >
-                  Limpiar todo
-                </button>
-                <button
-                  onClick={applyFilters}
-                  className="bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors"
-                >
-                  Aplicar filtros
-                </button>
-              </div>
+            {/* Footer del modal */}
+            <div className="bg-gray-50 px-4 py-3 flex justify-between border-t border-gray-200 sticky bottom-0">
+              <button
+                onClick={clearAllFilters}
+                className="text-gray-600 hover:text-gray-800 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+              >
+                Limpiar todo
+              </button>
+              <button
+                onClick={applyFilters}
+                className="bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors"
+              >
+                Aplicar filtros
+              </button>
             </div>
           </div>
         </div>
