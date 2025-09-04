@@ -53,6 +53,19 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
     }
   }, [selectedFilters]);
 
+  // Evitar scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
   const handleFilterChange = (newFilters: FilterState) => {
     setLocalFilters(newFilters);
     if (onFilterChange) {
@@ -120,7 +133,7 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
   return (
     <>
       {/* Botón para abrir el modal de filtros */}
-      <div className="sticky top-20 z-10 bg-white py-3 border-b border-gray-200">
+      <div className="sticky top-20 z-30 bg-white py-3 border-b border-gray-200">
         <div className="container mx-auto px-4">
           <button
             onClick={() => setIsModalOpen(true)}
@@ -137,30 +150,31 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
         </div>
       </div>
 
-      {/* Modal de filtros - VERSIÓN CORREGIDA */}
+      {/* Modal Lateral tipo Drawer - VERSIÓN MEJORADA */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Fondo del modal con mayor opacidad */}
+        <>
+          {/* Fondo semitransparente */}
           <div 
-            className="absolute inset-0 bg-gray-800 bg-opacity-75"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
             onClick={() => setIsModalOpen(false)}
-          ></div>
-
-          {/* Contenido del modal - centrado correctamente */}
-          <div className="relative bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-hidden z-50">
-            {/* Header del modal */}
-            <div className="bg-gray-50 px-4 py-3 flex justify-between items-center border-b border-gray-200 sticky top-0">
+          />
+          
+          {/* Drawer lateral */}
+          <div className="fixed right-0 top-0 h-full w-80 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out">
+            {/* Header del drawer */}
+            <div className="bg-gray-50 px-4 py-4 flex justify-between items-center border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-200"
+                className="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-200 transition-colors"
+                aria-label="Cerrar filtros"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
 
-            {/* Cuerpo del modal con scroll */}
-            <div className="p-4 overflow-y-auto max-h-[60vh]">
+            {/* Contenido del drawer con scroll */}
+            <div className="h-[calc(100%-120px)] overflow-y-auto p-4">
               <div className="space-y-6">
                 {/* Categorías */}
                 <div>
@@ -168,10 +182,10 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
                   <div className="space-y-2">
                     <button
                       onClick={() => handleSubcategoryChange('')}
-                      className={`block w-full text-left px-3 py-2 rounded-md ${
+                      className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
                         !localFilters.subcategory 
-                          ? 'bg-gray-100 font-medium text-black' 
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-gray-100 font-medium text-black border border-gray-300' 
+                          : 'text-gray-700 hover:bg-gray-50 border border-transparent'
                       }`}
                     >
                       Todas las categorías
@@ -180,10 +194,10 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
                       <button
                         key={subcat}
                         onClick={() => handleSubcategoryChange(subcat)}
-                        className={`block w-full text-left px-3 py-2 rounded-md capitalize ${
+                        className={`block w-full text-left px-3 py-2 rounded-md capitalize transition-colors ${
                           localFilters.subcategory === subcat 
-                            ? 'bg-gray-100 font-medium text-black' 
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-gray-100 font-medium text-black border border-gray-300' 
+                            : 'text-gray-700 hover:bg-gray-50 border border-transparent'
                         }`}
                       >
                         {subcat}
@@ -200,10 +214,10 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
                       <button
                         key={range.id}
                         onClick={() => handlePriceRangeChange(range.id)}
-                        className={`block w-full text-left px-3 py-2 rounded-md ${
+                        className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
                           localFilters.priceRange === range.id 
-                            ? 'bg-gray-100 font-medium text-black' 
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-gray-100 font-medium text-black border border-gray-300' 
+                            : 'text-gray-700 hover:bg-gray-50 border border-transparent'
                         }`}
                       >
                         {range.label}
@@ -220,7 +234,7 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
                       <button
                         key={size}
                         onClick={() => handleSizeChange(size)}
-                        className={`px-3 py-1.5 rounded-md border text-sm ${
+                        className={`px-3 py-2 rounded-md border text-sm transition-colors flex-1 min-w-[45px] ${
                           localFilters.sizes.includes(size) 
                             ? 'bg-black text-white border-black' 
                             : 'border-gray-300 text-gray-700 hover:border-gray-400'
@@ -240,7 +254,7 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
                       <button
                         key={color}
                         onClick={() => handleColorChange(color)}
-                        className={`px-3 py-1.5 rounded-md border text-sm ${
+                        className={`px-3 py-2 rounded-md border text-sm transition-colors flex-1 min-w-[70px] ${
                           localFilters.colors.includes(color) 
                             ? 'border-black font-medium bg-gray-100' 
                             : 'border-gray-300 text-gray-700 hover:border-gray-400'
@@ -254,23 +268,23 @@ export default function Filters({ category, onFilterChange, selectedFilters }: F
               </div>
             </div>
 
-            {/* Footer del modal */}
-            <div className="bg-gray-50 px-4 py-3 flex justify-between border-t border-gray-200 sticky bottom-0">
+            {/* Footer del drawer */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gray-50 px-4 py-4 flex justify-between border-t border-gray-200">
               <button
                 onClick={clearAllFilters}
-                className="text-gray-600 hover:text-gray-800 font-medium py-2 px-4 rounded-md hover:bg-gray-200"
+                className="text-gray-600 hover:text-gray-800 font-medium py-2 px-4 rounded-md hover:bg-gray-200 transition-colors"
               >
                 Limpiar todo
               </button>
               <button
                 onClick={applyFilters}
-                className="bg-black text-white px-4 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors"
+                className="bg-black text-white px-6 py-2 rounded-md font-medium hover:bg-gray-800 transition-colors"
               >
-                Aplicar filtros
+                Aplicar
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
