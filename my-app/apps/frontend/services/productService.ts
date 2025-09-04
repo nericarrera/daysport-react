@@ -36,9 +36,29 @@ export class TimeoutError extends Error {
   }
 }
 
-// Tipo de respuesta
+// Tipo de respuesta para productos filtrados
+export interface FilteredProductsResponse {
+  products: Product[];
+  pagination: {
+    total: number;
+    currentPage: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+  filters?: {
+    sizes: string[];
+    colors: string[];
+    brands: string[];
+    categories: string[];
+  };
+}
+
+// Tipo de respuesta para productos normales
 interface ProductsResponse {
   products?: Product[];
+  data?: Product[];
+  items?: Product[];
   pagination?: {
     total: number;
     currentPage: number;
@@ -84,10 +104,11 @@ export class ProductService {
   // Manejo de respuesta
   private static async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
       throw new ApiError(
         response.status,
         response.statusText,
-        `HTTP error! status: ${response.status}`
+        errorText || `HTTP error! status: ${response.status}`
       );
     }
     try {
@@ -124,12 +145,14 @@ export class ProductService {
     );
   }
 
-  // Extraer productos de la respuesta
+  // Extraer productos de la respuesta (compatible con múltiples formatos)
   private static extractProductsFromResponse(
-    data: ProductsResponse | Product[]
+    data: ProductsResponse | Product[] | any
   ): Product[] {
     if (Array.isArray(data)) return data;
-    if (data.products && Array.isArray(data.products)) return data.products;
+    if (data?.products && Array.isArray(data.products)) return data.products;
+    if (data?.data && Array.isArray(data.data)) return data.data;
+    if (data?.items && Array.isArray(data.items)) return data.items;
     return [];
   }
 
@@ -170,40 +193,163 @@ export class ProductService {
     }
   }
 
-  // Obtener productos con filtros (NUEVO método)
-  static async getFilteredProducts(filters: {
+  // Obtener productos con filtros (VERSIÓN MEJORADA)
+  static async getProductsWithFilters(filters: {
     category: string;
     subcategory?: string;
-    sizes?: string[];
-    colors?: string[];
-    brands?: string[];
+    sizes?: string | string[];
+    colors?: string | string[];
+    brands?: string | string[];
     priceRange?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     page?: number;
     limit?: number;
-  }): Promise<ProductsResponse> {
+    [key: string]: any; // Para filtros adicionales
+  }): Promise<FilteredProductsResponse> {
     const params = new URLSearchParams();
+    
+    // Parámetros base
     params.append('category', filters.category);
-
+    
+    // Parámetros opcionales
     if (filters.subcategory) params.append('subcategory', filters.subcategory);
-    if (filters.sizes?.length) params.append('sizes', filters.sizes.join(','));
-    if (filters.colors?.length) params.append('colors', filters.colors.join(','));
-    if (filters.brands?.length) params.append('brands', filters.brands.join(','));
+    
+    // Manejar arrays y strings para sizes
+    if (filters.sizes) {
+      if (Array.isArray(filters.sizes)) {
+        params.append('sizes', filters.sizes.join(','));
+      } else {
+        params.append('sizes', filters.sizes);
+      }
+    }
+    
+    // Manejar arrays y strings para colors
+    if (filters.colors) {
+      if (Array.isArray(filters.colors)) {
+        params.append('colors', filters.colors.join(','));
+      } else {
+        params.append('colors', filters.colors);
+      }
+    }
+    
+    // Manejar arrays y strings para brands
+    if (filters.brands) {
+      if (Array.isArray(filters.brands)) {
+        params.append('brands', filters.brands.join(','));
+      } else {
+        params.append('brands', filters.brands);
+      }
+    }
+    
     if (filters.priceRange) params.append('priceRange', filters.priceRange);
     if (filters.sortBy) params.append('sortBy', filters.sortBy);
     if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
     if (filters.page) params.append('page', filters.page.toString());
     if (filters.limit) params.append('limit', filters.limit.toString());
 
-    const url = `${API_CONFIG.BASE_URL}/api/products/filtered/list?${params.toString()}`;
+    const url = `${API_CONFIG.BASE_URL}/api/products/filtered?${params.toString()}`;
+    
+    console.log('🎯 Fetching filtered products from:', url);
+    console.log('📋 Filters applied:', filters);
+
+    try {
+      const response = await this.retry(async () => {
+        return await this.fetchWithTimeout(url);
+      });
+
+      const data = await this.handleResponse<FilteredProductsResponse>(response);
+      
+      console.log('✅ Filtered products received:', data.products?.length || 0, 'items');
+      return data;
+      
+    } catch (error) {
+      console.error('❌ Error fetching filtered products:', error);
+      
+      // Fallback: intentar obtener productos sin filtros
+      if (error instanceof ApiError && error.status === 404) {
+        console.log('🔄 Endpoint not found, trying without filters...');
+        try {
+          const fallbackProducts = await this.getProductsByCategory(filters.category);
+          return {
+            products: fallbackProducts,
+            pagination: {
+              total: fallbackProducts.length,
+              currentPage: 1,
+              totalPages: 1,
+              hasNextPage: false,
+              hasPrevPage: false
+            }
+          };
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError);
+        }
+      }
+      
+      throw error;
+    }
+  }
+
+  // Obtener opciones de filtro desde el backend
+  static async getFilterOptions(category: string): Promise<{
+    sizes: string[];
+    colors: string[];
+    brands: string[];
+    categories: string[];
+    priceRanges: { id: string; label: string }[];
+  }> {
+    const url = `${API_CONFIG.BASE_URL}/api/products/filters/${encodeURIComponent(category)}`;
+    
+    console.log('🔄 Fetching filter options for:', category);
 
     try {
       const response = await this.fetchWithTimeout(url);
-      return this.handleResponse<ProductsResponse>(response);
+      const data = await this.handleResponse<{
+        sizes: string[];
+        colors: string[];
+        brands: string[];
+        categories: string[];
+        priceRanges: { id: string; label: string }[];
+      }>(response);
+      
+      console.log('✅ Filter options received');
+      return data;
+      
     } catch (error) {
-      console.error('❌ Error fetching filtered products:', error);
-      throw error;
+      console.error('❌ Error fetching filter options:', error);
+      
+      // Devolver opciones por defecto si el endpoint no existe
+      return {
+        sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+        colors: ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa'],
+        brands: ['Nike', 'Adidas', 'Puma', 'Under Armour'],
+        categories: ['remeras', 'shorts', 'bermudas', 'buzos', 'zapatillas'],
+        priceRanges: [
+          { id: '0-25', label: 'Menos de $25' },
+          { id: '25-50', label: '$25 - $50' },
+          { id: '50-100', label: '$50 - $100' },
+          { id: '100-200', label: '$100 - $200' },
+          { id: '200+', label: 'Más de $200' }
+        ]
+      };
+    }
+  }
+
+  // Buscar productos por término de búsqueda
+  static async searchProducts(query: string, category?: string): Promise<Product[]> {
+    const params = new URLSearchParams();
+    params.append('q', query);
+    if (category) params.append('category', category);
+
+    const url = `${API_CONFIG.BASE_URL}/api/products/search?${params.toString()}`;
+
+    try {
+      const response = await this.fetchWithTimeout(url);
+      const data = await this.handleResponse<{ products: Product[] }>(response);
+      return data.products || [];
+    } catch (error) {
+      console.error('❌ Error searching products:', error);
+      return [];
     }
   }
 }

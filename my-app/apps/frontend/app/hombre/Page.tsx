@@ -11,48 +11,26 @@ import Filters, { FilterState } from '../components/Filters';
 import { ProductService } from '../../services/productService';
 import { Product } from '../types/product';
 
+type ProductFilterParams = {
+  category: string;
+  subcategory?: string;
+  sizes?: string | string[];
+  colors?: string | string[];
+  brands?: string | string[];
+  limit?: number;
+  [key: string]: any;
+};
+
 // Datos de las categorías circulares PARA HOMBRE
 const subcategories = [
-  {
-    name: 'Buzos',
-    slug: 'buzos',
-    image: '/menu-seccion-img/hombre/menu-buzos.jpg'
-  },
-  {
-    name: 'Camperas',
-    slug: 'camperas',
-    image: '/menu-seccion-img/hombre/menu-camperas.jpg'
-  },
-  {
-    name: 'Conjuntos',
-    slug: 'conjuntos',
-    image: '/menu-seccion-img/hombre/menu-conjuntos.jpg'
-  },
-  {
-    name: 'Deportes',
-    slug: 'deportes',
-    image: '/menu-seccion-img/hombre/menu-deportes.jpg'
-  },
-  {
-    name: 'Remeras',
-    slug: 'remeras',
-    image: '/menu-seccion-img/hombre/menu-remeras.jpg'
-  },
-  {
-    name: 'Shorts',
-    slug: 'shorts', 
-    image: '/menu-seccion-img/hombre/menu-shorts.jpg'
-  },
-  {
-    name: 'Pantalones',
-    slug: 'pantalones',
-    image: '/menu-seccion-img/hombre/menu-pantalones.jpg'
-  },
-  {
-    name: 'Sweaters',
-    slug: 'sweaters',
-    image: '/menu-seccion-img/hombre/menu-sweaters.jpg'
-  }
+  {name: 'Buzos', slug: 'buzos', image: '/menu-seccion-img/hombre/menu-buzos.jpg'},
+  {name: 'Camperas', slug: 'camperas', image: '/menu-seccion-img/hombre/menu-camperas.jpg'},
+  {name: 'Conjuntos', slug: 'conjuntos', image: '/menu-seccion-img/hombre/menu-conjuntos.jpg'},
+  {name: 'Deportes', slug: 'deportes', image: '/menu-seccion-img/hombre/menu-deportes.jpg'},
+  {name: 'Remeras', slug: 'remeras', image: '/menu-seccion-img/hombre/menu-remeras.jpg'},
+  {name: 'Shorts', slug: 'shorts', image: '/menu-seccion-img/hombre/menu-shorts.jpg'},
+  {name: 'Pantalones', slug: 'pantalones', image: '/menu-seccion-img/hombre/menu-pantalones.jpg'},
+  {name: 'Sweaters', slug: 'sweaters', image: '/menu-seccion-img/hombre/menu-sweaters.jpg'}
 ];
 
 // Función helper para obtener productos de diferentes formatos de respuesta
@@ -90,7 +68,6 @@ function normalizeColors(colors: unknown): string[] {
   }
   
   if (typeof colors === 'string') {
-    // Si es un string, intentar dividirlo por comas o retornar como array de un elemento
     if (colors.includes(',')) {
       return colors.split(',').map(c => c.trim().toLowerCase());
     }
@@ -132,10 +109,7 @@ function applyFilters(products: Product[], filters: FilterState): Product[] {
     
     // Filtrar por colores (con verificación de existencia)
     if (filters.colors.length > 0 && product.colors) {
-      // Normalizar los colores del producto a un array de strings en minúsculas
       const productColors = normalizeColors(product.colors);
-      
-      // Verificar si alguno de los colores filtrados coincide
       const hasMatchingColor = filters.colors.some(filterColor => {
         const normalizedFilterColor = filterColor.toLowerCase();
         return productColors.some(productColor => 
@@ -150,6 +124,17 @@ function applyFilters(products: Product[], filters: FilterState): Product[] {
   });
 }
 
+// Construir filtros para backend - CORREGIDO
+function buildBackendFilters(filters: FilterState): ProductFilterParams {
+  return {
+    category: 'hombre', // obligatorio
+    subcategory: filters.subcategory || undefined,
+    sizes: filters.sizes.length ? filters.sizes.join(',') : undefined,
+    colors: filters.colors.length ? filters.colors.join(',') : undefined,
+    priceRange: filters.priceRange || undefined,
+  };
+}
+
 export default function HombrePage({ 
   searchParams 
 }: { 
@@ -158,11 +143,14 @@ export default function HombrePage({
   // Desempaqueta los searchParams con use()
   const resolvedSearchParams = use(searchParams);
   
+  // ✅ CORRECCIÓN: Incluir category en el estado inicial
   const [filters, setFilters] = useState<FilterState>({
+    category: 'hombre', // ✅ Añadido
     subcategory: resolvedSearchParams.subcategory || '',
     priceRange: '',
     sizes: [],
-    colors: []
+    colors: [],
+    brands: [] // ✅ Añadido para consistencia
   });
   
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -170,6 +158,7 @@ export default function HombrePage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [backendMode, setBackendMode] = useState(true);
 
   // Actualizar filtros cuando cambien los parámetros de URL
   useEffect(() => {
@@ -199,34 +188,61 @@ export default function HombrePage({
       setError('');
       console.log('🔄 Cargando productos de hombre...');
       
-      const productsData = await ProductService.getProductsByCategory('hombre');
+      let productsData;
+      
+      if (backendMode) {
+        // Modo backend: usar filtros en el servidor
+        const params = buildBackendFilters(filters);
+        // ✅ Ahora params incluye category, así que es compatible
+        productsData = await ProductService.getProductsWithFilters(params);
+      } else {
+        // Modo local: traer todos y filtrar en cliente
+        productsData = await ProductService.getProductsByCategory('hombre');
+      }
+      
       console.log('🎯 Productos desde el servicio:', productsData);
       
-      // ✅ VERSIÓN CORREGIDA - Manejo seguro de tipos
       const productsArray = getProductsArray(productsData);
-      
       setAllProducts(productsArray);
       
     } catch (err) {
       console.error('💥 Error completo:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error al cargar los productos';
       setError(errorMessage);
+      
+      // Si falla el backend, cambiar a modo local
+      if (backendMode) {
+        console.log('🔄 Cambiando a modo de filtrado local...');
+        setBackendMode(false);
+        try {
+          const localData = await ProductService.getProductsByCategory('hombre');
+          const localArray = getProductsArray(localData);
+          setAllProducts(localArray);
+        } catch (localError) {
+          console.error('💥 Error también en modo local:', localError);
+        }
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [filters, backendMode]);
 
-  // Cargar productos al montar el componente
+  // Cargar productos al montar el componente o cambiar filtros
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
 
-  // Aplicar filtros cuando cambien los productos o los filtros
+  // Aplicar filtros locales cuando no esté en modo backend
   useEffect(() => {
-    const filtered = applyFilters(allProducts, filters);
-    setFilteredProducts(filtered);
-  }, [allProducts, filters]);
+    if (!backendMode) {
+      const filtered = applyFilters(allProducts, filters);
+      setFilteredProducts(filtered);
+    } else {
+      // En modo backend, los productos ya vienen filtrados
+      setFilteredProducts(allProducts);
+    }
+  }, [allProducts, filters, backendMode]);
 
   // Función para recargar productos
   const handleRefresh = () => {
@@ -234,54 +250,23 @@ export default function HombrePage({
     loadProducts();
   };
 
-  // DEBUG: Ver productos en consola (solo en desarrollo) - AMPLIADO
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📊 Todos los productos:', allProducts);
-      console.log('🔍 Productos filtrados:', filteredProducts);
-      console.log('🎯 Filtros aplicados:', filters);
-      
-      // ✅ DEBUG ESPECÍFICO PARA IMÁGENES
-      if (allProducts.length > 0) {
-        console.log('🖼️ === DEBUG DETALLADO DE IMÁGENES ===');
-        
-        allProducts.forEach((product, index) => {
-          console.log(`📦 Producto ${index + 1}:`, {
-            id: product.id,
-            name: product.name,
-            mainImage: product.mainImage,
-            mainImageUrl: product.mainImageUrl,
-            images: product.images,
-            hasMainImage: !!product.mainImage,
-            hasMainImageUrl: !!product.mainImageUrl,
-            hasImages: !!product.images?.length,
-            category: product.category,
-            subcategory: product.subcategory,
-            colors: product.colors,
-            sizes: product.sizes,
-            normalizedColors: normalizeColors(product.colors)
-          });
-        });
+  // Toggle entre modo backend y local
+  const toggleBackendMode = () => {
+    setBackendMode(!backendMode);
+    setRefreshing(true);
+  };
 
-        // Probar la primera imagen
-        const firstProduct = allProducts[0];
-        if (firstProduct?.mainImageUrl) {
-          console.log('🌐 URL para probar en navegador:', firstProduct.mainImageUrl);
-          console.log('🔗 ¿Es URL absoluta?', firstProduct.mainImageUrl.startsWith('http'));
-        }
-
-        // Verificar tipos de datos
-        console.log('🔎 Tipos de datos - Primer producto:');
-        console.log('   mainImage:', typeof firstProduct?.mainImage, firstProduct?.mainImage);
-        console.log('   mainImageUrl:', typeof firstProduct?.mainImageUrl, firstProduct?.mainImageUrl);
-        console.log('   images:', Array.isArray(firstProduct?.images) ? 'Array' : typeof firstProduct?.images);
-        console.log('   colors:', Array.isArray(firstProduct?.colors) ? 'Array' : typeof firstProduct?.colors);
-        console.log('   sizes:', Array.isArray(firstProduct?.sizes) ? 'Array' : typeof firstProduct?.sizes);
-      } else {
-        console.log('❌ No hay productos para debuggear');
-      }
-    }
-  }, [allProducts, filteredProducts, filters]);
+  // ✅ CORRECCIÓN: Función para limpiar filtros que incluya category
+  const clearAllFilters = () => {
+    setFilters({
+      category: 'hombre', // ✅ Mantener la categoría
+      subcategory: '',
+      priceRange: '',
+      sizes: [],
+      colors: [],
+      brands: []
+    });
+  };
 
   const compatibleProducts = filteredProducts;
 
@@ -381,12 +366,42 @@ export default function HombrePage({
           <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
             {compatibleProducts.length} {compatibleProducts.length === 1 ? 'producto' : 'productos'}
           </span>
+          
+          {/* Indicador de modo */}
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            backendMode 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-yellow-100 text-yellow-800'
+          }`}>
+            {backendMode ? 'Backend' : 'Local'}
+          </span>
+          
           {refreshing && (
             <span className="text-sm text-gray-500 flex items-center">
               <ArrowPathIcon className="h-4 w-4 animate-spin mr-1" />
               Actualizando...
             </span>
           )}
+        </div>
+
+        {/* Toggle modo backend/local */}
+        <div className="mt-2 flex items-center">
+          <span className="text-sm text-gray-600 mr-2">Modo de filtrado:</span>
+          <button
+            onClick={toggleBackendMode}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              backendMode ? 'bg-blue-600' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                backendMode ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+          <span className="ml-2 text-sm text-gray-600">
+            {backendMode ? 'Servidor' : 'Navegador'}
+          </span>
         </div>
       </div>
 
@@ -403,7 +418,7 @@ export default function HombrePage({
               className={`flex flex-col items-center group min-w-[90px] transition-all justify-center cursor-pointer ${
                 filters.subcategory === subcategory.slug 
                   ? 'scale-110 text-gray-900' 
-                  : 'text-gray-600 hover:text-gray-00'
+                  : 'text-gray-600 hover:text-gray-800'
               }`}
               aria-pressed={filters.subcategory === subcategory.slug}
             >
@@ -440,7 +455,7 @@ export default function HombrePage({
 
       {/* Contenido */}
       <div className="mt-8">
-        {/* Productos - AGREGAR ID PARA EL SCROLL */}
+        {/* Productos */}
         <div id="productos">
           {compatibleProducts.length > 0 ? (
             <>
@@ -480,7 +495,7 @@ export default function HombrePage({
             </>
           ) : (
             <div className="text-center py-20 bg-gray-50 rounded-lg">
-              <div className="text-gray-40 text-6xl mb-4">🛒</div>
+              <div className="text-gray-400 text-6xl mb-4">🛒</div>
               <p className="text-gray-500 text-lg font-medium mb-2">
                 No se encontraron productos
               </p>
@@ -491,12 +506,7 @@ export default function HombrePage({
                 }
               </p>
               <button 
-                onClick={() => setFilters({
-                  subcategory: '',
-                  priceRange: '',
-                  sizes: [],
-                  colors: []
-                })}
+                onClick={clearAllFilters} // ✅ Usar la función corregida
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 Limpiar todos los filtros
