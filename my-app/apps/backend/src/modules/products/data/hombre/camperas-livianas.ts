@@ -1,5 +1,6 @@
 export const camperaslivianasHombre = [
   {
+     newId: "hombre-campera-0001",
     name: "Campera Liviana Deportiva",
     price: 35.00,
     originalPrice: 40.00,
@@ -53,6 +54,7 @@ export const camperaslivianasHombre = [
   },
 
   {
+     newId: "hombre-campera-0002",
     name: "Campera Liviana Deportiva Clásica",
     price: 35.99,
     originalPrice: 45.00,
