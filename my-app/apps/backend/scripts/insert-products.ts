@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { camperaslivianasHombre } from '../src/modules/products/data/hombre/camperas-livianas';
 
+
 const prisma = new PrismaClient();
 
 // ✅ Función para manejar errores de forma segura
