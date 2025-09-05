@@ -15,11 +15,9 @@ const subcategoriesMap: { [key: string]: string[] } = {
 // Opciones de talles, colores y rangos de precio
 const sizesOptions = [
   // Tallas estándar
-  'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL',  
+  'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL',
   // Tallas numéricas (jeans, etc.)
   '28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50','52', '54', '56',
-  // Tallas especiales
-  '2XL', '3XL', '4XL', '5XL', '6XL', '7XL',
   // Tallas de calzado
   '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45',
   // Tallas universales
@@ -27,7 +25,16 @@ const sizesOptions = [
   // Tallas para niños
   '2', '4', '6', '8', '10', '12', '14', '16'
 ];
-const colorsOptions = ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa'];
+const sizeCategories = {
+  '👕 Tallas Standard': ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL', '4XL', '5XL'],
+  '👖 Tallas Jeans': ['28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50'],
+  '👟 Tallas Calzado': ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46'],
+  '👶 Tallas Niños': ['2', '4', '6', '8', '10', '12', '14', '16'],
+  '⚡ Especiales': ['Único', 'Universal', 'Ajustable']
+};
+
+const colorsOptions = ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa','Celeste', ];
+
 const priceRanges = [ { id: '0-25', label: 'Menos de $25' }, { id: '25-50', label: '$25 - $50' }, { id: '50-100', label: '$50 - $100' },
   { id: '100-200', label: '$100 - $200' }, { id: '200+', label: 'Más de $200' }];
 
@@ -280,30 +287,30 @@ export default function Filters({
 
             {/* Selector de Ordenamiento */}
             <div className="flex items-center gap-2">
-  <span className="text-sm text-gray-600 font-medium">Ordenar por:</span>
-  <select
-    value={selectedSort}
-    onChange={(e) => handleSortChange(e.target.value)}
-    disabled={isLoading}
-    className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-  >
-    {sortOptions.map(option => (
-      <option key={option.id} value={option.id} className="flex items-center gap-2">
-        {option.label}
-      </option>
-    ))}
-  </select>
-</div>
+              <span className="text-sm text-gray-600 font-medium">Ordenar por:</span>
+                <select
+                   value={selectedSort}
+                   onChange={(e) => handleSortChange(e.target.value)}
+                   disabled={isLoading}
+                   className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                    >
+                   {sortOptions.map(option => (
+                   <option key={option.id} value={option.id} className="flex items-center gap-2">
+                   {option.label}
+                   </option>
+                   ))}
+                  </select>
+                 </div>
+             </div>
           </div>
         </div>
-      </div>
 
       {/* Modal Lateral tipo Drawer */}
       {isModalOpen && (
         <>
           {/* Fondo semitransparente */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 backdrop-blur-sm"
+            className="fixed inset-0 bg-transparent z-40 transition-opacity duration-300 backdrop-blur-sm"
             onClick={() => setIsModalOpen(false)}
           />
           
@@ -473,40 +480,47 @@ export default function Filters({
 
                   {/* Sección de Tallas */}
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <button
-                      onClick={() => toggleSection('sizes')}
-                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
-                    >
-                      <span>Tallas</span>
-                      {expandedSections.sizes ? (
-                        <ChevronUpIcon className="h-4 w-4" />
-                      ) : (
-                        <ChevronDownIcon className="h-4 w-4" />
-                      )}
-                    </button>
-                    {expandedSections.sizes && (
-                      <div className="px-4 pb-3">
-                        <div className="grid grid-cols-3 gap-2">
-                          {filterOptions.sizes.map(size => (
-                            <button
-                              key={size}
-                              onClick={() => handleSizeChange(size)}
-                              className={`py-2 px-3 border rounded-full text-sm flex items-center justify-center gap-1 ${
-                                localFilters.sizes.includes(size)
-                                  ? 'bg-black text-white border-black font-medium'
-                                  : 'bg-white text-gray-800 border-gray-300 hover:border-gray-400'
-                              }`}
-                            >
-                              {size}
-                              {productCounts?.sizes?.[size] && (
-                                <span className="text-xs opacity-70">({productCounts.sizes[size]})</span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+  <button
+    onClick={() => toggleSection('sizes')}
+    className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+  >
+    <span>📏 Tallas</span>
+    {expandedSections.sizes ? (
+      <ChevronUpIcon className="h-4 w-4" />
+    ) : (
+      <ChevronDownIcon className="h-4 w-4" />
+    )}
+  </button>
+  {expandedSections.sizes && (
+    <div className="px-4 pb-3 space-y-4">
+      {Object.entries(sizeCategories).map(([category, sizes]) => (
+        <div key={category}>
+          <h4 className="font-medium text-gray-700 mb-2 text-sm">{category}</h4>
+          <div className="grid grid-cols-4 gap-2">
+            {sizes.map(size => (
+              <button
+                key={size}
+                onClick={() => handleSizeChange(size)}
+                className={`py-2 px-1 border rounded-md text-sm flex flex-col items-center justify-center transition-all ${
+                  localFilters.sizes.includes(size)
+                    ? 'bg-black text-white border-black font-medium shadow-md'
+                    : 'bg-white text-gray-800 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                }`}
+              >
+                <span className="font-medium">{size}</span>
+                {productCounts?.sizes?.[size] && (
+                  <span className="text-[10px] opacity-70 mt-1">
+                    ({productCounts.sizes[size]})
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
                   {/* Sección de Colores */}
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
