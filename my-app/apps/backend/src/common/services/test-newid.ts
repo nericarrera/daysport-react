@@ -39,7 +39,5 @@ async function testNewIdField() {
   }
 }
 
-// Ejecutar solo si es llamado directamente
-if (require.main === module) {
-  testNewIdField();
-}
+// Ejecutar la prueba
+testNewIdField();
