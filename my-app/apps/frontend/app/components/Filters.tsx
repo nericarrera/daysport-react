@@ -7,9 +7,13 @@ import {
   ChevronUpIcon,
   SparklesIcon,
   FireIcon,
-  ArrowsUpDownIcon
+  ArrowsUpDownIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
-import { FilterState, FilterOptions } from '../types/filters'; // ✅ Importar tipos
+import { FilterState, FilterOptions, FiltersProps } from '../types/filters';
+import { useDebounce } from '../hooks/useDebounce';
+import ActiveFilterChips from '../components/ActiveFilterChips';
+import FilterSkeleton from '../components/FilterSkeleton';
 
 // Mapeo de subcategorías por categoría principal
 const subcategoriesMap: { [key: string]: string[] } = {
@@ -39,16 +43,6 @@ const sortOptions = [
   { id: 'nombre-desc', label: 'Nombre: Z-A', icon: ArrowsUpDownIcon }
 ];
 
-interface FiltersProps {
-  category: string;
-  onFilterChange?: (filters: FilterState) => void;
-  onSortChange?: (sort: string) => void;
-  selectedFilters?: FilterState;
-  selectedSort?: string;
-  isLoading?: boolean;
-  className?: string;
-}
-
 export default function Filters({ 
   category, 
   onFilterChange, 
@@ -56,9 +50,14 @@ export default function Filters({
   selectedFilters,
   selectedSort = 'popularidad',
   isLoading = false,
-  className = '' 
+  className = '',
+  productCounts 
 }: FiltersProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     sizes: sizesOptions,
     colors: colorsOptions,
@@ -89,6 +88,14 @@ export default function Filters({
   );
 
   const subcategories = subcategoriesMap[category] || [];
+
+  // Efecto para búsqueda en tiempo real
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      // Aquí puedes agregar lógica de búsqueda
+      console.log('Buscando:', debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
 
   // Actualizar filtros locales cuando cambien los props
   useEffect(() => {
@@ -131,6 +138,15 @@ export default function Filters({
     }
   };
 
+  const handleRemoveFilter = (type: keyof FilterState, value?: string) => {
+    if (type === 'subcategory' || type === 'priceRange') {
+      handleFilterChange({ ...localFilters, [type]: '' });
+    } else if (value && Array.isArray(localFilters[type])) {
+      const newArray = (localFilters[type] as string[]).filter(item => item !== value);
+      handleFilterChange({ ...localFilters, [type]: newArray });
+    }
+  };
+
   const handleSortChange = (sortId: string) => {
     if (onSortChange) {
       onSortChange(sortId);
@@ -144,10 +160,10 @@ export default function Filters({
     });
   };
 
-  const handlePriceRangeChange = (priceRange: string) => {
+  const handlePriceRangeChange = (rangeId: string) => {
     handleFilterChange({
       ...localFilters,
-      priceRange: localFilters.priceRange === priceRange ? '' : priceRange
+      priceRange: localFilters.priceRange === rangeId ? '' : rangeId
     });
   };
 
@@ -217,6 +233,12 @@ export default function Filters({
     <>
       {/* Barra superior de Filtros y Ordenamiento */}
       <div className={`sticky top-20 z-40 bg-white border-b border-gray-200 ${className}`}>
+        <ActiveFilterChips 
+          filters={localFilters}
+          onRemoveFilter={handleRemoveFilter}
+          onClearAll={clearAllFilters}
+        />
+        
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             {/* Botón de Filtros */}
@@ -284,9 +306,25 @@ export default function Filters({
 
             {/* Contenido del drawer */}
             <div className="h-[calc(100%-120px)] overflow-y-auto p-4 bg-gray-50">
+              {/* Búsqueda */}
+              <div className="mb-6">
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar productos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
               {isLoadingOptions ? (
-                <div className="flex items-center justify-center h-40">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+                <div className="space-y-6">
+                  <FilterSkeleton />
+                  <FilterSkeleton />
+                  <FilterSkeleton />
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -348,22 +386,182 @@ export default function Filters({
                           <button
                             key={subcat}
                             onClick={() => handleSubcategoryChange(subcat)}
-                            className={`w-full text-left px-3 py-2 rounded-md transition-all duration-200 ${
+                            className={`w-full text-left px-3 py-2 rounded-md transition-all duration-200 flex justify-between items-center ${
                               localFilters.subcategory === subcat
                                 ? 'bg-blue-100 text-blue-800 font-medium border border-blue-200'
                                 : 'text-gray-700 hover:bg-gray-100 border border-transparent'
                             }`}
                           >
-                            {capitalize(subcat)}
+                            <span>{capitalize(subcat)}</span>
+                            {productCounts?.subcategories?.[subcat] && (
+                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                {productCounts.subcategories[subcat]}
+                              </span>
+                            )}
                           </button>
                         ))}
                       </div>
                     )}
                   </div>
 
-                  {/* Otras secciones (precios, talles, colores, marcas) */}
-                  {/* ... (similar a las secciones anteriores) */}
+                  {/* Sección de Precios */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button
+                      onClick={() => toggleSection('price')}
+                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      <span>Rango de Precio</span>
+                      {expandedSections.price ? (
+                        <ChevronUpIcon className="h-4 w-4" />
+                      ) : (
+                        <ChevronDownIcon className="h-4 w-4" />
+                      )}
+                    </button>
+                    {expandedSections.price && (
+                      <div className="px-4 pb-3 space-y-3">
+                        <div className="space-y-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max="1000"
+                            value={priceRange[1]}
+                            onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>${priceRange[0]}</span>
+                            <span>${priceRange[1]}</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {priceRanges.map(range => (
+                            <button
+                              key={range.id}
+                              onClick={() => handlePriceRangeChange(range.id)}
+                              className={`py-2 px-3 text-sm rounded-md border transition-all ${
+                                localFilters.priceRange === range.id
+                                  ? 'bg-blue-100 text-blue-800 border-blue-300 font-medium'
+                                  : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                              }`}
+                            >
+                              {range.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
+                  {/* Sección de Tallas */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button
+                      onClick={() => toggleSection('sizes')}
+                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      <span>Tallas</span>
+                      {expandedSections.sizes ? (
+                        <ChevronUpIcon className="h-4 w-4" />
+                      ) : (
+                        <ChevronDownIcon className="h-4 w-4" />
+                      )}
+                    </button>
+                    {expandedSections.sizes && (
+                      <div className="px-4 pb-3">
+                        <div className="grid grid-cols-3 gap-2">
+                          {filterOptions.sizes.map(size => (
+                            <button
+                              key={size}
+                              onClick={() => handleSizeChange(size)}
+                              className={`py-2 px-3 border rounded-full text-sm flex items-center justify-center gap-1 ${
+                                localFilters.sizes.includes(size)
+                                  ? 'bg-black text-white border-black font-medium'
+                                  : 'bg-white text-gray-800 border-gray-300 hover:border-gray-400'
+                              }`}
+                            >
+                              {size}
+                              {productCounts?.sizes?.[size] && (
+                                <span className="text-xs opacity-70">({productCounts.sizes[size]})</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección de Colores */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button
+                      onClick={() => toggleSection('colors')}
+                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      <span>Colores</span>
+                      {expandedSections.colors ? (
+                        <ChevronUpIcon className="h-4 w-4" />
+                      ) : (
+                        <ChevronDownIcon className="h-4 w-4" />
+                      )}
+                    </button>
+                    {expandedSections.colors && (
+                      <div className="px-4 pb-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          {filterOptions.colors.map(color => (
+                            <button
+                              key={color}
+                              onClick={() => handleColorChange(color)}
+                              className={`py-2 px-3 border rounded-md text-sm flex items-center justify-between ${
+                                localFilters.colors.includes(color)
+                                  ? 'bg-blue-100 text-blue-800 border-blue-300 font-medium'
+                                  : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'
+                              }`}
+                            >
+                              <span>{color}</span>
+                              {productCounts?.colors?.[color] && (
+                                <span className="text-xs bg-gray-100 px-1 rounded">
+                                  {productCounts.colors[color]}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección de Marcas */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button
+                      onClick={() => toggleSection('brands')}
+                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      <span>Marcas</span>
+                      {expandedSections.brands ? (
+                        <ChevronUpIcon className="h-4 w-4" />
+                      ) : (
+                        <ChevronDownIcon className="h-4 w-4" />
+                      )}
+                    </button>
+                    {expandedSections.brands && (
+                      <div className="px-4 pb-3 space-y-2">
+                        {filterOptions.brands.map(brand => (
+                          <label key={brand} className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              checked={localFilters.brands.includes(brand)}
+                              onChange={() => handleBrandChange(brand)}
+                              className="rounded text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700 flex-1">{brand}</span>
+                            {productCounts?.brands?.[brand] && (
+                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                {productCounts.brands[brand]}
+                              </span>
+                            )}
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

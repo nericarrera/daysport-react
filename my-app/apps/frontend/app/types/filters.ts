@@ -1,4 +1,3 @@
-// types/filters.ts
 export interface FilterState {
   category: string;
   subcategory: string;
@@ -15,4 +14,20 @@ export interface FilterOptions {
   brands: string[];
   priceRanges: { id: string; label: string }[];
   categories: string[];
+}
+
+export interface FiltersProps {
+  category: string;
+  onFilterChange?: (filters: FilterState) => void;
+  onSortChange?: (sort: string) => void;
+  selectedFilters?: FilterState;
+  selectedSort?: string;
+  isLoading?: boolean;
+  className?: string;
+  productCounts?: {
+    sizes?: { [size: string]: number };
+    colors?: { [color: string]: number };
+    brands?: { [brand: string]: number };
+    subcategories?: { [subcat: string]: number };
+  };
 }
