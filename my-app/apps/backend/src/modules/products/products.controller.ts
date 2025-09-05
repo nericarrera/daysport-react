@@ -77,7 +77,7 @@ export class ProductsController {
   @Get(':id')
   async getProductById(@Param('id') id: string) {
     try {
-      const product = await this.productsService.getProductById(Number(id));
+      const product = await this.productsService.getProductById(String(id));
       if (!product) {
         throw new NotFoundException(`Producto con ID ${id} no encontrado`);
       }
