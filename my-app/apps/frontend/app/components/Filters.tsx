@@ -11,7 +11,7 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { FilterState, FilterOptions, FiltersProps } from '../types/filters';
-import { useDebounce } from '../hooks/useDebounce';
+import { useDebounce } from '../hook/useDebounce';
 import ActiveFilterChips from '../components/ActiveFilterChips';
 import FilterSkeleton from '../components/FilterSkeleton';
 
