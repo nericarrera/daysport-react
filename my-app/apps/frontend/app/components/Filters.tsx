@@ -9,6 +9,35 @@ import {
   FireIcon,
   ArrowsUpDownIcon
 } from '@heroicons/react/24/outline';
+import { FilterState, FilterOptions } from '../types/filters'; // ✅ Importar tipos
+
+// Mapeo de subcategorías por categoría principal
+const subcategoriesMap: { [key: string]: string[] } = {
+  mujer: ['remeras', 'shorts', 'calzas', 'buzos', 'zapatillas'],
+  hombre: ['remeras', 'shorts', 'bermudas', 'buzos', 'zapatillas'],
+  niños: ['remeras', 'shorts', 'conjuntos', 'zapatillas'],
+  accesorios: ['hidratacion', 'medias', 'gorras', 'mochilas']
+};
+
+// Opciones de talles, colores y rangos de precio
+const sizesOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const colorsOptions = ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa'];
+const priceRanges = [
+  { id: '0-25', label: 'Menos de $25' },
+  { id: '25-50', label: '$25 - $50' },
+  { id: '50-100', label: '$50 - $100' },
+  { id: '100-200', label: '$100 - $200' },
+  { id: '200+', label: 'Más de $200' }
+];
+
+const sortOptions = [
+  { id: 'popularidad', label: 'Más vendidos', icon: FireIcon },
+  { id: 'nuevo', label: 'Más nuevos', icon: SparklesIcon },
+  { id: 'precio-asc', label: 'Precio: Menor a Mayor', icon: ArrowsUpDownIcon },
+  { id: 'precio-desc', label: 'Precio: Mayor a Menor', icon: ArrowsUpDownIcon },
+  { id: 'nombre-asc', label: 'Nombre: A-Z', icon: ArrowsUpDownIcon },
+  { id: 'nombre-desc', label: 'Nombre: Z-A', icon: ArrowsUpDownIcon }
+];
 
 interface FiltersProps {
   category: string;
@@ -19,25 +48,6 @@ interface FiltersProps {
   isLoading?: boolean;
   className?: string;
 }
-
-export interface FilterState {
-  category: string;
-  subcategory: string;
-  priceRange: string;
-  sizes: string[];
-  colors: string[];
-  brands?: string[]; // Hacer opcional
-  [key: string]: any;
-}
-
-const sortOptions = [
-  { id: 'popularidad', label: 'Más vendidos', icon: FireIcon },
-  { id: 'nuevo', label: 'Más nuevos', icon: SparklesIcon },
-  { id: 'precio-asc', label: 'Precio: Menor a Mayor', icon: ArrowsUpDownIcon },
-  { id: 'precio-desc', label: 'Precio: Mayor a Menor', icon: ArrowsUpDownIcon },
-  { id: 'nombre-asc', label: 'Nombre: A-Z', icon: ArrowsUpDownIcon },
-  { id: 'nombre-desc', label: 'Nombre: Z-A', icon: ArrowsUpDownIcon }
-];
 
 export default function Filters({ 
   category, 
@@ -50,14 +60,14 @@ export default function Filters({
 }: FiltersProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    sizes: [],
-    colors: [],
-    brands: [],
-    priceRanges: [],
+    sizes: sizesOptions,
+    colors: colorsOptions,
+    brands: ['Nike', 'Adidas', 'Puma', 'Under Armour'],
+    priceRanges: priceRanges,
     categories: []
   });
-  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
   
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({
     sort: true,
     categories: true,
@@ -67,7 +77,6 @@ export default function Filters({
     brands: true
   });
 
-  // CORRECCIÓN: Asegurar que brands siempre sea un array
   const [localFilters, setLocalFilters] = useState<FilterState>(
     selectedFilters || {
       category: category,
@@ -75,7 +84,7 @@ export default function Filters({
       priceRange: '',
       sizes: [],
       colors: [],
-      brands: [] // Inicializar como array vacío
+      brands: []
     }
   );
 
@@ -84,10 +93,9 @@ export default function Filters({
   // Actualizar filtros locales cuando cambien los props
   useEffect(() => {
     if (selectedFilters) {
-      // CORRECCIÓN: Asegurar que brands siempre tenga un valor
       setLocalFilters({
         ...selectedFilters,
-        brands: selectedFilters.brands || [] // Si es undefined, usar array vacío
+        brands: selectedFilters.brands || []
       });
     }
   }, [selectedFilters]);
@@ -113,7 +121,6 @@ export default function Filters({
   };
 
   const handleFilterChange = (newFilters: FilterState) => {
-    // CORRECCIÓN: Asegurar que brands siempre sea un array
     const safeFilters = {
       ...newFilters,
       brands: newFilters.brands || []
@@ -167,7 +174,6 @@ export default function Filters({
   };
 
   const handleBrandChange = (brand: string) => {
-    // CORRECCIÓN: Usar brands que siempre es array
     const currentBrands = localFilters.brands || [];
     const newBrands = currentBrands.includes(brand)
       ? currentBrands.filter(b => b !== brand)
@@ -180,13 +186,13 @@ export default function Filters({
   };
 
   const clearAllFilters = () => {
-    const clearedFilters = {
+    const clearedFilters: FilterState = {
       category: category,
       subcategory: '',
       priceRange: '',
       sizes: [],
       colors: [],
-      brands: [] // Array vacío
+      brands: []
     };
     handleFilterChange(clearedFilters);
   };
@@ -195,23 +201,17 @@ export default function Filters({
     setIsModalOpen(false);
   };
 
-  // CORRECCIÓN PRINCIPAL: Asegurar que brands siempre tenga length
   const selectedFiltersCount = [
     localFilters.subcategory ? 1 : 0,
     localFilters.priceRange ? 1 : 0,
     localFilters.sizes.length,
     localFilters.colors.length,
-    (localFilters.brands || []).length // ✅ Esto evita el error
+    localFilters.brands.length
   ].reduce((a, b) => a + b, 0);
 
-  // Función para capitalizar palabras
   const capitalize = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
-
-  // Agrupar talles numéricos y alfabéticos
-  const numericSizes = filterOptions.sizes.filter(size => /^\d+$/.test(size));
-  const letterSizes = filterOptions.sizes.filter(size => !/^\d+$/.test(size));
 
   return (
     <>
@@ -260,7 +260,7 @@ export default function Filters({
       {/* Modal Lateral tipo Drawer */}
       {isModalOpen && (
         <>
-          {/* Fondo semitransparente con animación */}
+          {/* Fondo semitransparente */}
           <div 
             className="fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300 backdrop-blur-sm"
             onClick={() => setIsModalOpen(false)}
@@ -290,7 +290,7 @@ export default function Filters({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Sección de Ordenamiento dentro del drawer */}
+                  {/* Sección de Ordenamiento */}
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                     <button
                       onClick={() => toggleSection('sort')}
@@ -329,8 +329,40 @@ export default function Filters({
                     )}
                   </div>
 
-                  {/* Otras secciones (categorías, precios, talles, colores) */}
-                  {/* ... (el resto del código permanece igual) */}
+                  {/* Sección de Subcategorías */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button
+                      onClick={() => toggleSection('categories')}
+                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      <span>Categorías</span>
+                      {expandedSections.categories ? (
+                        <ChevronUpIcon className="h-4 w-4" />
+                      ) : (
+                        <ChevronDownIcon className="h-4 w-4" />
+                      )}
+                    </button>
+                    {expandedSections.categories && (
+                      <div className="px-4 pb-3 space-y-2">
+                        {subcategories.map(subcat => (
+                          <button
+                            key={subcat}
+                            onClick={() => handleSubcategoryChange(subcat)}
+                            className={`w-full text-left px-3 py-2 rounded-md transition-all duration-200 ${
+                              localFilters.subcategory === subcat
+                                ? 'bg-blue-100 text-blue-800 font-medium border border-blue-200'
+                                : 'text-gray-700 hover:bg-gray-100 border border-transparent'
+                            }`}
+                          >
+                            {capitalize(subcat)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Otras secciones (precios, talles, colores, marcas) */}
+                  {/* ... (similar a las secciones anteriores) */}
 
                 </div>
               )}
@@ -357,31 +389,4 @@ export default function Filters({
       )}
     </>
   );
-}
-
-// Mapeo de subcategorías por categoría principal
-const subcategoriesMap: { [key: string]: string[] } = {
-  mujer: ['remeras', 'shorts', 'calzas', 'buzos', 'zapatillas'],
-  hombre: ['remeras', 'shorts', 'bermudas', 'buzos', 'zapatillas'],
-  niños: ['remeras', 'shorts', 'conjuntos', 'zapatillas'],
-  accesorios: ['hidratacion', 'medias', 'gorras', 'mochilas']
-};
-
-// Opciones de talles, colores y rangos de precio
-const sizesOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-const colorsOptions = ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa'];
-const priceRanges = [
-  { id: '0-25', label: 'Menos de $25' },
-  { id: '25-50', label: '$25 - $50' },
-  { id: '50-100', label: '$50 - $100' },
-  { id: '100-200', label: '$100 - $200' },
-  { id: '200+', label: 'Más de $200' }
-];
-
-interface FilterOptions {
-  sizes: string[];
-  colors: string[];
-  brands: string[];
-  priceRanges: { id: string; label: string }[];
-  categories: string[];
 }

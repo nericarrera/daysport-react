@@ -1,12 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef} from 'react';
 
 interface FilterButtonProps {
   category: string;
-  onFilterChange?: (subcategory: string) => void; // ← Hacer opcional
+  onFilterChange?: (subcategory: string) => void;
 }
 
-// Mapeo de subcategorías por categoría
+
+
 const subcategoriesMap: { [key: string]: string[] } = {
   mujer: ['remeras', 'shorts', 'calzas', 'buzos', 'camperas'],
   hombre: ['remeras', 'shorts', 'buzos', 'camperas', 'pantalones', 'accesorios'],
@@ -17,6 +18,7 @@ const subcategoriesMap: { [key: string]: string[] } = {
 export default function FilterButton({ category, onFilterChange }: FilterButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
 
   const subcategories = subcategoriesMap[category] || [];
 
@@ -35,8 +37,28 @@ export default function FilterButton({ category, onFilterChange }: FilterButtonP
     }
   };
 
+  // ✅ CORREGIDO: Cerrar el dropdown al hacer clic fuera
+  const handleClickOutside = (e: React.MouseEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsOpen(false);
+    }
+  };
+
+   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative">
+    <div ref={ref} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
