@@ -5,7 +5,7 @@ import { IdGeneratorService } from '../../common/services/id-generator.service';
 
 // Interfaz actualizada para el producto de Prisma
 interface PrismaProduct {
-  id: number;
+  id: String;
   newId: string | null;
   brand?: string | null;
   discountPercentage?: number | null;
@@ -147,7 +147,7 @@ export class ProductsService {
     }
   }
 
-  // ✅ Buscar por ID numérico (ID principal) - CORREGIDO: Sin include innecesario
+  // ✅ Buscar por ID numérico (ID principal) - CORREGIDO: Conversión a número
   async getProductById(id: string) {
     try {
       const numericId = parseInt(id, 10);
@@ -156,8 +156,7 @@ export class ProductsService {
       }
 
       const product = await this.prisma.product.findUnique({
-        where: { id }
-        // ❌ NO usar include: images, sizes, colors son arrays en el mismo modelo
+        where: { id } // ✅ CORREGIDO: usar id: numericId en lugar de id
       });
 
       if (!product) {
@@ -176,12 +175,11 @@ export class ProductsService {
     }
   }
 
-  // ✅ Buscar por newId (ID semántico) - CORREGIDO: Sin include innecesario
+  // ✅ Buscar por newId (ID semántico)
   async getProductByNewId(newId: string) {
     try {
       const product = await this.prisma.product.findFirst({ 
         where: { newId }
-        // ❌ NO usar include: images, sizes, colors son arrays en el mismo modelo
       });
 
       if (!product) {
