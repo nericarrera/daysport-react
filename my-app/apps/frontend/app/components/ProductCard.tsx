@@ -10,6 +10,7 @@ interface ProductCardProps {
   product: Product;
   showNewBadge?: boolean;
   priority?: boolean;
+  
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -145,7 +146,8 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
         )}
       </button>
 
-      <Link href={`/producto/${product.slug || product.id}`} className="block relative flex-grow">
+      {/* ✅ CORREGIDO: Usar product.newId en lugar de product.slug || product.id */}
+      <Link href={`/producto/${product.newId || product.id}`} className="block relative flex-grow">
         {/* Imagen principal */}
         <div className="relative h-90 w-full overflow-hidden">
           {imageLoading && <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>}
