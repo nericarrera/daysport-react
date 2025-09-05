@@ -147,7 +147,7 @@ export class ProductsService {
     }
   }
 
-  // ✅ Buscar por ID numérico (ID principal) - CORREGIDO: image → images
+  // ✅ Buscar por ID numérico (ID principal) - CORREGIDO: Sin include innecesario
   async getProductById(id: string) {
     try {
       const numericId = parseInt(id, 10);
@@ -156,12 +156,8 @@ export class ProductsService {
       }
 
       const product = await this.prisma.product.findUnique({
-        where: { id },
-        include: {
-          images: true,    // ← CORREGIDO: image → images
-          sizes: true,
-          colors: true,
-        }
+        where: { id }
+        // ❌ NO usar include: images, sizes, colors son arrays en el mismo modelo
       });
 
       if (!product) {
@@ -180,16 +176,12 @@ export class ProductsService {
     }
   }
 
-  // ✅ Buscar por newId (ID semántico) - CORREGIDO: image → images
+  // ✅ Buscar por newId (ID semántico) - CORREGIDO: Sin include innecesario
   async getProductByNewId(newId: string) {
     try {
       const product = await this.prisma.product.findFirst({ 
-        where: { newId },
-        include: {
-          images: true,    // ← CORREGIDO: image → images
-          sizes: true,
-          colors: true,
-        }
+        where: { newId }
+        // ❌ NO usar include: images, sizes, colors son arrays en el mismo modelo
       });
 
       if (!product) {
