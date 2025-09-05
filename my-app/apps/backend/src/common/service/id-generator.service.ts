@@ -1,4 +1,19 @@
 import { PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class IdGeneratorService {
+  async generateProductId(category: string): Promise<string> {
+    const prefix = category.slice(0, 3).toUpperCase();
+    const unique = Date.now().toString(36);
+    return `${prefix}-${unique}`;
+  }
+
+  async migrateExistingProduct(oldId: number, category: string): Promise<string> {
+    const prefix = category.slice(0, 3).toUpperCase();
+    return `${prefix}-${oldId}`;
+  }
+}
 
 const prisma = new PrismaClient();
 
