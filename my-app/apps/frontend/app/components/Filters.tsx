@@ -1,15 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { 
-  XMarkIcon, 
-  AdjustmentsHorizontalIcon, 
-  ChevronDownIcon, 
-  ChevronUpIcon,
-  SparklesIcon,
-  FireIcon,
-  ArrowsUpDownIcon,
-  MagnifyingGlassIcon
-} from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react'; 
+import {  XMarkIcon, AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, FireIcon, ArrowsUpDownIcon, MagnifyingGlassIcon} from '@heroicons/react/24/outline';
 import { FilterState, FilterOptions, FiltersProps } from '../types/filters';
 import { useDebounce } from '../hook/useDebounce';
 import ActiveFilterChips from '../components/ActiveFilterChips';
@@ -17,30 +8,37 @@ import FilterSkeleton from '../components/FilterSkeleton';
 
 // Mapeo de subcategorías por categoría principal
 const subcategoriesMap: { [key: string]: string[] } = {
-  mujer: ['remeras', 'shorts', 'calzas', 'buzos', 'zapatillas'],
-  hombre: ['remeras', 'shorts', 'bermudas', 'buzos', 'zapatillas'],
-  niños: ['remeras', 'shorts', 'conjuntos', 'zapatillas'],
-  accesorios: ['hidratacion', 'medias', 'gorras', 'mochilas']
+  mujer: ['remeras', 'shorts', 'calzas', 'buzos', 'zapatillas'],  hombre: ['remeras', 'shorts', 'bermudas', 'buzos', 'zapatillas'],
+  niños: ['remeras', 'shorts', 'conjuntos', 'zapatillas'],  accesorios: ['hidratacion', 'medias', 'gorras', 'mochilas']
 };
 
 // Opciones de talles, colores y rangos de precio
-const sizesOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-const colorsOptions = ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa'];
-const priceRanges = [
-  { id: '0-25', label: 'Menos de $25' },
-  { id: '25-50', label: '$25 - $50' },
-  { id: '50-100', label: '$50 - $100' },
-  { id: '100-200', label: '$100 - $200' },
-  { id: '200+', label: 'Más de $200' }
+const sizesOptions = [
+  // Tallas estándar
+  'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL',  
+  // Tallas numéricas (jeans, etc.)
+  '28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50','52', '54', '56',
+  // Tallas especiales
+  '2XL', '3XL', '4XL', '5XL', '6XL', '7XL',
+  // Tallas de calzado
+  '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45',
+  // Tallas universales
+  'Único', 'Universal', 'Ajustable',
+  // Tallas para niños
+  '2', '4', '6', '8', '10', '12', '14', '16'
 ];
+const colorsOptions = ['Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Gris', 'Rosa'];
+const priceRanges = [ { id: '0-25', label: 'Menos de $25' }, { id: '25-50', label: '$25 - $50' }, { id: '50-100', label: '$50 - $100' },
+  { id: '100-200', label: '$100 - $200' }, { id: '200+', label: 'Más de $200' }];
 
 const sortOptions = [
-  { id: 'popularidad', label: 'Más vendidos', icon: FireIcon },
-  { id: 'nuevo', label: 'Más nuevos', icon: SparklesIcon },
-  { id: 'precio-asc', label: 'Precio: Menor a Mayor', icon: ArrowsUpDownIcon },
-  { id: 'precio-desc', label: 'Precio: Mayor a Menor', icon: ArrowsUpDownIcon },
-  { id: 'nombre-asc', label: 'Nombre: A-Z', icon: ArrowsUpDownIcon },
-  { id: 'nombre-desc', label: 'Nombre: Z-A', icon: ArrowsUpDownIcon }
+  { id: 'popularidad', label: ' Más vendidos', icon: FireIcon, description: 'Productos más populares'},
+  { id: 'nuevo', label: '🆕 Más nuevos', icon: SparklesIcon, description: 'Productos recién agregados'},
+  { id: 'precio-asc', label: 'Precio: Menor a Mayor', icon: ArrowsUpDownIcon, description: 'De menor a mayor precio'},
+  { id: 'precio-desc', label: 'Precio: Mayor a Menor', icon: ArrowsUpDownIcon, description: 'De mayor a menor precio'},
+  { id: 'nombre-asc', abel: 'Nombre: A-Z', icon: ArrowsUpDownIcon, description: 'Orden alfabético A-Z'},
+  { id: 'nombre-desc', label: 'Nombre: Z-A', icon: ArrowsUpDownIcon, description: 'Orden alfabético Z-A'},
+  { id: 'descuento', label: 'Mejores descuentos', icon: SparklesIcon, description: 'Mayor porcentaje de descuento'}
 ];
 
 export default function Filters({ 
@@ -61,10 +59,31 @@ export default function Filters({
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     sizes: sizesOptions,
     colors: colorsOptions,
-    brands: ['Nike', 'Adidas', 'Puma', 'Under Armour'],
+    brands: ['Nike', 'Adidas', 'Puma', 'Original'],
     priceRanges: priceRanges,
     categories: []
   });
+
+  const colorMap: { [key: string]: string } = {
+  'Negro': '#000000',
+  'Blanco': '#FFFFFF',
+  'Azul': '#0000FF',
+  'Rojo': '#FF0000',
+  'Verde': '#00FF00',
+  'Gris': '#808080',
+  'Rosa': '#FFC0CB',
+  'Amarillo': '#FFFF00',
+  'Naranja': '#FFA500',
+  'Morado': '#800080',
+  'Marrón': '#A52A2A',
+  'Beige': '#F5F5DC',
+  'Celeste': '#87CEEB',
+  'Turquesa': '#40E0D0',
+  'Vino': '#722F37',
+  'Bordo': '#800020',
+  'Verde militar': '#78866B',
+  'Jeans': '#1560BD'
+};
   
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({
@@ -261,20 +280,20 @@ export default function Filters({
 
             {/* Selector de Ordenamiento */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 font-medium">Ordenar por:</span>
-              <select
-                value={selectedSort}
-                onChange={(e) => handleSortChange(e.target.value)}
-                disabled={isLoading}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-              >
-                {sortOptions.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+  <span className="text-sm text-gray-600 font-medium">Ordenar por:</span>
+  <select
+    value={selectedSort}
+    onChange={(e) => handleSortChange(e.target.value)}
+    disabled={isLoading}
+    className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+  >
+    {sortOptions.map(option => (
+      <option key={option.id} value={option.id} className="flex items-center gap-2">
+        {option.label}
+      </option>
+    ))}
+  </select>
+</div>
           </div>
         </div>
       </div>
@@ -491,42 +510,61 @@ export default function Filters({
 
                   {/* Sección de Colores */}
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <button
-                      onClick={() => toggleSection('colors')}
-                      className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
-                    >
-                      <span>Colores</span>
-                      {expandedSections.colors ? (
-                        <ChevronUpIcon className="h-4 w-4" />
-                      ) : (
-                        <ChevronDownIcon className="h-4 w-4" />
-                      )}
-                    </button>
-                    {expandedSections.colors && (
-                      <div className="px-4 pb-3">
-                        <div className="grid grid-cols-2 gap-2">
-                          {filterOptions.colors.map(color => (
-                            <button
-                              key={color}
-                              onClick={() => handleColorChange(color)}
-                              className={`py-2 px-3 border rounded-md text-sm flex items-center justify-between ${
-                                localFilters.colors.includes(color)
-                                  ? 'bg-blue-100 text-blue-800 border-blue-300 font-medium'
-                                  : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'
-                              }`}
-                            >
-                              <span>{color}</span>
-                              {productCounts?.colors?.[color] && (
-                                <span className="text-xs bg-gray-100 px-1 rounded">
-                                  {productCounts.colors[color]}
-                                </span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+  <button
+    onClick={() => toggleSection('colors')}
+    className="w-full px-4 py-3 flex justify-between items-center text-left font-semibold text-gray-800 hover:bg-gray-50 rounded-t-lg"
+  >
+    <span>🎨 Colores</span>
+    {expandedSections.colors ? (
+      <ChevronUpIcon className="h-4 w-4" />
+    ) : (
+      <ChevronDownIcon className="h-4 w-4" />
+    )}
+  </button>
+  {expandedSections.colors && (
+    <div className="px-4 pb-3">
+      <div className="grid grid-cols-4 gap-3">
+        {filterOptions.colors.map(color => {
+          const colorHex = colorMap[color] || '#CCCCCC';
+          const isSelected = localFilters.colors.includes(color);
+          
+          return (
+            <button
+              key={color}
+              onClick={() => handleColorChange(color)}
+              className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all ${
+                isSelected 
+                  ? 'border-blue-500 bg-blue-50 shadow-md' 
+                  : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
+              title={color}
+            >
+              {/* Cuadrado de color */}
+              <div 
+                className="w-8 h-8 rounded-md border border-gray-200 shadow-inner mb-1"
+                style={{ backgroundColor: colorHex }}
+              />
+              
+              {/* Nombre del color */}
+              <span className={`text-xs font-medium ${
+                isSelected ? 'text-blue-700' : 'text-gray-700'
+              }`}>
+                {color.length > 8 ? `${color.substring(0, 6)}...` : color}
+              </span>
+              
+              {/* Contador */}
+              {productCounts?.colors?.[color] && (
+                <span className="text-[10px] text-gray-500 mt-1">
+                  ({productCounts.colors[color]})
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  )}
+</div>
 
                   {/* Sección de Marcas */}
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
