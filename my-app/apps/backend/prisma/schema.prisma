@@ -25,7 +25,7 @@ model User {
 }
 
 model Product {
-  id                 Int        @id @default(autoincrement())
+  id                 String        @id @default(autoincrement())
   newId       String?    @unique // ← NUEVO CAMPO TEMPORAL
   name               String
   price              Float
