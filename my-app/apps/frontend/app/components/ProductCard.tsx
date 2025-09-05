@@ -152,7 +152,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
           {imageLoading && <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>}
           <Image
             src={imageSrc}
-            alt={product.id}
+            alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
             unoptimized={true}
@@ -182,7 +182,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
                       {colorImage && !hasError ? (
                         <Image
                           src={colorImage}
-                          alt={`${product.id} - ${color}`}
+                          alt={`${product.name} - ${color}`}
                           fill
                           className="object-cover"
                           onError={() => handleColorImageError(color)}
@@ -212,7 +212,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             )}
           </div>
 
-          <h3 className="font-light text-s mb-2 p-2 line-clamp-2 text-gray-900">{product.id}</h3>
+          <h3 className="font-light text-s mb-2 p-2 line-clamp-2 text-gray-900">{product.name}</h3>
           {product.brand && <p className="text-sm text-gray-900 mb-1 ml-2 font-medium">{product.brand}</p>}
 
           <div className="flex items-center text-sm text-gray-500 mb-3 ml-2">
