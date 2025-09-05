@@ -10,7 +10,6 @@ interface ProductCardProps {
   product: Product;
   showNewBadge?: boolean;
   priority?: boolean;
-  
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -146,14 +145,14 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
         )}
       </button>
 
-      {/* ✅ CORREGIDO: Usar product.newId en lugar de product.slug || product.id */}
-      <Link href={`/producto/${product.newId || product.id}`} className="block relative flex-grow">
+      {/* ✅ CORREGIDO: Usar product.newId */}
+      <Link href={`/producto/${product.newId}`} className="block relative flex-grow">
         {/* Imagen principal */}
         <div className="relative h-90 w-full overflow-hidden">
           {imageLoading && <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>}
           <Image
             src={imageSrc}
-            alt={product.name}
+            alt={product.id}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300 z-10"
             unoptimized={true}
@@ -183,7 +182,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
                       {colorImage && !hasError ? (
                         <Image
                           src={colorImage}
-                          alt={`${product.name} - ${color}`}
+                          alt={`${product.id} - ${color}`}
                           fill
                           className="object-cover"
                           onError={() => handleColorImageError(color)}
@@ -213,7 +212,7 @@ export default function ProductCard({ product, showNewBadge = false, priority = 
             )}
           </div>
 
-          <h3 className="font-light text-s mb-2 p-2 line-clamp-2 text-gray-900">{product.name}</h3>
+          <h3 className="font-light text-s mb-2 p-2 line-clamp-2 text-gray-900">{product.id}</h3>
           {product.brand && <p className="text-sm text-gray-900 mb-1 ml-2 font-medium">{product.brand}</p>}
 
           <div className="flex items-center text-sm text-gray-500 mb-3 ml-2">
