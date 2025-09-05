@@ -1,11 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { JsonValue } from '@prisma/client/runtime/library';
-import { IdGeneratorService } from '../../common/service/id-generator.service';
+import { IdGeneratorService } from '../../common/services/id-generator.service'; // ← Corregido
 
-// Interfaz actualizada para el producto de Prisma (ID como string)
+// Interfaz actualizada para el producto de Prisma
 interface PrismaProduct {
-  id: string; // ← CAMBIO: Ahora es string
+  id: number; // ← MANTENER como number hasta cambiar el schema
+  newId: string | null; // ← Corregido mayúscula
+  brand?: string | null;
+  discountPercentage?: number | null;
+  reviewCount?: number | null;
+  rating?: number | null;
+  stockQuantity?: number | null;
+  specifications?: JsonValue;
   name: string;
   description: string | null;
   price: number;
@@ -31,7 +38,7 @@ interface PrismaProduct {
 export class ProductsService {
   constructor(
     private prisma: PrismaService,
-    private idGenerator: IdGeneratorService // ← Nuevo servicio inyectado
+    private idGenerator: IdGeneratorService
   ) {}
 
   private buildImageUrl(imagePath: string): string {
@@ -46,22 +53,17 @@ export class ProductsService {
     return `${host}/assets/images/${imagePath}`;
   }
 
-  // Función segura para manejar colorImages como JsonValue
   private parseColorImages(colorImages: JsonValue | null | undefined): Record<string, string[]> {
-    if (!colorImages || typeof colorImages !== 'object' || colorImages === null) {
-      return {};
-    }
+    if (!colorImages || typeof colorImages !== 'object' || colorImages === null) return {};
     
     try {
       const parsed = colorImages as Record<string, unknown>;
       const result: Record<string, string[]> = {};
-      
       for (const [color, value] of Object.entries(parsed)) {
         if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
           result[color] = value as string[];
         }
       }
-      
       return result;
     } catch {
       return {};
@@ -78,15 +80,14 @@ export class ProductsService {
     );
   }
 
-  // ✅ NUEVO MÉTODO: Crear producto con ID semántico
+  // ✅ Crear producto con ID semántico en newId (NO en id principal)
   async createProduct(productData: any) {
     try {
       const newId = await this.idGenerator.generateProductId(productData.category);
-      
       const product = await this.prisma.product.create({
-        data: {
-          ...productData,
-          id: newId
+        data: { 
+          ...productData, 
+          newId // ← Usar newId, NO sobreescribir id principal
         }
       });
 
@@ -95,7 +96,7 @@ export class ProductsService {
       return { 
         ...productTyped, 
         mainImageUrl: this.buildImageUrl(productTyped.mainImage),
-        images: (productTyped.images || []).map((img: string) => this.buildImageUrl(img)),
+        images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
         colorImages: this.buildColorImages(productTyped.colorImages),
       };
     } catch (error) {
@@ -115,16 +116,12 @@ export class ProductsService {
         orderBy: { createdAt: 'desc' },
       });
 
-      if (products.length > 0) {
-        console.log('📦 Estructura real del primer producto:', JSON.stringify(products[0], null, 2));
-      }
-
       const productsWithImages = products.map((p: any) => {
         const product = p as PrismaProduct;
         return {
           ...product,
           mainImageUrl: this.buildImageUrl(product.mainImage),
-          images: (product.images || []).map((img: string) => this.buildImageUrl(img)),
+          images: (product.images || []).map(img => this.buildImageUrl(img)),
           colorImages: this.buildColorImages(product.colorImages),
         };
       });
@@ -136,19 +133,25 @@ export class ProductsService {
     }
   }
 
-  // ✅ ACTUALIZADO: Ahora acepta string ID
+  // ✅ Buscar por ID numérico (porque el ID principal sigue siendo number)
   async getProductById(id: string) {
     try {
-      const product = await this.prisma.product.findUnique({ 
-        where: { id } // ← ID ya es string
+      // Convertir a número porque el ID principal es number
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId)) {
+        throw new NotFoundException('ID de producto inválido');
+      }
+
+      const product = await this.prisma.product.findUnique({
+        where: { id } // ← Buscar por ID numérico
       });
-      
+
       if (!product) throw new NotFoundException('Product not found');
 
       const productTyped = product as unknown as PrismaProduct;
 
-      return { 
-        ...productTyped, 
+      return {
+        ...productTyped,
         mainImageUrl: this.buildImageUrl(productTyped.mainImage),
         images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
         colorImages: this.buildColorImages(productTyped.colorImages),
@@ -172,7 +175,7 @@ export class ProductsService {
         return {
           ...product,
           mainImageUrl: this.buildImageUrl(product.mainImage),
-          images: (product.images || []).map((img: string) => this.buildImageUrl(img)),
+          images: (product.images || []).map(img => this.buildImageUrl(img)),
           colorImages: this.buildColorImages(product.colorImages),
         };
       });
@@ -198,18 +201,13 @@ export class ProductsService {
   }) {
     try {
       const where: any = {};
-
       if (filters.category) where.category = filters.category;
       if (filters.subcategory) where.subcategory = filters.subcategory;
       if (filters.brands) where.brand = { in: filters.brands };
       if (filters.sizes) where.sizes = { hasSome: filters.sizes };
       if (filters.colors) where.colors = { hasSome: filters.colors };
-
       if (filters.priceRange) {
-        where.price = {
-          gte: filters.priceRange[0],
-          lte: filters.priceRange[1],
-        };
+        where.price = { gte: filters.priceRange[0], lte: filters.priceRange[1] };
       }
 
       const page = filters.page || 1;
@@ -232,7 +230,7 @@ export class ProductsService {
         return {
           ...product,
           mainImageUrl: this.buildImageUrl(product.mainImage),
-          images: (product.images || []).map((img: string) => this.buildImageUrl(img)),
+          images: (product.images || []).map(img => this.buildImageUrl(img)),
           colorImages: this.buildColorImages(product.colorImages),
         };
       });
@@ -249,48 +247,29 @@ export class ProductsService {
     }
   }
 
-  // ✅ NUEVO MÉTODO: Migrar IDs existentes
+  // ✅ Migrar IDs existentes (CORREGIDO - sin parámetro)
   async migrateProductIds() {
     try {
-      // Obtener todos los productos con ID numérico (legacy)
-      const products = await this.prisma.product.findMany({
-        where: {
-          id: {
-            not: {
-              contains: '-'
-            }
-          }
-        }
-      });
-
+      const products = await this.prisma.product.findMany();
+      
       let migratedCount = 0;
       const errors: string[] = [];
 
       for (const product of products) {
         try {
-          const newId = await this.idGenerator.migrateExistingProduct(
-            product.id,
-            product.category
-          );
-
-          // Actualizar el producto y sus relaciones en una transacción
-          await this.prisma.$transaction([
-            // Actualizar CartItems
-            this.prisma.cartItem.updateMany({
-              where: { productId: product.id },
-              data: { productId: newId }
-            }),
-            // Actualizar el producto
-            this.prisma.product.update({
-              where: { id: product.id },
-              data: { id: newId }
-            })
-          ]);
+          const newId = await this.idGenerator.generateProductId(product.category);
+          
+          // Solo actualizar el campo newId, NO el id principal
+          await this.prisma.product.update({
+            where: { id: product.id },
+            data: { newId }
+          });
 
           migratedCount++;
-          console.log(`✅ Migrado: ${product.id} -> ${newId}`);
-        } catch (error) {
-          const errorMsg = `Error migrando producto ${product.id}: ${error instanceof Error ? error.message : String(error)}`;
+          console.log(`✅ Migrado: ${product.id} -> newId: ${newId}`);
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : String(error);
+          const errorMsg = `Error migrando producto ${product.id}: ${message}`;
           errors.push(errorMsg);
           console.error(`❌ ${errorMsg}`);
         }
@@ -302,33 +281,32 @@ export class ProductsService {
         total: products.length,
         errors: errors.length > 0 ? errors : undefined
       };
-    } catch (error) {
-      console.error('❌ Error en migración de IDs:', error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('❌ Error en migración de IDs:', message);
       throw new Error('Error durante la migración de IDs');
     }
   }
 
-  // ✅ NUEVO MÉTODO: Buscar producto por ID legacy (para transición)
-  async getProductByIdLegacy(id: number) {
+  // ✅ Buscar por newId en lugar del id numérico
+  async getProductByNewId(newId: string) {
     try {
-      // Buscar si existe un producto con el ID numérico
-      const product = await this.prisma.product.findUnique({ 
-        where: { id: id.toString() } 
+      const product = await this.prisma.product.findFirst({ 
+        where: { newId } 
       });
-      
-      if (product) {
-        const productTyped = product as unknown as PrismaProduct;
-        return { 
-          ...productTyped, 
-          mainImageUrl: this.buildImageUrl(productTyped.mainImage),
-          images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
-          colorImages: this.buildColorImages(productTyped.colorImages),
-        };
-      }
 
-      throw new NotFoundException('Product not found');
-    } catch (error) {
-      console.error('❌ Error fetching product by legacy ID:', error);
+      if (!product) throw new NotFoundException('Product not found');
+
+      const productTyped = product as unknown as PrismaProduct;
+
+      return { 
+        ...productTyped, 
+        mainImageUrl: this.buildImageUrl(productTyped.mainImage),
+        images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
+        colorImages: this.buildColorImages(productTyped.colorImages),
+      };
+    } catch (error: unknown) {
+      console.error('❌ Error fetching product by newId:', error);
       throw error;
     }
   }
