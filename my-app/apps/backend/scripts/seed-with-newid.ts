@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { IdGeneratorService } from '../../common/services/id-generator.service';
+import { IdGeneratorService } from '../src/common/service/id-generator.service';
 
 const prisma = new PrismaClient();
 const idGenerator = new IdGeneratorService();
