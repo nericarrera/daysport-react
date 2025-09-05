@@ -10,7 +10,7 @@ datasource db {
 }
 
 model User {
-  id          String          @id @default(autoincrement())
+  id          String          @id @default(cuid())
   email       String       @unique
   password    String
   name        String?
@@ -25,7 +25,7 @@ model User {
 }
 
 model Product {
-  id                 String        @id @default(autoincrement())
+  id                 String        @id @default(cuid())
   newId       String?    @unique // ← NUEVO CAMPO TEMPORAL
   name               String
   price              Float
@@ -57,7 +57,7 @@ model Product {
 }
 
 model CartItem {
-  id        String     @id @default(autoincrement())
+  id        String     @id @default(cuid())
   cartId    Int
   productId Int
   quantity  Int
@@ -68,7 +68,7 @@ model CartItem {
 }
 
 model Cart {
-  id       String        @id @default(autoincrement())
+  id       String        @id @default(cuid())
   userId   Int        @unique
   user     User       @relation(fields: [userId], references: [id])
   CartItem CartItem[]
@@ -83,7 +83,7 @@ model ResetToken {
 }
 
 model SizeGuide {
-  id          String      @id @default(autoincrement())
+  id          String      @id @default(cuid())
   category    String
   subcategory String?
   measures    Json
