@@ -63,7 +63,7 @@ export class AuthService {
   }
 
   // -------------------- Login --------------------
-  async login(user: { id: number; email: string; name?: string }) {
+  async login(user: { id: String; email: string; name?: string }) {
     const payload = { 
       sub: user.id, 
       email: user.email,
@@ -84,9 +84,9 @@ export class AuthService {
   }
 
   // -------------------- Obtener perfil --------------------
-  async getProfile(userId: number) {
+  async getProfile(userId: String) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id : String(userId) },
       select: {
         id: true,
         email: true,
