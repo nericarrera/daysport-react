@@ -327,7 +327,7 @@ export class ProductService {
     if (filters.limit) params.append('limit', filters.limit.toString());
 
     // ✅ 3. Construir URL final
-    const url = `${API_CONFIG.BASE_URL}/api/products/filtered?${params.toString()}`;
+    const url = `${API_CONFIG.BASE_URL}/api/products/filtered/list?${params.toString()}`;
     console.log('🌐 URL final enviada al backend:', url);
     console.log('=====================================');
 

@@ -1,5 +1,5 @@
 export const conjuntosHombre = [
-  {
+  { newId: "hombre-conjuntos-0001",
     name: "Conjuto Combinado Campera Deportiva y Pantalon",
     price: 55.00,
     originalPrice: 40.00,
@@ -45,6 +45,7 @@ export const conjuntosHombre = [
 
   // SEGUNDO PRODUCTO 
   {
+    newId: "hombre-conjuntos-0002",
     name: "Conjunto Deportivo Verano Remera y Short",
     price: 45.00,
     originalPrice: 50.99,

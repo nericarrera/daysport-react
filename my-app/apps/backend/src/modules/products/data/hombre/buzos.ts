@@ -1,5 +1,5 @@
 export const buzosHombre = [
-  {
+  { newId: "hombree-buzos-0001",
     name: "Buzos de Algodón con Capucha",
     price: 35.00,
     originalPrice: 40.00,

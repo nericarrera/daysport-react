@@ -1,5 +1,6 @@
 export const camperasHombre = [
   {
+    newId: "hombre-camperas-0001",
     name: "Pantalon Corte Chino, Recto",
     price: 36.00,
     originalPrice: 40.00,

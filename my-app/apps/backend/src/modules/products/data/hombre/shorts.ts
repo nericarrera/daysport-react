@@ -1,5 +1,6 @@
 export const shortsHombre = [
   {
+    newId: "hombre-shorts-0001",
     name: "Pantalon Corte Chino, Recto",
     price: 36.00,
     originalPrice: 40.00,
@@ -51,6 +52,7 @@ export const shortsHombre = [
 
   // SEGUNDO PRODUCTO 
   {
+    newId: "hombre-shorts-0002",
     name: "Polo Deportivo Infantil Active Fit",
     price: 25.99,
     originalPrice: 32.99,

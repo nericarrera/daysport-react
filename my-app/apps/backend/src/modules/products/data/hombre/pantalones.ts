@@ -1,5 +1,5 @@
 export const pantalonesHombre = [
-  {
+  { newId: "hombre-pantalones-0001",
     name: "Pantalon Corte Chino, Recto",
     price: 36.0,
     originalPrice: 40.0,
@@ -45,6 +45,7 @@ export const pantalonesHombre = [
   },
 
   {
+    newId: "hombre-pantalones-0002",
     name: "Polo Deportivo Infantil Active Fit",
     price: 25.99,
     originalPrice: 32.99,
