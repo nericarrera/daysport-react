@@ -135,32 +135,32 @@ export class ProductsService {
 
   // ✅ Buscar por ID numérico (porque el ID principal sigue siendo number)
   async getProductById(id: string) {
-    try {
-      // Convertir a número porque el ID principal es number
-      const numericId = parseInt(id, 10);
-      if (isNaN(numericId)) {
-        throw new NotFoundException('ID de producto inválido');
-      }
-
-      const product = await this.prisma.product.findUnique({
-        where: { id } // ← Buscar por ID numérico
-      });
-
-      if (!product) throw new NotFoundException('Product not found');
-
-      const productTyped = product as unknown as PrismaProduct;
-
-      return {
-        ...productTyped,
-        mainImageUrl: this.buildImageUrl(productTyped.mainImage),
-        images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
-        colorImages: this.buildColorImages(productTyped.colorImages),
-      };
-    } catch (error) {
-      console.error('❌ Error fetching product:', error);
-      throw error;
+  try {
+    // Convertir a número porque el ID principal es number
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      throw new NotFoundException('ID de producto inválido');
     }
+
+    const product = await this.prisma.product.findUnique({
+      where: { id } // ← Usar el número convertido
+    });
+
+    if (!product) throw new NotFoundException('Product not found');
+
+    const productTyped = product as unknown as PrismaProduct;
+
+    return {
+      ...productTyped,
+      mainImageUrl: this.buildImageUrl(productTyped.mainImage),
+      images: (productTyped.images || []).map(img => this.buildImageUrl(img)),
+      colorImages: this.buildColorImages(productTyped.colorImages),
+    };
+  } catch (error) {
+    console.error('❌ Error fetching product:', error);
+    throw error;
   }
+}
 
   async getFeaturedProducts() {
     try {
