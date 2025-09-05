@@ -73,17 +73,33 @@ export class ProductsController {
     }
   }
 
-  // GET /api/products/:id
-  @Get(':id')
-  async getProductById(@Param('id') id: string) {
+  // GET /api/products/:identifier - ✅ ACTUALIZADO para aceptar ID o newId
+  @Get(':identifier')
+  async getProductById(@Param('identifier') identifier: string) {
     try {
-      const product = await this.productsService.getProductById(String(id));
-      if (!product) {
-        throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+      // Detectar si es ID de Prisma (24 caracteres hexadecimales)
+      const isPrismaId = /^[a-f0-9]{24}$/.test(identifier);
+      
+      let product;
+      if (isPrismaId) {
+        product = await this.productsService.getProductById(identifier);
+      } else {
+        product = await this.productsService.getProductByNewId(identifier);
       }
+      
+      if (!product) {
+        throw new NotFoundException(`Producto con ID ${identifier} no encontrado`);
+      }
+      
       return product;
     } catch (error) {
       console.error('❌ Error en getProductById:', error);
+      
+      // Mejor mensaje de error según el tipo
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      
       throw new BadRequestException('Error al obtener el producto');
     }
   }
