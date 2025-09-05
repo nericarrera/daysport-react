@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { camperaslivianasHombre } from '../src/modules/products/data/hombre/camperas-livianas';
+import { camperaslivianasHombre } from '../modules/products/data/hombre/camperas-livianas';
 
 
 const prisma = new PrismaClient();
