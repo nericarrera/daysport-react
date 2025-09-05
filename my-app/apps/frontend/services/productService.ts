@@ -395,42 +395,38 @@ export class ProductService {
 
           // ✅ CORRECCIÓN COMPLETA: Filtrar por colores de forma segura
           if (filters.colors) {
-            try {
-              // @ts-ignore - Ignorar TypeScript momentáneamente
-              const colorsArray = Array.isArray(filters.colors) ? filters.colors : [filters.colors];
-              
-              // @ts-ignore  
-              const normalizedFilterColors = colorsArray.map(color => {
-                return String(color).toLowerCase();
-              }).filter(color => color && color !== '');
+  try {
+    const colorsArray = Array.isArray(filters.colors) ? filters.colors : [filters.colors];
+    
+    const normalizedFilterColors = colorsArray
+      .filter(color => typeof color === 'string')
+      .map(color => (color as string).toLowerCase().trim())
+      .filter(color => color !== '');
 
-              if (normalizedFilterColors.length > 0) {
-                filteredProducts = filteredProducts.filter(product => {
-                  if (!product.colors) return false;
-                  
-                  try {
-                    // @ts-ignore
-                    const normalizedProductColors = typeof product.colors === 'string' 
-                      ? [product.colors.toLowerCase()]
-                      // @ts-ignore  
-                      : Array.isArray(product.colors) 
-                        ? product.colors.map(c => String(c).toLowerCase()).filter(c => c && c !== '')
-                        : [];
-                    
-                    return normalizedFilterColors.some(filterColor =>
-                      normalizedProductColors.some(productColor =>
-                        productColor.includes(filterColor)
-                      )
-                    );
-                  } catch {
-                    return false;
-                  }
-                });
-              }
-            } catch (error) {
-              console.warn('Error en filtro de colores (approach nuclear):', error);
-            }
-          }
+    if (normalizedFilterColors.length > 0) {
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.colors) return false;
+        
+        const productColors = Array.isArray(product.colors) 
+          ? product.colors 
+          : [product.colors];
+        
+        const normalizedProductColors = productColors
+          .filter(color => typeof color === 'string')
+          .map(color => (color as string).toLowerCase().trim())
+          .filter(color => color !== '');
+        
+        return normalizedFilterColors.some(filterColor =>
+          normalizedProductColors.some(productColor =>
+            productColor.includes(filterColor)
+          )
+        );
+      });
+    }
+  } catch (error) {
+    console.warn('Error en filtro de colores:', error);
+  }
+}
           
           // ✅ CORRECCIÓN: Filtrar por marcas de forma segura
           if (filters.brands) {
