@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { JsonValue } from '@prisma/client/runtime/library';
-import { IdGeneratorService } from '../../common/services/id-generator.service';
+import { IdGeneratorService } from '../../common/service/id-generator.service';
 
 // Interfaz actualizada para el producto de Prisma (ID como string)
 interface PrismaProduct {
@@ -90,7 +90,7 @@ export class ProductsService {
         }
       });
 
-      const productTyped = product as PrismaProduct;
+      const productTyped = product as unknown as PrismaProduct;
 
       return { 
         ...productTyped, 
@@ -140,12 +140,12 @@ export class ProductsService {
   async getProductById(id: string) {
     try {
       const product = await this.prisma.product.findUnique({ 
-        where: { id } // ← Ahora busca por string ID
+        where: { id } // ← ID ya es string
       });
       
       if (!product) throw new NotFoundException('Product not found');
 
-      const productTyped = product as PrismaProduct;
+      const productTyped = product as unknown as PrismaProduct;
 
       return { 
         ...productTyped, 
@@ -252,7 +252,7 @@ export class ProductsService {
   // ✅ NUEVO MÉTODO: Migrar IDs existentes
   async migrateProductIds() {
     try {
-      // Obtener todos los productos con ID numérico
+      // Obtener todos los productos con ID numérico (legacy)
       const products = await this.prisma.product.findMany({
         where: {
           id: {
@@ -269,7 +269,7 @@ export class ProductsService {
       for (const product of products) {
         try {
           const newId = await this.idGenerator.migrateExistingProduct(
-            parseInt(product.id, 10),
+            product.id,
             product.category
           );
 
@@ -290,7 +290,7 @@ export class ProductsService {
           migratedCount++;
           console.log(`✅ Migrado: ${product.id} -> ${newId}`);
         } catch (error) {
-          const errorMsg = `Error migrando producto ${product.id}: ${error.message}`;
+          const errorMsg = `Error migrando producto ${product.id}: ${error instanceof Error ? error.message : String(error)}`;
           errors.push(errorMsg);
           console.error(`❌ ${errorMsg}`);
         }
@@ -317,7 +317,7 @@ export class ProductsService {
       });
       
       if (product) {
-        const productTyped = product as PrismaProduct;
+        const productTyped = product as unknown as PrismaProduct;
         return { 
           ...productTyped, 
           mainImageUrl: this.buildImageUrl(productTyped.mainImage),

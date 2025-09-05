@@ -14,7 +14,8 @@ export class IdGeneratorService {
       'niños': 'nino',
       'accesorios': 'acc',
       'accesorio': 'acc',
-      'unisex': 'uni'
+      'unisex': 'uni',
+      'infantil': 'nino'
     };
 
     return prefixMap[category.toLowerCase()] || 'prod';
@@ -27,7 +28,7 @@ export class IdGeneratorService {
     const lastProduct = await this.prisma.product.findFirst({
       where: {
         id: {
-          startsWith: prefix
+          startsWith: prefix + '-'
         }
       },
       orderBy: {
@@ -40,9 +41,10 @@ export class IdGeneratorService {
 
     let nextNumber = 1;
     
-    if (lastProduct && lastProduct.id.startsWith(prefix)) {
+    if (lastProduct) {
       // Extraer el número del último ID
-      const match = lastProduct.id.match(new RegExp(`${prefix}-(\\d+)$`));
+      const idString = lastProduct.id.toString(); // ← Asegurar que es string
+      const match = idString.match(new RegExp(`${prefix}-(\\d+)$`));
       if (match && match[1]) {
         nextNumber = parseInt(match[1], 10) + 1;
       }
@@ -51,9 +53,28 @@ export class IdGeneratorService {
     return `${prefix}-${nextNumber.toString().padStart(4, '0')}`;
   }
 
-  // Para migrar productos existentes
-  async migrateExistingProduct(oldId: number, category: string): Promise<string> {
+  // Para migrar productos existentes (versión segura)
+  async migrateExistingProduct(oldId: string, category: string): Promise<string> {
     const prefix = this.getCategoryPrefix(category);
-    return `${prefix}-${oldId.toString().padStart(4, '0')}`;
+    return `${prefix}-${oldId.padStart(4, '0')}`;
+  }
+
+  // ✅ NUEVO MÉTODO: Para manejar la transición
+  async findProductById(id: string | number) {
+    if (typeof id === 'number') {
+      // Buscar por ID numérico durante la transición
+      return this.prisma.product.findFirst({
+        where: {
+          OR: [
+            { id: id.toString() }, // Para IDs ya migrados
+            { id: id.toString() }  // Para IDs numéricos legacy
+          ]
+        }
+      });
+    }
+    
+    return this.prisma.product.findUnique({
+      where: { id }
+    });
   }
 }
