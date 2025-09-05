@@ -14,6 +14,7 @@ export const conjuntosHombre = [
       "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg"  // Azul - lateral
     ],
     mainImage: "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg",
+    hoverImage: "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verdeoliva-1.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
@@ -59,6 +60,7 @@ export const conjuntosHombre = [
       "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg"  // Negro - detalle
     ],
     mainImage: "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
+    hoverImage: "/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
 
     colorImages: {
       "negro": [

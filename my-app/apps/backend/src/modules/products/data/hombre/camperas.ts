@@ -15,8 +15,7 @@ export const camperasHombre = [
       "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"  // Azul - lateral
     ],
     mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
-
-    detailImages: [],
+    hoverImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {

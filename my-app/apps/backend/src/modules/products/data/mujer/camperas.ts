@@ -1,5 +1,6 @@
 export const camperasMujer = [
   {
+    newId: "mujer-camperas-0001",
     name: "Conjunto Deportivo Infantil Sport Pro",
     price: 35.99,
     originalPrice: 45.99,
@@ -14,6 +15,7 @@ export const camperasMujer = [
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500"  // Azul - lateral
     ],
     mainImage: "https://images.unsplash.com/photo-1506629905877-52a5ca6d63b1?w=500",
+    hoverImage: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {
@@ -65,6 +67,7 @@ export const camperasMujer = [
 
   // SEGUNDO PRODUCTO NIÑO - Polo Deportivo
   {
+    newId: "mujer-camperas-0002",
     name: "Polo Deportivo Infantil Active Fit",
     price: 25.99,
     originalPrice: 32.99,
@@ -78,6 +81,7 @@ export const camperasMujer = [
       "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"  // Negro - detalle
     ],
     mainImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
+    hoverImage:  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
 
     colorImages: {
       "negro": [

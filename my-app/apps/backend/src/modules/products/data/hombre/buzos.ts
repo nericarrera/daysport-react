@@ -1,5 +1,5 @@
 export const buzosHombre = [
-  { newId: "hombree-buzos-0001",
+  { newId: "hombre-buzos-0001",
     name: "Buzos de Algodón con Capucha",
     price: 35.00,
     originalPrice: 40.00,
@@ -14,6 +14,7 @@ export const buzosHombre = [
       "/images/hombre/buzos/buzos-algodon-frizado-concapucha-2.jpeg"  // Azul - lateral
     ],
     mainImage: "/images/hombre/buzos/buzos-algodon-frizado-concapucha-1.jpeg",
+    hoverImage: "/images/hombre/buzos/buzos-algodon-frizado-concapucha-2.jpeg",
 
     // Imágenes detalladas por color (6-8 fotos por color)
     colorImages: {

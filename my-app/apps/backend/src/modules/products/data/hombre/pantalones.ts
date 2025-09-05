@@ -14,6 +14,7 @@ export const pantalonesHombre = [
       "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-2.jpeg"
     ],
     mainImage: "/images/hombre/pantalones/pantalon-gabardina-recto-chocolate-1.jpeg",
+    hoverImage:"/images/hombre/conjuntos/conjunto-deportivo-liviano-combinado-verano-blanco-1.jpeg",
 
     // ✅ RUTAS RELATIVAS - CORREGIDO
     colorImages: {
@@ -59,6 +60,7 @@ export const pantalonesHombre = [
       "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"
     ],
     mainImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
+     hoverImage: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",
 
     colorImages: {
       "negro": [
