@@ -3,12 +3,24 @@ import { camperaslivianasHombre } from '../src/modules/products/data/hombre/camp
 
 const prisma = new PrismaClient();
 
+// ✅ Función para manejar errores de forma segura
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  } else if (typeof error === 'string') {
+    return error;
+  } else {
+    return 'Error desconocido';
+  }
+}
+
 async function insertProducts() {
   try {
     console.log('🚀 Insertando productos de camperas ligeras para hombre...');
     
     let insertedCount = 0;
     let skippedCount = 0;
+    let errorCount = 0;
     
     for (const productData of camperaslivianasHombre) {
       try {
@@ -54,18 +66,26 @@ async function insertProducts() {
         console.log(`✅ ${product.newId} - ${product.name}`);
         
       } catch (error) {
-        console.error(`❌ Error insertando ${productData.newId}:`, error.message);
+        errorCount++;
+        console.error(`❌ Error insertando ${productData.newId}:`, getErrorMessage(error));
       }
     }
     
-    console.log(`🎉 Inserción completada! ${insertedCount} insertados, ${skippedCount} saltados`);
+    console.log(`🎉 Inserción completada!`);
+    console.log(`✅ ${insertedCount} productos insertados`);
+    console.log(`⏭️  ${skippedCount} productos saltados (ya existían)`);
+    console.log(`❌ ${errorCount} productos con errores`);
+    console.log(`📊 Total procesados: ${camperaslivianasHombre.length}`);
     
   } catch (error) {
-    console.error('❌ Error en inserción:', error);
+    console.error('❌ Error general en inserción:', getErrorMessage(error));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-// Ejecutar la inserción
-insertProducts();
+// Ejecutar la inserción con manejo de errores
+insertProducts().catch(error => {
+  console.error('❌ Error inesperado:', getErrorMessage(error));
+  process.exit(1);
+});
